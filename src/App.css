@@ -1,0 +1,626 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6f9;
+  color: #333;
+}
+
+/* --- BARRA DE NAVEGACIÓN --- */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #004080;
+  padding: 15px 40px;
+  color: white;
+  flex-wrap: wrap;
+  gap: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-brand {
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-link-btn {
+  background: transparent;
+  color: white;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.nav-link-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.nav-link-btn.activo {
+  background-color: rgba(255, 255, 255, 0.25);
+  font-weight: bold;
+}
+
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.welcome-user {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.login-nav-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.login-nav-btn:hover {
+  background-color: #c0392b;
+}
+
+/* --- CONTENEDOR PRINCIPAL AMPLIADO PARA PC --- */
+.hero-section {
+  padding: 30px 40px;
+  width: 100%;
+  max-width: 1500px; /* Ampliado para que ocupe bien la pantalla de la PC */
+  margin: 0 auto;
+  min-height: calc(100vh - 90px);
+  box-sizing: border-box;
+}
+
+.dashboard-container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- 1. HERO BANNER PRINCIPAL --- */
+.focus-hero-banner-main {
+  background: linear-gradient(110deg, #0052cc 0%, #002b80 100%);
+  border-radius: 16px;
+  padding: 45px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 10px 25px rgba(0, 82, 204, 0.25);
+}
+
+.hero-banner-content {
+  flex: 1;
+}
+
+.hero-tag {
+  background: rgba(255, 255, 255, 0.18);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+.hero-banner-content h1 {
+  font-size: 42px;
+  line-height: 1.15;
+  margin: 0 0 20px 0;
+  font-weight: 800;
+}
+
+.text-highlight {
+  color: #00e6ff;
+}
+
+.hero-stats-badge {
+  background: #ff8800;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  display: inline-flex;
+  flex-direction: column;
+  margin-bottom: 25px;
+}
+
+.hero-stats-badge strong {
+  font-size: 24px;
+}
+
+.hero-action-btn {
+  background: white;
+  color: #0052cc;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+  display: block;
+}
+
+.hero-action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.hero-banner-image {
+  flex-shrink: 0;
+}
+
+.hero-banner-image img {
+  width: 420px;
+  height: 270px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* --- 2. TARJETAS DE CATEGORÍA CORREGIDAS (Más espacio y texto visible) --- */
+.category-section {
+  margin-bottom: 40px;
+}
+
+.section-main-title {
+  text-align: center;
+  font-size: 30px;
+  color: #003366;
+  margin-bottom: 5px;
+}
+
+.section-sub-title {
+  text-align: center;
+  color: #0056b3;
+  margin-bottom: 25px;
+  font-size: 16px;
+}
+
+.category-cards-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.category-card-btn {
+  background: white;
+  border: 2px solid #e2e8f0;
+  padding: 15px 25px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 220px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+.category-card-btn:hover {
+  border-color: #0052cc;
+  transform: translateY(-2px);
+}
+
+.category-card-btn.active {
+  background: #0052cc;
+  border-color: #0052cc;
+  color: white;
+}
+
+.cat-icon-box {
+  background: #eef4ff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 22px;
+}
+
+.category-card-btn.active .cat-icon-box {
+  background: rgba(255,255,255,0.2);
+}
+
+.cat-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.cat-text strong {
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.cat-text small {
+  opacity: 0.8;
+  font-size: 12px;
+}
+
+/* --- 3. CUADRÍCULA DE CURSOS (Se adapta perfectamente en PC) --- */
+.courses-grid-focus {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.focus-card-item {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.focus-card-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.card-image-wrapper {
+  position: relative;
+  height: 200px;
+}
+
+.card-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge-status {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #10b981;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.badge-type {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #0052cc;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.card-body-content {
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+.card-body-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 19px;
+  color: #1e293b;
+}
+
+.card-body-content p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 20px;
+  background: #f8fafc;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.card-action-btn {
+  background: #0052cc;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.card-action-btn:hover {
+  background: #003d99;
+}
+
+/* --- ESTILOS DE LA VENTANA MODAL --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background: white;
+  padding: 35px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 26px;
+  cursor: pointer;
+  color: #666;
+}
+
+.join-live-btn {
+  width: 100%;
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background 0.2s;
+}
+
+.join-live-btn:hover {
+  background: #218838;
+}
+
+/* --- PANTALLA DE LOGIN --- */
+.app-container.login-fondo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #003366, #0056b3);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.login-box {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-header-brand {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.login-header-brand h2 {
+  margin: 10px 0 0 0;
+  color: #222;
+  font-size: 22px;
+}
+
+.input-group {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #444;
+  font-weight: 500;
+}
+
+.input-group input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: #003d82;
+}
+
+.login-msg {
+  text-align: center;
+  margin-top: 15px;
+  font-weight: bold;
+  color: #d9534f;
+  font-size: 14px;
+}
+
+/* --- CONTENEDORES ADICIONALES --- */
+.cert-container, .info-container {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  max-width: 600px;
+  margin: 40px auto;
+  text-align: center;
+}
+
+/* --- MEDIA QUERIES PARA DISPOSITIVOS MÓVILES --- */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 20px;
+  }
+  .navbar {
+    padding: 15px 20px;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .nav-links {
+    justify-content: center;
+  }
+
+  .user-area {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .focus-hero-banner-main {
+    flex-direction: column;
+    padding: 25px;
+    text-align: center;
+  }
+  .hero-banner-image img {
+    width: 100%;
+    height: 180px;
+  }
+}
+/* --- CONTENEDOR PRINCIPAL FLUIDO PARA PC --- */
+.hero-section {
+  padding: 30px 50px;
+  width: 100%;
+  max-width: 100%; /* Ocupa todo el ancho de la pantalla de forma fluida */
+  margin: 0 auto;
+  min-height: calc(100vh - 90px);
+  box-sizing: border-box;
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 1400px; /* Límite cómodo para que no se estire demasiado en monitores gigantes */
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* --- CORRECCIÓN DE TEXTOS EN BOTONES DE CATEGORÍA --- */
+.category-card-btn {
+  background: white;
+  border: 2px solid #e2e8f0;
+  padding: 15px 25px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 220px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  color: #1e293b; /* Asegura que el texto por defecto sea oscuro y visible */
+}
+
+.category-card-btn:hover {
+  border-color: #0052cc;
+  transform: translateY(-2px);
+}
+
+.category-card-btn.active {
+  background: #0052cc;
+  border-color: #0052cc;
+  color: white;
+}
+
+.cat-icon-box {
+  background: #eef4ff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 22px;
+}
+
+.category-card-btn.active .cat-icon-box {
+  background: rgba(255,255,255,0.2);
+}
+
+.cat-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.cat-text strong {
+  font-size: 15px;
+  margin-bottom: 2px;
+  color: #1e293b; /* Texto oscuro visible en botones inactivos */
+}
+
+.category-card-btn.active .cat-text strong,
+.category-card-btn.active .cat-text small {
+  color: white; /* Texto blanco solo cuando está activo */
+}
+
+.cat-text small {
+  opacity: 0.8;
+  font-size: 12px;
+  color: #64748b;
+}
+/* Hacer que el contenedor principal ocupe todo el ancho disponible */
+.app-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Si quieres que el contenido interior se mantenga bien alineado y amplio */
+.dashboard-container, .hero-section {
+  width: 100% !important;
+  max-width: 1400px; /* Puedes subir este valor o poner 100% */
+  margin: 0 auto;
+  padding: 20px;
+}
