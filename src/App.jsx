@@ -14,6 +14,9 @@ export default function App() {
     return localStorage.getItem('rolUsuario') || '';
   });
 
+  // Estado para el menú desplegable en celulares
+  const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
+
   const [modalidadFiltro, setModalidadFiltro] = useState('virtual'); 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todas');
   const [busqueda, setBusqueda] = useState('');
@@ -26,6 +29,7 @@ export default function App() {
   const seccionUsuariosRef = useRef(null);
 
   const irASeccion = (ref) => {
+    setMenuMovilAbierto(false); // Cierra menú en móvil al hacer click
     if (ref && ref.current) {
       ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -272,10 +276,10 @@ export default function App() {
   // VISTA DE LOGIN FORMAL Y LIMPIO
   if (!sesionIniciada) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f172a', padding: '20px' }}>
-        <div style={{ background: '#ffffff', padding: '40px', borderRadius: '16px', width: '100%', maxWidth: '420px', boxShadow: '0 25px 50px rgba(0,0,0,0.35)', border: '1px solid #1e293b' }}>
+      <div style={{ minHeight: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f172a', padding: '20px', boxSizing: 'border-box' }}>
+        <div style={{ background: '#ffffff', padding: '40px 30px', borderRadius: '16px', width: '100%', maxWidth: '420px', boxShadow: '0 25px 50px rgba(0,0,0,0.35)', border: '1px solid #1e293b', boxSizing: 'border-box' }}>
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ color: '#0f172a', margin: '0 0 6px 0', fontSize: '22px', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
+            <h2 style={{ color: '#0f172a', margin: '0 0 6px 0', fontSize: '24px', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
             <p style={{ color: '#64748b', fontSize: '13px', margin: 0, fontWeight: '500' }}>Sistema de Gestión Académica & Aula Virtual</p>
           </div>
 
@@ -317,84 +321,94 @@ export default function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
+    <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
       
-      {/* NAVBAR SUPERIOR FIJO */}
-      <header style={{ background: '#0f172a', color: '#fff', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 1000 }}>
+      {/* NAVBAR SUPERIOR EDGE-TO-EDGE */}
+      <header style={{ width: '100%', background: '#091e42', color: '#fff', padding: '15px 25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 1000, flexWrap: 'wrap', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '16px', color: '#38bdf8' }}>Pórtico San Marcos</h2>
+            <h2 style={{ margin: 0, fontSize: '18px', color: '#38bdf8', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
             <span style={{ fontSize: '11px', color: '#94a3b8' }}>Aula Virtual & Biblioteca 3D</span>
           </div>
         </div>
 
-        {/* PESTAÑAS CON PESTAÑA CURSOS INCLUIDA */}
-        <nav style={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
-          <button 
-            onClick={() => irASeccion(seccionInicioRef)}
-            style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}
-          >
-            Inicio
-          </button>
+        {/* BOTÓN HAMBURGUESA PARA CELULAR */}
+        <button 
+          onClick={() => setMenuMovilAbierto(!menuMovilAbierto)}
+          style={{ display: 'none', background: 'none', border: 'none', color: '#fff', fontSize: '26px', cursor: 'pointer' }}
+          className="mobile-btn-toggle"
+        >
+          ☰
+        </button>
 
-          <button 
-            onClick={() => irASeccion(seccionCursosRef)}
-            style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}
-          >
-            Cursos
-          </button>
+        {/* PESTAÑAS */}
+        <nav className={`navbar-menu-items ${menuMovilAbierto ? 'abierto' : ''}`} style={{ display: 'flex', gap: '22px', alignItems: 'center' }}>
+          <button onClick={() => irASeccion(seccionInicioRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Inicio</button>
+          <button onClick={() => irASeccion(seccionCursosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Cursos</button>
           
           {rolUsuario === 'alumno' && (
-            <button 
-              onClick={() => irASeccion(seccionDocentesRef)}
-              style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}
-            >
-              Docentes
-            </button>
+            <button onClick={() => irASeccion(seccionDocentesRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Docentes</button>
           )}
 
-          <button 
-            onClick={() => irASeccion(seccionBibliotecaRef)}
-            style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}
-          >
-            Biblioteca 3D
-          </button>
+          <button onClick={() => irASeccion(seccionBibliotecaRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Biblioteca 3D</button>
 
           {rolUsuario === 'docente' && (
-            <button 
-              onClick={() => irASeccion(seccionUsuariosRef)}
-              style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}
-            >
-              Usuarios
-            </button>
+            <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios</button>
           )}
-        </nav>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <div style={{ textAlign: 'right' }}>
-            <span style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#fff' }}>{usuarioLogueado}</span>
-            <span style={{ fontSize: '11px', color: '#38bdf8', textTransform: 'uppercase' }}>{rolUsuario}</span>
+          <div className="navbar-user-info" style={{ display: 'flex', alignItems: 'center', gap: '15px', marginLeft: '10px' }}>
+            <div style={{ textAlign: 'right' }}>
+              <span style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#fff' }}>{usuarioLogueado}</span>
+              <span style={{ fontSize: '11px', color: '#38bdf8', textTransform: 'uppercase', fontWeight: 'bold' }}>{rolUsuario}</span>
+            </div>
+            <button onClick={cerrarSesion} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>
+              Cerrar Sesión
+            </button>
           </div>
-          <button onClick={cerrarSesion} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>
-            Cerrar Sesión
-          </button>
-        </div>
+        </nav>
       </header>
 
-      {/* CONTENIDO PRINCIPAL CONTINUO */}
-      <main style={{ flex: 1, padding: '30px 0', display: 'flex', flexDirection: 'column', gap: '40px' }}>
+      {/* REGLA DINÁMICA DEL MENÚ CELULAR */}
+      <style>{`
+        @media (max-width: 860px) {
+          .mobile-btn-toggle {
+            display: block !important;
+          }
+          .navbar-menu-items {
+            display: none !important;
+            width: 100%;
+            flex-direction: column;
+            align-items: flex-start !important;
+            padding-top: 15px;
+            gap: 15px !important;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 12px;
+          }
+          .navbar-menu-items.abierto {
+            display: flex !important;
+          }
+          .navbar-user-info {
+            width: 100%;
+            justify-content: space-between;
+            margin-left: 0 !important;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+          }
+        }
+      `}</style>
+
+      {/* CONTENIDO PRINCIPAL */}
+      <main style={{ flex: 1, padding: '30px 0', display: 'flex', flexDirection: 'column', gap: '40px', width: '100%' }}>
         
-        {/* SECCIÓN 1: INICIO */}
-        <div ref={seccionInicioRef} style={{ width: '100%', maxWidth: '100%', padding: '0 20px', scrollMarginTop: '90px' }}>
-          <div className="dashboard-container" style={{ width: '100%', maxWidth: '100%', margin: '0 auto' }}>
-            
-            {/* HERO BANNER DINÁMICO */}
-            <div className="focus-hero-banner-main" style={{ borderRadius: '16px', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2563eb 100%)', boxShadow: '0 10px 25px rgba(0,0,0,0.15)', position: 'relative', overflow: 'hidden', paddingBottom: '45px', marginBottom: '35px' }}>
+        {/* SECCIÓN 1: INICIO & BANNER HERO */}
+        <div ref={seccionInicioRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
+          <div className="dashboard-container">
+            <div className="focus-hero-banner-main">
               <div className="hero-banner-content">
-                <span className="hero-tag" style={{ background: 'rgba(255,255,255,0.15)', color: '#38bdf8', padding: '6px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: 'bold' }}>
+                <span style={{ background: 'rgba(255,255,255,0.15)', color: '#38bdf8', padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>
                   {bannersHero[bannerActual].tag} ({rolUsuario.toUpperCase()})
                 </span>
-                <h1 style={{ color: '#ffffff', marginTop: '15px', fontSize: '34px', lineHeight: '1.2' }}>
+                <h1>
                   {bannersHero[bannerActual].titulo}<br /><span style={{ color: '#38bdf8' }}>{bannersHero[bannerActual].subtitulo}</span>
                 </h1>
                 <div className="hero-stats-badge" style={{ marginTop: '20px', display: 'flex', gap: '20px', background: 'rgba(255,255,255,0.1)', padding: '12px 20px', borderRadius: '12px', backdropFilter: 'blur(10px)', width: 'fit-content' }}>
@@ -405,19 +419,19 @@ export default function App() {
                 </div>
               </div>
               <div className="hero-banner-image">
-                <img src={bannersHero[bannerActual].img} alt="Hero Banner" style={{ borderRadius: '12px', boxShadow: '0 10px 20px rgba(0,0,0,0.3)', transition: 'all 0.5s ease' }} />
+                <img src={bannersHero[bannerActual].img} alt="Hero Banner" />
               </div>
 
-              {/* PUNTITOS */}
-              <div style={{ position: 'absolute', bottom: '15px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '10px', zIndex: 10 }}>
+              {/* PUNTITOS INDICADORES */}
+              <div style={{ position: 'absolute', bottom: '15px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px', zIndex: 10 }}>
                 {bannersHero.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setBannerActual(index)}
                     style={{
-                      width: bannerActual === index ? '24px' : '10px',
-                      height: '10px',
-                      borderRadius: '5px',
+                      width: bannerActual === index ? '22px' : '8px',
+                      height: '8px',
+                      borderRadius: '4px',
                       border: 'none',
                       backgroundColor: bannerActual === index ? '#ef4444' : 'rgba(255,255,255,0.5)',
                       cursor: 'pointer',
@@ -427,26 +441,24 @@ export default function App() {
                 ))}
               </div>
             </div>
-
           </div>
         </div>
 
         {/* SECCIÓN 2: CURSOS Y OFERTA ACADÉMICA */}
-        <div ref={seccionCursosRef} style={{ width: '100%', maxWidth: '100%', padding: '0 20px', scrollMarginTop: '90px' }}>
-          <div className="dashboard-container" style={{ width: '100%', maxWidth: '100%', margin: '0 auto' }}>
-            
-            <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', textAlign: 'left' }}>
-              <h2 style={{ fontSize: '26px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
+        <div ref={seccionCursosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
+          <div className="dashboard-container">
+            <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
                 OFERTA ACADÉMICA & CURSOS
               </h2>
             </div>
 
-            <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '25px', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
-              <div style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap' }}>
+            <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '25px', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+              <div className="filter-bar-responsive" style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <button 
                   onClick={() => { setModalidadFiltro('virtual'); setVideoActivo(null); setLaboratorioSeleccionado(null); }}
                   style={{
-                    padding: '12px 24px',
+                    padding: '10px 20px',
                     borderRadius: '8px',
                     border: 'none',
                     fontWeight: 'bold',
@@ -461,7 +473,7 @@ export default function App() {
                 <button 
                   onClick={() => { setModalidadFiltro('presencial'); setVideoActivo(null); setLaboratorioSeleccionado(null); }}
                   style={{
-                    padding: '12px 24px',
+                    padding: '10px 20px',
                     borderRadius: '8px',
                     border: 'none',
                     fontWeight: 'bold',
@@ -478,12 +490,12 @@ export default function App() {
                   placeholder="Buscar clase o profesor..." 
                   value={busqueda} 
                   onChange={(e) => setBusqueda(e.target.value)}
-                  style={{ marginLeft: 'auto', padding: '10px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', minWidth: '260px', fontSize: '14px' }}
+                  style={{ marginLeft: 'auto', padding: '10px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', minWidth: '240px', outline: 'none' }}
                 />
               </div>
 
               {/* Categorías */}
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
                 <span style={{ fontSize: '13px', color: '#64748b', alignSelf: 'center', fontWeight: 'bold' }}>Categorías:</span>
                 {[
                   { id: 'todas', label: 'Todas' },
@@ -496,7 +508,7 @@ export default function App() {
                     key={cat.id}
                     onClick={() => setCategoriaSeleccionada(cat.id)}
                     style={{
-                      padding: '6px 14px',
+                      padding: '6px 12px',
                       borderRadius: '20px',
                       border: 'none',
                       fontSize: '12px',
@@ -523,12 +535,11 @@ export default function App() {
                 </div>
                 <video controls autoPlay style={{ width: '100%', maxHeight: '420px', borderRadius: '8px', background: '#000' }}>
                   <source src={videoActivo.videoUrl} type="video/mp4" />
-                  Tu navegador no soporta video HTML5.
                 </video>
               </div>
             )}
 
-            {/* TARJETAS DE CLASES */}
+            {/* TARJETAS DE CURSOS */}
             <div className="courses-grid-focus">
               {clasesFiltradas.length > 0 ? (
                 clasesFiltradas.map((item) => (
@@ -542,24 +553,24 @@ export default function App() {
                       <h3>{item.titulo}</h3>
                       <p>{item.desc}</p>
                       
-                      <div className="card-meta" style={{ flexDirection: 'column', gap: '5px', alignItems: 'flex-start' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#475569', marginBottom: '15px' }}>
                         <span><strong>Horario:</strong> {item.horario}</span>
                         <span><strong>Docente:</strong> {item.instructor}</span>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                      <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
                         {item.tipo === 'Virtual' ? (
                           <>
-                            <button className="card-action-btn" onClick={() => setVideoActivo(item)}>
-                              Ver Grabación
+                            <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>
+                              Grabación
                             </button>
-                            <a href={item.enlaceSede} target="_blank" rel="noreferrer" className="card-action-btn" style={{ backgroundColor: '#10b981', textAlign: 'center', textDecoration: 'none' }}>
-                              Ir a Zoom
+                            <a href={item.enlaceSede} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none' }}>
+                              Zoom
                             </a>
                           </>
                         ) : (
-                          <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%', cursor: 'pointer' }}>
-                            Ver Detalles y Ubicación
+                          <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>
+                            Detalles Sede
                           </button>
                         )}
                       </div>
@@ -567,20 +578,19 @@ export default function App() {
                   </div>
                 ))
               ) : (
-                <p style={{ textAlign: 'center', color: '#64748b', gridColumn: '1 / -1', padding: '40px' }}>
-                  No se encontraron clases que coincidan con los criterios.
+                <p style={{ textAlign: 'center', color: '#64748b', gridColumn: '1 / -1', padding: '30px' }}>
+                  No se encontraron clases que coincidan con la búsqueda.
                 </p>
               )}
             </div>
-
           </div>
         </div>
 
-        {/* SECCIÓN 3: DOCENTES E INSTRUCTORES (EXCLUSIVO PARA ALUMNOS) */}
+        {/* SECCIÓN 3: DOCENTES (EXCLUSIVO PARA ALUMNOS) */}
         {rolUsuario === 'alumno' && (
-          <div ref={seccionDocentesRef} style={{ width: '100%', maxWidth: '1150px', margin: '0 auto', padding: '0 20px', scrollMarginTop: '90px' }}>
-            <div style={{ background: '#f8fafc', padding: '30px 25px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px', textAlign: 'left' }}>
+          <div ref={seccionDocentesRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
+            <div className="dashboard-container">
+              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
                 <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
                   DOCENTES & INSTRUCTORES
                 </h2>
@@ -589,7 +599,7 @@ export default function App() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                 {docentesDestacados.map(docente => (
                   <div key={docente.id} style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid #cbd5e1', overflow: 'hidden', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-                    <img src={docente.foto} alt={docente.nombre} style={{ width: '100%', height: '190px', objectFit: 'cover' }} />
+                    <img src={docente.foto} alt={docente.nombre} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
                     <div style={{ padding: '15px' }}>
                       <h3 style={{ margin: '0 0 5px 0', fontSize: '15px', color: '#1e293b', fontWeight: 'bold' }}>{docente.nombre}</h3>
                       <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#2563eb', fontWeight: 'bold' }}>{docente.especialidad}</p>
@@ -605,107 +615,112 @@ export default function App() {
         )}
 
         {/* SECCIÓN 4: BIBLIOTECA DIGITAL Y VISOR 3D */}
-        <div ref={seccionBibliotecaRef} style={{ width: '100%', maxWidth: '1150px', margin: '0 auto', padding: '0 20px', scrollMarginTop: '90px' }}>
-          <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px', textAlign: 'left' }}>
-            <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
-              BIBLIOTECA VIRTUAL & LIBROS INTERACTIVOS (3D)
-            </h2>
-          </div>
+        <div ref={seccionBibliotecaRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
+          <div className="dashboard-container">
+            <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
+                BIBLIOTECA VIRTUAL & LIBROS INTERACTIVOS (3D)
+              </h2>
+            </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-            {listaLibros.map((libro) => (
-              <div key={libro.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
-                <img src={libro.portada} alt={libro.titulo} style={{ width: '100%', height: '210px', objectFit: 'cover' }} />
-                <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                  <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>{libro.categoria}</span>
-                  <h3 style={{ fontSize: '15px', color: '#0f172a', margin: '0 0 8px 0', lineHeight: '1.4', fontWeight: 'bold' }}>{libro.titulo}</h3>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 15px 0' }}>Autor: {libro.autor}</p>
-                  <button 
-                    onClick={() => setLibroSeleccionado(libro.pdfUrl)}
-                    style={{ marginTop: 'auto', padding: '10px 16px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', textAlign: 'center' }}
-                  >
-                    Leer en Flipbook 3D
-                  </button>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
+              {listaLibros.map((libro) => (
+                <div key={libro.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
+                  <img src={libro.portada} alt={libro.titulo} style={{ width: '100%', height: '210px', objectFit: 'cover' }} />
+                  <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '6px' }}>{libro.categoria}</span>
+                    <h3 style={{ fontSize: '15px', color: '#0f172a', margin: '0 0 8px 0', lineHeight: '1.4', fontWeight: 'bold' }}>{libro.titulo}</h3>
+                    <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 15px 0' }}>Autor: {libro.autor}</p>
+                    <button 
+                      onClick={() => setLibroSeleccionado(libro.pdfUrl)}
+                      style={{ marginTop: 'auto', padding: '10px 16px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}
+                    >
+                      Leer en Flipbook 3D
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
         {/* SECCIÓN 5: GESTIÓN DE USUARIOS (SÓLO DOCENTES) */}
         {rolUsuario === 'docente' && (
-          <div ref={seccionUsuariosRef} style={{ width: '100%', maxWidth: '1150px', margin: '0 auto', padding: '0 20px', scrollMarginTop: '90px' }}>
-            <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
-                GESTIÓN DE USUARIOS Y ACCESOS
-              </h2>
-              <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
-                + Nuevo Usuario
-              </button>
-            </div>
+          <div ref={seccionUsuariosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
+            <div className="dashboard-container">
+              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
+                  GESTIÓN DE USUARIOS Y ACCESOS
+                </h2>
+                <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
+                  + Nuevo Usuario
+                </button>
+              </div>
 
-            <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                <thead>
-                  <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontSize: '13px' }}>
-                    <th style={{ padding: '15px' }}>Usuario</th>
-                    <th style={{ padding: '15px' }}>Nombres Completos</th>
-                    <th style={{ padding: '15px' }}>Rol</th>
-                    <th style={{ padding: '15px' }}>Estado</th>
-                    <th style={{ padding: '15px', textAlign: 'right' }}>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {listaUsuarios.map(u => (
-                    <tr key={u.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '14px', color: '#1e293b' }}>
-                      <td style={{ padding: '15px', fontWeight: 'bold' }}>{u.usuario}</td>
-                      <td style={{ padding: '15px' }}>{u.nombres}</td>
-                      <td style={{ padding: '15px' }}>
-                        <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold', backgroundColor: u.rol === 'docente' ? '#e0f2fe' : '#f1f5f9', color: u.rol === 'docente' ? '#0369a1' : '#475569' }}>
-                          {u.rol}
-                        </span>
-                      </td>
-                      <td style={{ padding: '15px' }}>
-                        <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold', backgroundColor: u.estado === 'activo' ? '#dcfce7' : '#fee2e2', color: u.estado === 'activo' ? '#166534' : '#991b1b' }}>
-                          {u.estado}
-                        </span>
-                      </td>
-                      <td style={{ padding: '15px', textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                        <button onClick={() => abrirModalEditarUsuario(u)} style={{ background: '#e2e8f0', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Editar</button>
-                        <button onClick={() => toggleEstadoUsuario(u.id)} style={{ background: u.estado === 'activo' ? '#fee2e2' : '#dcfce7', color: u.estado === 'activo' ? '#991b1b' : '#166534', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
-                          {u.estado === 'activo' ? 'Desactivar' : 'Activar'}
-                        </button>
-                        <button onClick={() => { setUserToReset(u); setModalResetPass(true); }} style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Clave</button>
-                      </td>
+              {/* CONTENEDOR CON SCROLL HORIZONTAL TÁCTIL */}
+              <div className="table-responsive-wrapper">
+                <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontSize: '13px' }}>
+                      <th style={{ padding: '14px' }}>Usuario</th>
+                      <th style={{ padding: '14px' }}>Nombres</th>
+                      <th style={{ padding: '14px' }}>Rol</th>
+                      <th style={{ padding: '14px' }}>Estado</th>
+                      <th style={{ padding: '14px', textAlign: 'right' }}>Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {listaUsuarios.map(u => (
+                      <tr key={u.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '13px', color: '#1e293b' }}>
+                        <td style={{ padding: '14px', fontWeight: 'bold' }}>{u.usuario}</td>
+                        <td style={{ padding: '14px' }}>{u.nombres}</td>
+                        <td style={{ padding: '14px' }}>
+                          <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', backgroundColor: u.rol === 'docente' ? '#e0f2fe' : '#f1f5f9', color: u.rol === 'docente' ? '#0369a1' : '#475569' }}>
+                            {u.rol}
+                          </span>
+                        </td>
+                        <td style={{ padding: '14px' }}>
+                          <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', backgroundColor: u.estado === 'activo' ? '#dcfce7' : '#fee2e2', color: u.estado === 'activo' ? '#166534' : '#991b1b' }}>
+                            {u.estado}
+                          </span>
+                        </td>
+                        <td style={{ padding: '14px', textAlign: 'right', display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                          <button onClick={() => abrirModalEditarUsuario(u)} style={{ background: '#e2e8f0', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Editar</button>
+                          <button onClick={() => toggleEstadoUsuario(u.id)} style={{ background: u.estado === 'activo' ? '#fee2e2' : '#dcfce7', color: u.estado === 'activo' ? '#991b1b' : '#166534', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>
+                            {u.estado === 'activo' ? 'Desactivar' : 'Activar'}
+                          </button>
+                          <button onClick={() => { setUserToReset(u); setModalResetPass(true); }} style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Clave</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
       </main>
 
-      {/* VENTANA EMERGENTE DE UBICACIÓN Y DETALLES DE LABORATORIO */}
+      {/* MODAL DETALLES DE LABORATORIO */}
       {laboratorioSeleccionado && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.75)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, backdropFilter: 'blur(5px)' }}>
-          <div style={{ background: '#ffffff', width: '90%', maxWidth: '750px', padding: '30px', borderRadius: '16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
-              <h3 style={{ margin: 0, color: '#059669', fontSize: '20px', fontWeight: 'bold' }}>Ubicación y Detalle del Laboratorio</h3>
-              <button onClick={() => setLaboratorioSeleccionado(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar X</button>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.75)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, backdropFilter: 'blur(5px)', padding: '20px', boxSizing: 'border-box' }}>
+          <div style={{ background: '#ffffff', width: '100%', maxWidth: '750px', maxHeight: '90vh', overflowY: 'auto', padding: '25px', borderRadius: '16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)', boxSizing: 'border-box' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
+              <h3 style={{ margin: 0, color: '#059669', fontSize: '18px', fontWeight: 'bold' }}>Ubicación y Detalle del Laboratorio</h3>
+              <button onClick={() => setLaboratorioSeleccionado(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar X</button>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px', alignItems: 'center' }}>
+            <div className="modal-laboratorio-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px', alignItems: 'center' }}>
               <div>
-                <h4 style={{ fontSize: '18px', color: '#1e293b', marginBottom: '10px', fontWeight: 'bold' }}>{laboratorioSeleccionado.titulo}</h4>
-                <p style={{ color: '#475569', fontSize: '14px', lineHeight: '1.6', marginBottom: '15px' }}>{laboratorioSeleccionado.desc}</p>
-                <p style={{ fontSize: '14px', margin: '8px 0', color: '#1e293b' }}><strong>Sede y Aula:</strong> {laboratorioSeleccionado.enlaceSede}</p>
-                <p style={{ fontSize: '14px', margin: '8px 0', color: '#1e293b' }}><strong>Horario:</strong> {laboratorioSeleccionado.horario}</p>
-                <p style={{ fontSize: '14px', margin: '8px 0', color: '#1e293b' }}><strong>Docente:</strong> {laboratorioSeleccionado.instructor}</p>
+                <h4 style={{ fontSize: '17px', color: '#1e293b', marginBottom: '8px', fontWeight: 'bold' }}>{laboratorioSeleccionado.titulo}</h4>
+                <p style={{ color: '#475569', fontSize: '13px', lineHeight: '1.6', marginBottom: '12px' }}>{laboratorioSeleccionado.desc}</p>
+                <p style={{ fontSize: '13px', margin: '6px 0', color: '#1e293b' }}><strong>Sede y Aula:</strong> {laboratorioSeleccionado.enlaceSede}</p>
+                <p style={{ fontSize: '13px', margin: '6px 0', color: '#1e293b' }}><strong>Horario:</strong> {laboratorioSeleccionado.horario}</p>
+                <p style={{ fontSize: '13px', margin: '6px 0', color: '#1e293b' }}><strong>Docente:</strong> {laboratorioSeleccionado.instructor}</p>
               </div>
               <div>
-                <img src={laboratorioSeleccionado.ubicacionImg || laboratorioSeleccionado.imgUrl} alt="Ubicación Laboratorio" style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px', border: '1px solid #cbd5e1' }} />
+                <img src={laboratorioSeleccionado.ubicacionImg || laboratorioSeleccionado.imgUrl} alt="Ubicación Laboratorio" style={{ width: '100%', height: '210px', objectFit: 'cover', borderRadius: '10px', border: '1px solid #cbd5e1' }} />
               </div>
             </div>
           </div>
@@ -719,48 +734,48 @@ export default function App() {
 
       {/* MODAL CREAR / EDITAR USUARIO */}
       {modalUsuario && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
-          <div style={{ background: '#fff', width: '90%', maxWidth: '450px', padding: '30px', borderRadius: '12px' }}>
-            <h3 style={{ margin: '0 0 20px 0', color: '#0f172a' }}>{modoEdicion ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}</h3>
-            {mensajeUserMsg && <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '15px' }}>{mensajeUserMsg}</p>}
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px', boxSizing: 'border-box' }}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: '440px', padding: '25px', borderRadius: '12px', boxSizing: 'border-box' }}>
+            <h3 style={{ margin: '0 0 15px 0', color: '#0f172a' }}>{modoEdicion ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}</h3>
+            {mensajeUserMsg && <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '12px' }}>{mensajeUserMsg}</p>}
             
-            <form onSubmit={handleGuardarUsuario} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <form onSubmit={handleGuardarUsuario} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '5px' }}>Nombre de usuario:</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '5px' }}>Nombre de usuario:</label>
                 <input 
                   type="text" 
                   disabled={modoEdicion}
                   value={usuarioForm.usuario} 
                   onChange={e => setUsuarioForm({...usuarioForm, usuario: e.target.value})}
                   required 
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', backgroundColor: modoEdicion ? '#f1f5f9' : '#fff' }}
+                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: modoEdicion ? '#f1f5f9' : '#fff', boxSizing: 'border-box' }}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '5px' }}>Nombres completos:</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '5px' }}>Nombres completos:</label>
                 <input 
                   type="text" 
                   value={usuarioForm.nombres} 
                   onChange={e => setUsuarioForm({...usuarioForm, nombres: e.target.value})}
                   required 
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '5px' }}>Rol:</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '5px' }}>Rol:</label>
                 <select 
                   value={usuarioForm.rol} 
                   onChange={e => setUsuarioForm({...usuarioForm, rol: e.target.value})}
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
                 >
                   <option value="alumno">Alumno</option>
                   <option value="docente">Docente</option>
                 </select>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                <button type="submit" style={{ flex: 1, background: '#2563eb', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Guardar</button>
-                <button type="button" onClick={() => setModalUsuario(false)} style={{ flex: 1, background: '#e2e8f0', color: '#334155', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Cancelar</button>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                <button type="submit" style={{ flex: 1, background: '#2563eb', color: '#fff', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Guardar</button>
+                <button type="button" onClick={() => setModalUsuario(false)} style={{ flex: 1, background: '#e2e8f0', color: '#334155', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Cancelar</button>
               </div>
             </form>
           </div>
@@ -769,22 +784,22 @@ export default function App() {
 
       {/* MODAL RESETEAR CONTRASEÑA */}
       {modalResetPass && userToReset && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
-          <div style={{ background: '#fff', width: '90%', maxWidth: '400px', padding: '30px', borderRadius: '12px' }}>
-            <h3 style={{ margin: '0 0 10px 0', color: '#0f172a' }}>Restablecer Clave</h3>
-            <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '20px' }}>Establezca una nueva contraseña para el usuario <strong>{userToReset.usuario}</strong>.</p>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px', boxSizing: 'border-box' }}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: '390px', padding: '25px', borderRadius: '12px', boxSizing: 'border-box' }}>
+            <h3 style={{ margin: '0 0 8px 0', color: '#0f172a' }}>Restablecer Clave</h3>
+            <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '15px' }}>Nueva clave para el usuario <strong>{userToReset.usuario}</strong>:</p>
             
-            <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <input 
                 type="password" 
                 value={newPasswordInput} 
-                onChange={e => setNewPasswordInput(e.target.value)}
+                onChange={e => setNewPasswordInput(e.target.value)} 
                 required 
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
               />
               <div style={{ display: 'flex', gap: '10px' }}>
-                <button type="submit" style={{ flex: 1, background: '#d97706', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Actualizar</button>
-                <button type="button" onClick={() => setModalResetPass(false)} style={{ flex: 1, background: '#e2e8f0', color: '#334155', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Cancelar</button>
+                <button type="submit" style={{ flex: 1, background: '#d97706', color: '#fff', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Actualizar</button>
+                <button type="button" onClick={() => setModalResetPass(false)} style={{ flex: 1, background: '#e2e8f0', color: '#334155', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Cancelar</button>
               </div>
             </form>
           </div>
