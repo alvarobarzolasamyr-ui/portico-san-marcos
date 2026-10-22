@@ -43,7 +43,6 @@ exports.loginUser = async (req, res) => {
       }
     });
   } catch (error) {
-    // ESTO IMPRIMIRÁ EL ERROR EXACTO EN TU TERMINAL DE NODE
     console.error('❌ ERROR CRÍTICO EN LOGIN:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor', errorDetalle: error.message });
   }
@@ -110,5 +109,57 @@ exports.resetPassword = async (req, res) => {
     res.json({ success: true, message: 'Contraseña restablecida' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al cambiar contraseña' });
+  }
+};
+
+// --- ENDPOINT AUTOMÁTICO PARA CREAR TABLA E INSERTAR USUARIOS EN AIVEN ---
+exports.migrarAiven = async (req, res) => {
+  try {
+    // 1. Crea la tabla usuarios si aún no existe en defaultdb de Aiven
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS usuarios (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nombres VARCHAR(100),
+        apellidos VARCHAR(100),
+        usuario VARCHAR(50) UNIQUE,
+        password VARCHAR(255),
+        estado VARCHAR(20) DEFAULT 'activo',
+        rol VARCHAR(20) DEFAULT 'alumno'
+      )
+    `);
+
+    // 2. Lista completa de docentes y alumnos
+    const usuariosAMigrar = [
+      { nombres: 'Carlos', apellidos: 'Mendoza', usuario: 'cendoza', passPlana: 'carlos2026', rol: 'docente' },
+      { nombres: 'Ana', apellidos: 'García', usuario: 'agarcia', passPlana: 'ana.garcia*', rol: 'docente' },
+      { nombres: 'Miguel', apellidos: 'Ángel', usuario: 'mangel', passPlana: 'mangel987', rol: 'docente' },
+      { nombres: 'Rosa', apellidos: 'Fernández', usuario: 'rfernandez', passPlana: 'rosa#2026', rol: 'docente' },
+      { nombres: 'Jorge', apellidos: 'Salazar', usuario: 'jsalazar', passPlana: 'jorge.pass', rol: 'docente' },
+      { nombres: 'Luis', apellidos: 'Alvarez', usuario: 'lalvarez', passPlana: 'alumnoluis2026', rol: 'alumno' },
+      { nombres: 'Maria', apellidos: 'Torres', usuario: 'mtorres', passPlana: 'maria.pass123', rol: 'alumno' },
+      { nombres: 'Kevin', apellidos: 'Quispe', usuario: 'kquispe', passPlana: 'kevin2026', rol: 'alumno' },
+      { nombres: 'Sofia', apellidos: 'Ramirez', usuario: 'sramirez', passPlana: 'sofia.pass#1', rol: 'alumno' },
+      { nombres: 'Diego', apellidos: 'Flores', usuario: 'dflores', passPlana: 'dflores2026', rol: 'alumno' }
+    ];
+
+    // 3. Hashea e inserta usando INSERT IGNORE
+    for (const user of usuariosAMigrar) {
+      const hashedPassword = await bcrypt.hash(user.passPlana, 10);
+      await db.query(
+        'INSERT IGNORE INTO usuarios (nombres, apellidos, usuario, password, estado, rol) VALUES (?, ?, ?, ?, ?, ?)',
+        [user.nombres, user.apellidos, user.usuario, hashedPassword, 'activo', user.rol]
+      );
+    }
+
+    res.send(`
+      <div style="font-family: sans-serif; text-align: center; padding: 40px;">
+        <h2 style="color: #16a34a;">¡Tabla y usuarios creados con éxito en Aiven!</h2>
+        <p>Los docentes y alumnos ya están guardados en <strong>defaultdb</strong> con contraseñas encriptadas.</p>
+        <p>Ya puedes volver a tu aplicación e iniciar sesión.</p>
+      </div>
+    `);
+  } catch (error) {
+    console.error('Error durante la migración a Aiven:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
