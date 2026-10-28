@@ -5,7 +5,7 @@ import PdfFlipbook from './components/PdfFlipbook';
 // ⚠️ NÚMERO DE WHATSAPP ACTUALIZADO
 const WHATSAPP_NUMERO = '51967107035';
 
-// Catálogo base de respaldo instantáneo (también se sincroniza con Aiven/Render)
+// CATÁLOGO UNIFICADO: Datos para Tienda (precios, demo) + Datos para Aula Interna (horario, tipo, zoom)
 const CATALOGO_INICIAL = [
   {
     id: 1,
@@ -22,7 +22,13 @@ const CATALOGO_INICIAL = [
       'Módulo 3: Cinemática Directa y parámetros Denavit-Hartenberg (D-H)',
       'Módulo 4: Cinemática Inversa algebraica y geométrica',
       'Módulo 5: Planificación de trayectorias articulares y cartesianas'
-    ]
+    ],
+    // Campos Internos Aula Virtual
+    tipo: 'Virtual',
+    horario: 'Martes y Jueves - 7:00 PM',
+    instructor: 'Ing. Fabrizio Barzola',
+    enlaceSede: 'https://zoom.us/j/9876543210',
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
   },
   {
     id: 2,
@@ -39,7 +45,12 @@ const CATALOGO_INICIAL = [
       'Módulo 3: Diodos, transistores BJT y MOSFET en conmutación',
       'Módulo 4: Amplificadores Operacionales (Op-Amps) y filtrado de sensores',
       'Módulo 5: Electrónica de potencia, reguladores y drivers Puente H'
-    ]
+    ],
+    tipo: 'Presencial',
+    horario: 'Viernes - 7:00 PM',
+    instructor: 'Ing. Carlos Mendoza',
+    enlaceSede: 'Campus Central - Laboratorio de Electrónica',
+    ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'
   },
   {
     id: 3,
@@ -56,7 +67,12 @@ const CATALOGO_INICIAL = [
       'Módulo 3: Conversión Analógica-Digital (ADC) y control de velocidad PWM',
       'Módulo 4: Interrupciones externas y Timers por hardware en tiempo real',
       'Módulo 5: Protocolos de comunicación UART, I2C y SPI'
-    ]
+    ],
+    tipo: 'Virtual',
+    horario: 'Sábados - 3:00 PM',
+    instructor: 'Ing. Fabrizio Barzola',
+    enlaceSede: 'https://zoom.us/j/1234567890',
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
   },
   {
     id: 4,
@@ -73,7 +89,12 @@ const CATALOGO_INICIAL = [
       'Módulo 3: C++ Parte 2: Programación Orientada a Objetos para librerías de sensores',
       'Módulo 4: Python Parte 1: Sintaxis, colecciones y automatización de scripts',
       'Módulo 5: Python Parte 2: Matrices con NumPy y cálculo de trayectorias'
-    ]
+    ],
+    tipo: 'Virtual',
+    horario: 'Lunes y Miércoles - 8:00 PM',
+    instructor: 'Dra. María Fernández',
+    enlaceSede: 'https://meet.google.com/abc-defg-hij',
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
   },
   {
     id: 5,
@@ -90,7 +111,12 @@ const CATALOGO_INICIAL = [
       'Módulo 3: Diagrama de Bloques de Funciones (FBD) y escalamiento analógico',
       'Módulo 4: Texto Estructurado (ST/SCL) para algoritmos matemáticos',
       'Módulo 5: Secuencias industriales paso a paso con Grafcet (SFC)'
-    ]
+    ],
+    tipo: 'Virtual',
+    horario: 'Martes y Jueves - 8:00 PM',
+    instructor: 'Ing. Carlos Mendoza',
+    enlaceSede: 'https://zoom.us/j/9876543210',
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
   },
   {
     id: 6,
@@ -107,7 +133,12 @@ const CATALOGO_INICIAL = [
       'Módulo 3: Segmentación y reconocimiento de geometrías en fajas transportadoras',
       'Módulo 4: Object Tracking y extracción de coordenadas para robots',
       'Módulo 5: Redes neuronales básicas para control de calidad visual'
-    ]
+    ],
+    tipo: 'Virtual',
+    horario: 'Viernes - 6:00 PM',
+    instructor: 'Dra. María Fernández',
+    enlaceSede: 'https://zoom.us/j/5556667770',
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
   },
   {
     id: 7,
@@ -124,7 +155,12 @@ const CATALOGO_INICIAL = [
       'Módulo 3: Reglas de ruteo PCB, cálculo de ancho de pistas y planos GND',
       'Módulo 4: Diseño de etapas de potencia y aislamiento con optoacopladores',
       'Módulo 5: Exportación de archivos Gerber, BOM y preparación DFM'
-    ]
+    ],
+    tipo: 'Presencial',
+    horario: 'Miércoles - 4:00 PM',
+    instructor: 'Ing. Carlos Mendoza',
+    enlaceSede: 'Campus Central - Laboratorio de Electrónica',
+    ubicacionImg: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800'
   },
   {
     id: 8,
@@ -141,7 +177,12 @@ const CATALOGO_INICIAL = [
       'Módulo 3: Diseño de mandos secuenciales por método Cascada y Paso a Paso',
       'Módulo 4: Electroneumática con relés, sensores magnéticos y electroválvulas',
       'Módulo 5: Sistemas de vacío, ventosas y actuadores de giro'
-    ]
+    ],
+    tipo: 'Presencial',
+    horario: 'Martes - 4:00 PM',
+    instructor: 'Ing. Luis Alvarado',
+    enlaceSede: 'Sede Arequipa - Pabellón B - Lab 2',
+    ubicacionImg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'
   },
   {
     id: 9,
@@ -158,7 +199,12 @@ const CATALOGO_INICIAL = [
       'Módulo 3: Parámetros de laminado en Cura/PrusaSlicer (Infill, perímetros y soportes)',
       'Módulo 4: Diseño paramétrico de tolerancias y ajustes para piezas móviles',
       'Módulo 5: Diagnóstico de fallas (Warping, Stringing) y calibración mecánica'
-    ]
+    ],
+    tipo: 'Presencial',
+    horario: 'Jueves - 5:00 PM',
+    instructor: 'Ing. Fabrizio Barzola',
+    enlaceSede: 'Campus Central - Taller Mecánico',
+    ubicacionImg: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=800'
   },
   {
     id: 10,
@@ -175,7 +221,12 @@ const CATALOGO_INICIAL = [
       'Módulo 3: Ensamblaje de caja reductora de engranajes rectos de 3 ejes',
       'Módulo 4: Simulación de esfuerzos (FEA) y validación de engranajes bajo norma AGMA',
       'Módulo 5: Planos de fabricación detallados, lista de materiales (BOM) y exportación STEP'
-    ]
+    ],
+    tipo: 'Virtual',
+    horario: 'Lunes - 7:00 PM',
+    instructor: 'Ing. Luis Alvarado',
+    enlaceSede: 'https://zoom.us/j/1234567890',
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
   }
 ];
 
@@ -191,8 +242,10 @@ export default function App() {
     return localStorage.getItem('rolUsuario') || '';
   });
 
-  // ESTADOS DE LA TIENDA VIRTUAL PÚBLICA (PRE-LOGIN)
+  // ESTADO UNIFICADO: Sirve tanto para la tienda pública como para el aula interna
   const [cursosCatalogo, setCursosCatalogo] = useState(CATALOGO_INICIAL);
+  
+  // ESTADOS PÚBLICOS
   const [catTiendaActiva, setCatTiendaActiva] = useState('Todos');
   const [busquedaTienda, setBusquedaTienda] = useState('');
   const [cursoDemoModal, setCursoDemoModal] = useState(null);
@@ -208,17 +261,21 @@ export default function App() {
     localStorage.setItem('carrito_portico', JSON.stringify(carrito));
   }, [carrito]);
 
-  // Cargar catálogo desde Render / Aiven
+  // Cargar catálogo desde Render / Aiven y MEZCLARLO con datos locales para no perder horarios
   useEffect(() => {
     fetch('https://portico-san-marcos.onrender.com/api/catalogo')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
-          setCursosCatalogo(data);
+          const cursosUnificados = data.map(dbCurso => {
+            const cursoLocal = CATALOGO_INICIAL.find(c => c.id === dbCurso.id) || {};
+            return { ...cursoLocal, ...dbCurso };
+          });
+          setCursosCatalogo(cursosUnificados);
         }
       })
       .catch(() => {
-        console.log('Mostrando catálogo instantáneo mientras despierta el servidor.');
+        console.log('Mostrando catálogo base mientras despierta el servidor.');
       });
   }, []);
 
@@ -229,34 +286,28 @@ export default function App() {
     }
     setCarritoAbierto(true);
   };
-
   const quitarDelCarrito = (id) => {
     setCarrito(carrito.filter(item => item.id !== id));
   };
-
   const estaEnCarrito = (id) => carrito.some(item => item.id === id);
-
   const totalCarrito = carrito.reduce((acc, item) => acc + Number(item.precio), 0);
 
   const enviarPedidoWhatsApp = () => {
     if (carrito.length === 0) return;
-
     const saludo = nombreInteresado.trim()
       ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreInteresado.trim()}*.`
       : `¡Hola *Pórtico San Marcos*! 👋`;
-
     const listaTexto = carrito
       .map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`)
       .join('\n');
-
     const textoFinal = `${saludo}\nDeseo adquirir los siguientes cursos de Ingeniería Mecatrónica:\n\n${listaTexto}\n\n💰 *Total a pagar: S/ ${totalCarrito.toFixed(2)}*\n\n¿Me podrían brindar los medios de pago e información para habilitar mi acceso al Aula Virtual?`;
-
-    // Redirige directamente a la app de WhatsApp en móviles o web en desktop
+    
+    // Enlaza directamente a la app de WhatsApp
     const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`;
     window.open(url, '_blank');
   };
 
-  // Estado para el menú desplegable en celulares (Aula interna)
+  // ESTADOS DEL AULA INTERNA
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [modalidadFiltro, setModalidadFiltro] = useState('virtual'); 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todas');
@@ -383,18 +434,6 @@ export default function App() {
   const [userToReset, setUserToReset] = useState(null);
   const [newPasswordInput, setNewPasswordInput] = useState('');
 
-  // CLASES Y CURSOS INTERNOS
-  const [listaClases] = useState([
-    { id: 1, titulo: 'Asesoría en Automatización y PLC TIA Portal', tipo: 'Virtual', categoria: 'ingenieria', horario: 'Martes y Jueves - 7:00 PM', instructor: 'Ing. Carlos Mendoza', desc: 'Clases en vivo resolviendo lógica de contactos y programación PID.', enlaceSede: 'https://zoom.us/j/9876543210', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', imgUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600&auto=format&fit=crop' },
-    { id: 2, titulo: 'Fundamentos de Microservicios en Node.js', tipo: 'Virtual', categoria: 'programacion', horario: 'Lunes y Miércoles - 8:00 PM', instructor: 'Dr. Roberto Gómez', desc: 'Arquitectura limpia y conexión a base de datos MySQL.', enlaceSede: 'https://meet.google.com/abc-defg-hij', videoUrl: 'https://media.w3.org/2010/05/sintel/trailer.mp4', imgUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop' },
-    { id: 3, titulo: 'Control de Sistemas de Eventos Discretos', tipo: 'Virtual', categoria: 'ingenieria', horario: 'Sábados - 3:00 PM', instructor: 'Ing. Carlos Mendoza', desc: 'Modelado usando Redes de Petri y supervisión SCADA.', enlaceSede: 'https://zoom.us/j/1234567890', videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', imgUrl: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600&auto=format&fit=crop' },
-    { id: 4, titulo: 'Procesamiento Digital de Señales en MATLAB', tipo: 'Virtual', categoria: 'programacion', horario: 'Viernes - 6:00 PM', instructor: 'Dra. María Fernández', desc: 'Análisis de transformadas de Fourier y diseño de filtros.', enlaceSede: 'https://zoom.us/j/5556667770', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', imgUrl: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=600&auto=format&fit=crop' },
-    { id: 5, titulo: 'Clase Magistral de Robótica con ESP32', tipo: 'Presencial', categoria: 'mecatronica', horario: 'Lunes y Miércoles - 6:00 PM', instructor: 'Ing. Fabrizio Barzola', desc: 'Implementación de sensores y control de servomotores IoT en banco de pruebas físico.', enlaceSede: 'Campus Central - Laboratorio 4', ubicacionImg: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=800&auto=format&fit=crop', imgUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=600&auto=format&fit=crop' },
-    { id: 6, titulo: 'Laboratorio de Neumática y Electroneumática', tipo: 'Presencial', categoria: 'mecatronica', horario: 'Martes - 4:00 PM', instructor: 'Ing. Luis Alvarado', desc: 'Simulación FluidSIM e implementación física en banco de pruebas neumáticas ISO 1219.', enlaceSede: 'Sede Arequipa - Pabellón B - Lab 2', ubicacionImg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800&auto=format&fit=crop', imgUrl: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=600&auto=format&fit=crop' },
-    { id: 7, titulo: 'Taller de Ensamblaje e Impresión 3D', tipo: 'Presencial', categoria: 'mecatronica', horario: 'Jueves - 5:00 PM', instructor: 'Ing. Fabrizio Barzola', desc: 'Diseño en Tinkercad, calibración de extrusores e impresión física de partes mecánicas.', enlaceSede: 'Campus Central - Taller Mecánico', ubicacionImg: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=800&auto=format&fit=crop', imgUrl: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=600&auto=format&fit=crop' },
-    { id: 8, titulo: 'Sistemas Electrónicos de Potencia y Rectificadores', tipo: 'Presencial', categoria: 'potencia', horario: 'Viernes - 7:00 PM', instructor: 'Ing. Carlos Mendoza', desc: 'Mediciones de THD, factor de rizado y pruebas con tiristores usando osciloscopio de banco.', enlaceSede: 'Campus Central - Laboratorio de Electrónica', ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop', imgUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop' }
-  ]);
-
   const guardarSesionLocal = (nombres, rol) => {
     localStorage.setItem('sesionIniciada', 'true');
     localStorage.setItem('usuarioLogueado', nombres);
@@ -411,7 +450,6 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario, password })
       });
-      
       const data = await response.json();
 
       if (response.ok && data.success) {
@@ -446,34 +484,27 @@ export default function App() {
     setLibroSeleccionado(null);
   };
 
-  // FUNCIONES DE USUARIO
   const abrirModalCrearUsuario = () => {
     setModoEdicion(false);
     setUsuarioForm({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
     setMensajeUserMsg('');
     setModalUsuario(true);
   };
-
   const abrirModalEditarUsuario = (u) => {
     setModoEdicion(true);
     setUsuarioForm({ id: u.id, usuario: u.usuario, password: '', nombres: u.nombres, rol: u.rol });
     setMensajeUserMsg('');
     setModalUsuario(true);
   };
-
   const handleGuardarUsuario = (e) => {
     e.preventDefault();
     setMensajeUserMsg('');
-
     if (!modoEdicion) {
-      const existe = listaUsuarios.some(
-        u => u.usuario.toLowerCase() === usuarioForm.usuario.toLowerCase()
-      );
+      const existe = listaUsuarios.some(u => u.usuario.toLowerCase() === usuarioForm.usuario.toLowerCase());
       if (existe) {
         setMensajeUserMsg('El nombre de usuario ya existe en la base de datos.');
         return;
       }
-
       const nuevo = { id: Date.now(), usuario: usuarioForm.usuario, nombres: usuarioForm.nombres, rol: usuarioForm.rol, estado: 'activo' };
       setListaUsuarios([...listaUsuarios, nuevo]);
       setModalUsuario(false);
@@ -484,17 +515,14 @@ export default function App() {
       setModalUsuario(false);
     }
   };
-
   const toggleEstadoUsuario = (id) => {
     setListaUsuarios(listaUsuarios.map(u => {
       if (u.id === id) {
-        const nuevoEstado = u.estado === 'activo' ? 'inactivo' : 'activo';
-        return { ...u, estado: nuevoEstado };
+        return { ...u, estado: u.estado === 'activo' ? 'inactivo' : 'activo' };
       }
       return u;
     }));
   };
-
   const handleResetPassword = (e) => {
     e.preventDefault();
     if (!newPasswordInput) return;
@@ -504,18 +532,21 @@ export default function App() {
     setUserToReset(null);
   };
 
-  // FILTRADO DE CLASES INTERNAS
-  const clasesFiltradas = listaClases.filter(item => {
-    const coincideModalidad = item.tipo.toLowerCase() === modalidadFiltro.toLowerCase();
+  // FILTRADO DE CLASES INTERNAS USANDO EL CATÁLOGO UNIFICADO
+  const clasesInternasFiltradas = cursosCatalogo.filter(item => {
+    const tipoFiltro = item.tipo ? item.tipo.toLowerCase() : 'virtual';
+    const coincideModalidad = tipoFiltro === modalidadFiltro.toLowerCase();
     const coincideCategoria = categoriaSeleccionada === 'todas' || item.categoria === categoriaSeleccionada;
-    const coincideBusqueda = item.titulo.toLowerCase().includes(busqueda.toLowerCase()) || 
-                             item.instructor.toLowerCase().includes(busqueda.toLowerCase());
+    
+    const busqMin = busqueda.toLowerCase();
+    const coincideBusqueda = item.titulo.toLowerCase().includes(busqMin) || 
+                             (item.instructor && item.instructor.toLowerCase().includes(busqMin));
 
     return coincideModalidad && coincideCategoria && coincideBusqueda;
   });
 
   // =========================================================================
-  // ETAPA PREVIA AL LOGIN: TIENDA VIRTUAL DE CURSOS + VIDEO DEMO + WHATSAPP
+  // ETAPA PREVIA AL LOGIN: TIENDA VIRTUAL DE CURSOS
   // =========================================================================
   if (!sesionIniciada) {
     const categoriasTienda = ['Todos', ...new Set(cursosCatalogo.map(c => c.categoria))];
@@ -599,7 +630,7 @@ export default function App() {
           ))}
         </div>
 
-        {/* GRILLA DE LOS CURSOS */}
+        {/* GRILLA DE LOS CURSOS (PÚBLICO) */}
         <main style={{ maxWidth: '1260px', margin: '0 auto', padding: '0 20px 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '24px' }}>
           {cursosTiendaFiltrados.map(curso => (
             <div key={curso.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 25px rgba(0,0,0,0.25)' }}>
@@ -648,7 +679,7 @@ export default function App() {
           ))}
         </main>
 
-        {/* MODAL DE VIDEO DEMO Y SÍLABO DETALLADO */}
+        {/* MODAL DE VIDEO DEMO Y SÍLABO */}
         {cursoDemoModal && (
           <div onClick={() => setCursoDemoModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
             <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', maxWidth: '680px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '24px', position: 'relative' }}>
@@ -659,7 +690,6 @@ export default function App() {
               <span style={{ color: '#38bdf8', fontSize: '12px', fontWeight: 'bold' }}>{cursoDemoModal.categoria}</span>
               <h2 style={{ margin: '4px 0 14px 0', fontSize: '22px', color: '#fff' }}>{cursoDemoModal.titulo}</h2>
 
-              {/* Video Demo */}
               <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, borderRadius: '10px', overflow: 'hidden', background: '#000', marginBottom: '20px' }}>
                 <iframe
                   src={cursoDemoModal.video_demo_url}
@@ -671,7 +701,6 @@ export default function App() {
                 />
               </div>
 
-              {/* Temario */}
               <h4 style={{ color: '#38bdf8', margin: '0 0 10px 0', fontSize: '15px' }}>📋 Sílabo y Temario del Curso:</h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {(Array.isArray(cursoDemoModal.temario) ? cursoDemoModal.temario : []).map((mod, i) => (
@@ -701,7 +730,7 @@ export default function App() {
           </div>
         )}
 
-        {/* DRAWER LATERAL DEL CARRITO DE COMPRAS -> WHATSAPP */}
+        {/* DRAWER LATERAL DEL CARRITO */}
         {carritoAbierto && (
           <div onClick={() => setCarritoAbierto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 250, display: 'flex', justifyContent: 'flex-end' }}>
             <aside onClick={e => e.stopPropagation()} style={{ background: '#1e293b', width: '100%', maxWidth: '410px', height: '100vh', padding: '24px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
@@ -765,7 +794,7 @@ export default function App() {
           </div>
         )}
 
-        {/* MODAL DE INICIO DE SESIÓN AL AULA VIRTUAL */}
+        {/* MODAL DE INICIO DE SESIÓN */}
         {mostrarModalLogin && (
           <div onClick={() => setMostrarModalLogin(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
             <div onClick={e => e.stopPropagation()} style={{ background: '#ffffff', color: '#0f172a', padding: '35px 28px', borderRadius: '16px', width: '100%', maxWidth: '410px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
@@ -822,7 +851,7 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
       
-      {/* NAVBAR SUPERIOR EDGE-TO-EDGE */}
+      {/* NAVBAR SUPERIOR INTERNO */}
       <header style={{ width: '100%', background: '#091e42', color: '#fff', padding: '15px 25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 1000, flexWrap: 'wrap', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div>
@@ -893,7 +922,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* SECCIÓN 2: CURSOS Y OFERTA ACADÉMICA */}
+        {/* SECCIÓN 2: CURSOS Y OFERTA ACADÉMICA (AHORA USA EL CATÁLOGO COMPLETO) */}
         <div ref={seccionCursosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>
@@ -908,14 +937,14 @@ export default function App() {
                   onClick={() => { setModalidadFiltro('virtual'); setVideoActivo(null); setLaboratorioSeleccionado(null); }}
                   style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'virtual' ? '#2563eb' : '#f1f5f9', color: modalidadFiltro === 'virtual' ? '#fff' : '#334155' }}
                 >
-                  Modalidad Virtual ({listaClases.filter(c => c.tipo === 'Virtual').length})
+                  Modalidad Virtual ({cursosCatalogo.filter(c => (c.tipo || 'Virtual') === 'Virtual').length})
                 </button>
 
                 <button 
                   onClick={() => { setModalidadFiltro('presencial'); setVideoActivo(null); setLaboratorioSeleccionado(null); }}
                   style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'presencial' ? '#059669' : '#f1f5f9', color: modalidadFiltro === 'presencial' ? '#fff' : '#334155' }}
                 >
-                  Modalidad Presencial ({listaClases.filter(c => c.tipo === 'Presencial').length})
+                  Modalidad Presencial ({cursosCatalogo.filter(c => c.tipo === 'Presencial').length})
                 </button>
 
                 <input 
@@ -928,6 +957,7 @@ export default function App() {
               </div>
             </div>
 
+            {/* REPRODUCTOR VIRTUAL */}
             {modalidadFiltro === 'virtual' && videoActivo && (
               <div style={{ background: '#0f172a', padding: '20px', borderRadius: '12px', color: '#fff', marginBottom: '30px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
@@ -937,38 +967,48 @@ export default function App() {
                   </button>
                 </div>
                 <video controls autoPlay style={{ width: '100%', maxHeight: '420px', borderRadius: '8px', background: '#000' }}>
-                  <source src={videoActivo.videoUrl} type="video/mp4" />
+                  <source src={videoActivo.videoUrl || videoActivo.video_demo_url} type="video/mp4" />
                 </video>
               </div>
             )}
 
+            {/* GRILLA DE CLASES INTERNAS */}
             <div className="courses-grid-focus">
-              {clasesFiltradas.map((item) => (
-                <div key={item.id} className="focus-card-item">
-                  <div className="card-image-wrapper">
-                    <img src={item.imgUrl} alt={item.titulo} />
-                    <span className="badge-status">Activo</span>
-                  </div>
-                  <div className="card-body-content">
-                    <h3>{item.titulo}</h3>
-                    <p>{item.desc}</p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#475569', marginBottom: '15px' }}>
-                      <span><strong>Horario:</strong> {item.horario}</span>
-                      <span><strong>Docente:</strong> {item.instructor}</span>
+              {clasesInternasFiltradas.length > 0 ? (
+                clasesInternasFiltradas.map((item) => {
+                  const esVirtual = (item.tipo || 'Virtual') === 'Virtual';
+                  return (
+                    <div key={item.id} className="focus-card-item">
+                      <div className="card-image-wrapper">
+                        <img src={item.imagen_url} alt={item.titulo} />
+                        <span className="badge-status">Activo</span>
+                      </div>
+                      <div className="card-body-content">
+                        <h3>{item.titulo}</h3>
+                        <p>{item.descripcion}</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#475569', marginBottom: '15px' }}>
+                          <span><strong>Horario:</strong> {item.horario || 'Por definir'}</span>
+                          <span><strong>Docente:</strong> {item.instructor || 'Staff Académico'}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                          {esVirtual ? (
+                            <>
+                              <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>Grabación</button>
+                              <a href={item.enlaceSede || '#'} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none' }}>Zoom</a>
+                            </>
+                          ) : (
+                            <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>Detalles Sede</button>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
-                      {item.tipo === 'Virtual' ? (
-                        <>
-                          <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>Grabación</button>
-                          <a href={item.enlaceSede} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none' }}>Zoom</a>
-                        </>
-                      ) : (
-                        <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>Detalles Sede</button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })
+              ) : (
+                <p style={{ textAlign: 'center', color: '#64748b', gridColumn: '1 / -1', padding: '30px' }}>
+                  No se encontraron clases que coincidan con la búsqueda.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -1064,6 +1104,7 @@ export default function App() {
       </main>
 
       {libroSeleccionado && <PdfFlipbook pdfUrl={libroSeleccionado} alCerrar={() => setLibroSeleccionado(null)} />}
+      
       {laboratorioSeleccionado && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.75)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px' }}>
           <div style={{ background: '#fff', maxWidth: '700px', width: '100%', padding: '25px', borderRadius: '16px' }}>
@@ -1071,7 +1112,7 @@ export default function App() {
               <h3 style={{ margin: 0, color: '#059669' }}>{laboratorioSeleccionado.titulo}</h3>
               <button onClick={() => setLaboratorioSeleccionado(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar</button>
             </div>
-            <p>{laboratorioSeleccionado.desc}</p>
+            <p>{laboratorioSeleccionado.descripcion}</p>
             <p><strong>Sede:</strong> {laboratorioSeleccionado.enlaceSede} | <strong>Horario:</strong> {laboratorioSeleccionado.horario}</p>
           </div>
         </div>
