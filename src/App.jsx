@@ -2,6 +2,183 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import PdfFlipbook from './components/PdfFlipbook';
 
+// ⚠️ CAMBIA ESTE NÚMERO POR EL WHATSAPP OFICIAL (con código de país 51)
+const WHATSAPP_NUMERO = '51987654321';
+
+// Catálogo base de respaldo instantáneo (también se sincroniza con Aiven/Render)
+const CATALOGO_INICIAL = [
+  {
+    id: 1,
+    titulo: 'Fundamentos de Robótica y Cinemática',
+    categoria: 'Robótica',
+    descripcion: 'Domina el modelado espacial, matrices de transformación y parámetros Denavit-Hartenberg para brazos robóticos.',
+    precio: 120.00,
+    duracion: '5 Semanas (20 Horas)',
+    imagen_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80',
+    video_demo_url: 'https://www.youtube.com/embed/fc_cA62Z1kQ',
+    temario: [
+      'Módulo 1: Morfología del robot (grados de libertad, articulaciones y actuadores)',
+      'Módulo 2: Álgebra matricial y transformaciones espaciales 3D',
+      'Módulo 3: Cinemática Directa y parámetros Denavit-Hartenberg (D-H)',
+      'Módulo 4: Cinemática Inversa algebraica y geométrica',
+      'Módulo 5: Planificación de trayectorias articulares y cartesianas'
+    ]
+  },
+  {
+    id: 2,
+    titulo: 'Electrónica Aplicada a la Ingeniería',
+    categoria: 'Electrónica',
+    descripcion: 'Análisis de circuitos DC/AC, semiconductores, amplificadores operacionales y etapas de potencia para motores.',
+    precio: 95.00,
+    duracion: '4 Semanas (16 Horas)',
+    imagen_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80',
+    video_demo_url: 'https://www.youtube.com/embed/r9GC50r2Ge8',
+    temario: [
+      'Módulo 1: Leyes de Ohm, Kirchhoff y análisis de mallas/nodos DC',
+      'Módulo 2: Componentes pasivos e impedancia en corriente alterna',
+      'Módulo 3: Diodos, transistores BJT y MOSFET en conmutación',
+      'Módulo 4: Amplificadores Operacionales (Op-Amps) y filtrado de sensores',
+      'Módulo 5: Electrónica de potencia, reguladores y drivers Puente H'
+    ]
+  },
+  {
+    id: 3,
+    titulo: 'Arquitectura y Programación de Microcontroladores',
+    categoria: 'Sistemas Embebidos',
+    descripcion: 'Programación de registros, conversores ADC, señales PWM y protocolos industriales con Arduino Mega y ESP32.',
+    precio: 110.00,
+    duracion: '5 Semanas (20 Horas)',
+    imagen_url: 'https://images.unsplash.com/photo-1553406830-ef2513450d76?w=600&q=80',
+    video_demo_url: 'https://www.youtube.com/embed/fJWR7dBuc18',
+    temario: [
+      'Módulo 1: Arquitectura interna (CPU, memoria Flash/RAM y registros)',
+      'Módulo 2: Entradas y salidas digitales (GPIO) y control de actuadores',
+      'Módulo 3: Conversión Analógica-Digital (ADC) y control de velocidad PWM',
+      'Módulo 4: Interrupciones externas y Timers por hardware en tiempo real',
+      'Módulo 5: Protocolos de comunicación UART, I2C y SPI'
+    ]
+  },
+  {
+    id: 4,
+    titulo: 'Lógica de Programación para Mecatrónica (C++ y Python)',
+    categoria: 'Programación',
+    descripcion: 'Desarrollo de algoritmos de control de hardware en C++ orientado a objetos y procesamiento matemático en Python.',
+    precio: 100.00,
+    duracion: '5 Semanas (20 Horas)',
+    imagen_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80',
+    video_demo_url: 'https://www.youtube.com/embed/ZzaPdXTrSb8',
+    temario: [
+      'Módulo 1: Algoritmos, diagramas de flujo y estructuras de control',
+      'Módulo 2: C++ Parte 1: Tipos de datos, funciones y manejo de punteros',
+      'Módulo 3: C++ Parte 2: Programación Orientada a Objetos para librerías de sensores',
+      'Módulo 4: Python Parte 1: Sintaxis, colecciones y automatización de scripts',
+      'Módulo 5: Python Parte 2: Matrices con NumPy y cálculo de trayectorias'
+    ]
+  },
+  {
+    id: 5,
+    titulo: 'Automatización Industrial y PLCs Multimarca',
+    categoria: 'Automatización',
+    descripcion: 'Programación industrial en entornos Siemens TIA Portal, Allen-Bradley y Delta bajo la norma IEC 61131-3.',
+    precio: 150.00,
+    duracion: '6 Semanas (24 Horas)',
+    imagen_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80',
+    video_demo_url: 'https://www.youtube.com/embed/PbAGl_mv5XI',
+    temario: [
+      'Módulo 1: Hardware de PLCs: Siemens (S7-1200/1500), Allen-Bradley y Delta',
+      'Módulo 2: Lenguaje Ladder (KOP), temporizadores y contadores en TIA Portal y Studio 5000',
+      'Módulo 3: Diagrama de Bloques de Funciones (FBD) y escalamiento analógico',
+      'Módulo 4: Texto Estructurado (ST/SCL) para algoritmos matemáticos',
+      'Módulo 5: Secuencias industriales paso a paso con Grafcet (SFC)'
+    ]
+  },
+  {
+    id: 6,
+    titulo: 'Visión Artificial y Procesamiento de Imágenes',
+    categoria: 'Inteligencia Artificial',
+    descripcion: 'Clasificación de piezas industriales, detección de bordes y seguimiento de objetos en tiempo real con Python y OpenCV.',
+    precio: 140.00,
+    duracion: '5 Semanas (20 Horas)',
+    imagen_url: 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?w=600&q=80',
+    video_demo_url: 'https://www.youtube.com/embed/oXlwWbU8l2o',
+    temario: [
+      'Módulo 1: Espacios de color (RGB, HSV) y matrices de píxeles',
+      'Módulo 2: Filtrado de ruido y detección de bordes Canny con OpenCV',
+      'Módulo 3: Segmentación y reconocimiento de geometrías en fajas transportadoras',
+      'Módulo 4: Object Tracking y extracción de coordenadas para robots',
+      'Módulo 5: Redes neuronales básicas para control de calidad visual'
+    ]
+  },
+  {
+    id: 7,
+    titulo: 'Diseño y Ruteo de Placas Electrónicas (PCBs)',
+    categoria: 'Electrónica',
+    descripcion: 'Creación de esquemáticos profesionales, ruteo multicapa, aislamiento óptico y archivos Gerber listos para manufactura.',
+    precio: 115.00,
+    duracion: '4 Semanas (16 Horas)',
+    imagen_url: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=600&q=80',
+    video_demo_url: 'https://www.youtube.com/embed/35YuILUlfGs',
+    temario: [
+      'Módulo 1: Simbología esquemática y encapsulados SMD vs THT',
+      'Módulo 2: Captura de esquemáticos electrónicos en software EDA (KiCad/Altium)',
+      'Módulo 3: Reglas de ruteo PCB, cálculo de ancho de pistas y planos GND',
+      'Módulo 4: Diseño de etapas de potencia y aislamiento con optoacopladores',
+      'Módulo 5: Exportación de archivos Gerber, BOM y preparación DFM'
+    ]
+  },
+  {
+    id: 8,
+    titulo: 'Simulación de Sistemas Neumáticos y Electroneumáticos',
+    categoria: 'Automatización',
+    descripcion: 'Diseño de circuitos secuenciales por método cascada, válvulas direccionales y control por relés en FluidSIM.',
+    precio: 105.00,
+    duracion: '4 Semanas (16 Horas)',
+    imagen_url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&q=80',
+    video_demo_url: 'https://www.youtube.com/embed/2f_ca121kFQ',
+    temario: [
+      'Módulo 1: Tratamiento del aire comprimido y unidad de mantenimiento FRL',
+      'Módulo 2: Válvulas distribuidoras (3/2, 5/2, 5/3) y cilindros neumáticos (ISO 1219)',
+      'Módulo 3: Diseño de mandos secuenciales por método Cascada y Paso a Paso',
+      'Módulo 4: Electroneumática con relés, sensores magnéticos y electroválvulas',
+      'Módulo 5: Sistemas de vacío, ventosas y actuadores de giro'
+    ]
+  },
+  {
+    id: 9,
+    titulo: 'Manufactura Aditiva e Impresión 3D',
+    categoria: 'Manufactura',
+    descripcion: 'Configuración avanzada de laminadores, selección de polímeros técnicos (PLA, PETG, ABS, TPU) y diseño de tolerancias.',
+    precio: 90.00,
+    duracion: '4 Semanas (16 Horas)',
+    imagen_url: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=600&q=80',
+    video_demo_url: 'https://www.youtube.com/embed/Vx0Z6LplaMU',
+    temario: [
+      'Módulo 1: Tecnologías FDM, SLA y cinemática de impresoras 3D',
+      'Módulo 2: Propiedades mecánicas y térmicas de filamentos (PLA, ABS, PETG, TPU)',
+      'Módulo 3: Parámetros de laminado en Cura/PrusaSlicer (Infill, perímetros y soportes)',
+      'Módulo 4: Diseño paramétrico de tolerancias y ajustes para piezas móviles',
+      'Módulo 5: Diagnóstico de fallas (Warping, Stringing) y calibración mecánica'
+    ]
+  },
+  {
+    id: 10,
+    titulo: 'Diseño Mecánico y Modelado CAD 3D',
+    categoria: 'Diseño Mecánico',
+    descripcion: 'Modelado paramétrico en Autodesk Inventor, cajas reductoras de engranajes, cálculo AGMA y análisis de esfuerzos FEA.',
+    precio: 135.00,
+    duracion: '5 Semanas (20 Horas)',
+    imagen_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80',
+    video_demo_url: 'https://www.youtube.com/embed/ddU98eb21wY',
+    temario: [
+      'Módulo 1: Lectura de planos industriales, cortes y tolerancias geométricas (GD&T)',
+      'Módulo 2: Modelado paramétrico 3D (extrusión, revolución, barrido y nervios)',
+      'Módulo 3: Ensamblaje de caja reductora de engranajes rectos de 3 ejes',
+      'Módulo 4: Simulación de esfuerzos (FEA) y validación de engranajes bajo norma AGMA',
+      'Módulo 5: Planos de fabricación detallados, lista de materiales (BOM) y exportación STEP'
+    ]
+  }
+];
+
 export default function App() {
   // Persistencia de sesión
   const [sesionIniciada, setSesionIniciada] = useState(() => {
@@ -14,9 +191,72 @@ export default function App() {
     return localStorage.getItem('rolUsuario') || '';
   });
 
-  // Estado para el menú desplegable en celulares
-  const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
+  // ESTADOS DE LA TIENDA VIRTUAL PÚBLICA (PRE-LOGIN)
+  const [cursosCatalogo, setCursosCatalogo] = useState(CATALOGO_INICIAL);
+  const [catTiendaActiva, setCatTiendaActiva] = useState('Todos');
+  const [busquedaTienda, setBusquedaTienda] = useState('');
+  const [cursoDemoModal, setCursoDemoModal] = useState(null);
+  const [carritoAbierto, setCarritoAbierto] = useState(false);
+  const [mostrarModalLogin, setMostrarModalLogin] = useState(false);
+  const [nombreInteresado, setNombreInteresado] = useState('');
+  const [carrito, setCarrito] = useState(() => {
+    const guardado = localStorage.getItem('carrito_portico');
+    return guardado ? JSON.parse(guardado) : [];
+  });
 
+  useEffect(() => {
+    localStorage.setItem('carrito_portico', JSON.stringify(carrito));
+  }, [carrito]);
+
+  // Cargar catálogo desde Render / Aiven
+  useEffect(() => {
+    fetch('https://portico-san-marcos.onrender.com/api/catalogo')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCursosCatalogo(data);
+        }
+      })
+      .catch(() => {
+        console.log('Mostrando catálogo instantáneo mientras despierta el servidor.');
+      });
+  }, []);
+
+  // Funciones del carrito
+  const agregarAlCarrito = (curso) => {
+    if (!carrito.some(item => item.id === curso.id)) {
+      setCarrito([...carrito, curso]);
+    }
+    setCarritoAbierto(true);
+  };
+
+  const quitarDelCarrito = (id) => {
+    setCarrito(carrito.filter(item => item.id !== id));
+  };
+
+  const estaEnCarrito = (id) => carrito.some(item => item.id === id);
+
+  const totalCarrito = carrito.reduce((acc, item) => acc + Number(item.precio), 0);
+
+  const enviarPedidoWhatsApp = () => {
+    if (carrito.length === 0) return;
+
+    const saludo = nombreInteresado.trim()
+      ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreInteresado.trim()}*.`
+      : `¡Hola *Pórtico San Marcos*! 👋`;
+
+    const listaTexto = carrito
+      .map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`)
+      .join('\n');
+
+    const textoFinal = `${saludo}\nDeseo adquirir los siguientes cursos de Ingeniería Mecatrónica:\n\n${listaTexto}\n\n💰 *Total a pagar: S/ ${totalCarrito.toFixed(2)}*\n\n¿Me podrían brindar los medios de pago e información para habilitar mi acceso al Aula Virtual?`;
+
+    const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`;
+    window.open(url, '_blank');
+  };
+
+  // Estado para el menú desplegable en celulares (Aula interna)
+  const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [modalidadFiltro, setModalidadFiltro] = useState('virtual'); 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todas');
   const [busqueda, setBusqueda] = useState('');
@@ -29,7 +269,7 @@ export default function App() {
   const seccionUsuariosRef = useRef(null);
 
   const irASeccion = (ref) => {
-    setMenuMovilAbierto(false); // Cierra menú en móvil al hacer click
+    setMenuMovilAbierto(false);
     if (ref && ref.current) {
       ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -71,14 +311,11 @@ export default function App() {
     return () => clearInterval(interval);
   }, [bannersHero.length]);
 
-  // ESTADOS MULTIMEDIA Y MODALES
+  // ESTADOS MULTIMEDIA Y MODALES DEL AULA
   const [videoActivo, setVideoActivo] = useState(null);
   const [laboratorioSeleccionado, setLaboratorioSeleccionado] = useState(null);
-
-  // ESTADO Y MODAL DE LIBROS (FLIPBOOK PDF REAL)
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
 
-  // LISTADO DE LIBROS FIJOS VINCULADOS A LA CARPETA /public
   const listaLibros = [
     {
       id: 1,
@@ -145,8 +382,8 @@ export default function App() {
   const [userToReset, setUserToReset] = useState(null);
   const [newPasswordInput, setNewPasswordInput] = useState('');
 
-  // CLASES Y CURSOS
-  const [listaClases, setListaClases] = useState([
+  // CLASES Y CURSOS INTERNOS
+  const [listaClases] = useState([
     { id: 1, titulo: 'Asesoría en Automatización y PLC TIA Portal', tipo: 'Virtual', categoria: 'ingenieria', horario: 'Martes y Jueves - 7:00 PM', instructor: 'Ing. Carlos Mendoza', desc: 'Clases en vivo resolviendo lógica de contactos y programación PID.', enlaceSede: 'https://zoom.us/j/9876543210', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', imgUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600&auto=format&fit=crop' },
     { id: 2, titulo: 'Fundamentos de Microservicios en Node.js', tipo: 'Virtual', categoria: 'programacion', horario: 'Lunes y Miércoles - 8:00 PM', instructor: 'Dr. Roberto Gómez', desc: 'Arquitectura limpia y conexión a base de datos MySQL.', enlaceSede: 'https://meet.google.com/abc-defg-hij', videoUrl: 'https://media.w3.org/2010/05/sintel/trailer.mp4', imgUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop' },
     { id: 3, titulo: 'Control de Sistemas de Eventos Discretos', tipo: 'Virtual', categoria: 'ingenieria', horario: 'Sábados - 3:00 PM', instructor: 'Ing. Carlos Mendoza', desc: 'Modelado usando Redes de Petri y supervisión SCADA.', enlaceSede: 'https://zoom.us/j/1234567890', videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', imgUrl: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600&auto=format&fit=crop' },
@@ -182,7 +419,8 @@ export default function App() {
 
         setUsuarioLogueado(nombreUsr);
         setRolUsuario(rolUsr);
-        setSesionIniciada(true); 
+        setSesionIniciada(true);
+        setMostrarModalLogin(false);
         setMensaje('');
 
         guardarSesionLocal(nombreUsr, rolUsr);
@@ -195,7 +433,9 @@ export default function App() {
   };
 
   const cerrarSesion = () => {
-    localStorage.clear();
+    localStorage.removeItem('sesionIniciada');
+    localStorage.removeItem('usuarioLogueado');
+    localStorage.removeItem('rolUsuario');
     setSesionIniciada(false);
     setUsuario('');
     setPassword('');
@@ -263,7 +503,7 @@ export default function App() {
     setUserToReset(null);
   };
 
-  // FILTRADO DE CLASES
+  // FILTRADO DE CLASES INTERNAS
   const clasesFiltradas = listaClases.filter(item => {
     const coincideModalidad = item.tipo.toLowerCase() === modalidadFiltro.toLowerCase();
     const coincideCategoria = categoriaSeleccionada === 'todas' || item.categoria === categoriaSeleccionada;
@@ -273,53 +513,311 @@ export default function App() {
     return coincideModalidad && coincideCategoria && coincideBusqueda;
   });
 
-  // VISTA DE LOGIN FORMAL Y LIMPIO
+  // =========================================================================
+  // ETAPA PREVIA AL LOGIN: TIENDA VIRTUAL DE CURSOS + VIDEO DEMO + WHATSAPP
+  // =========================================================================
   if (!sesionIniciada) {
+    const categoriasTienda = ['Todos', ...new Set(cursosCatalogo.map(c => c.categoria))];
+    const cursosTiendaFiltrados = cursosCatalogo.filter(c => {
+      const matchCat = catTiendaActiva === 'Todos' || c.categoria === catTiendaActiva;
+      const matchTxt = c.titulo.toLowerCase().includes(busquedaTienda.toLowerCase()) ||
+                       c.descripcion.toLowerCase().includes(busquedaTienda.toLowerCase());
+      return matchCat && matchTxt;
+    });
+
     return (
-      <div style={{ minHeight: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f172a', padding: '20px', boxSizing: 'border-box' }}>
-        <div style={{ background: '#ffffff', padding: '40px 30px', borderRadius: '16px', width: '100%', maxWidth: '420px', boxShadow: '0 25px 50px rgba(0,0,0,0.35)', border: '1px solid #1e293b', boxSizing: 'border-box' }}>
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ color: '#0f172a', margin: '0 0 6px 0', fontSize: '24px', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
-            <p style={{ color: '#64748b', fontSize: '13px', margin: 0, fontWeight: '500' }}>Sistema de Gestión Académica & Aula Virtual</p>
+      <div style={{ minHeight: '100vh', backgroundColor: '#0f172a', color: '#f8fafc', fontFamily: 'system-ui, sans-serif' }}>
+        
+        {/* NAVBAR PÚBLICO */}
+        <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #1e293b', padding: '14px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <span style={{ background: '#2563eb', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '3px 8px', borderRadius: '4px', letterSpacing: '1px' }}>
+              ESPECIALIZACIÓN EN INGENIERÍA MECATRÓNICA
+            </span>
+            <h1 style={{ margin: '4px 0 0 0', fontSize: '20px', color: '#38bdf8', fontWeight: 'bold' }}>
+              Pórtico San Marcos
+            </h1>
           </div>
 
-          <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '6px', color: '#334155' }}>Usuario:</label>
-              <input 
-                type="text" 
-                value={usuario} 
-                onChange={(e) => setUsuario(e.target.value)} 
-                required 
-                style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box', outline: 'none' }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '6px', color: '#334155' }}>Contraseña:</label>
-              <input 
-                type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                required 
-                style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box', outline: 'none' }}
-              />
-            </div>
-
-            {mensaje && (
-              <div style={{ color: mensaje.includes('exitoso') || mensaje.includes('Verificando') ? '#0284c7' : '#ef4444', fontSize: '13px', textAlign: 'center', fontWeight: 'bold' }}>
-                {mensaje}
-              </div>
-            )}
-
-            <button type="submit" style={{ width: '100%', padding: '12px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer', marginTop: '5px' }}>
-              Ingresar al Portal
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <button
+              onClick={() => setCarritoAbierto(true)}
+              style={{ background: '#1e293b', color: '#fff', border: '1px solid #334155', padding: '10px 16px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              🛒 Mi Carrito
+              {carrito.length > 0 && (
+                <span style={{ background: '#ef4444', color: '#fff', fontSize: '12px', padding: '2px 8px', borderRadius: '999px' }}>
+                  {carrito.length}
+                </span>
+              )}
             </button>
-          </form>
+
+            <button
+              onClick={() => setMostrarModalLogin(true)}
+              style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+            >
+              🔐 Ingresar al Aula Virtual
+            </button>
+          </div>
+        </header>
+
+        {/* HERO DE CATÁLOGO */}
+        <section style={{ textAlign: 'center', padding: '50px 20px 30px', maxWidth: '850px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '34px', margin: '0 0 12px 0', color: '#ffffff', fontWeight: '800' }}>
+            Catálogo de Cursos de Ingeniería Mecatrónica
+          </h2>
+          <p style={{ color: '#94a3b8', fontSize: '16px', lineHeight: '1.6', margin: '0 0 25px 0' }}>
+            Explora el temario oficial, visualiza una clase demostrativa de cada especialidad y agrega los cursos de tu interés al carrito para coordinar tu matrícula directamente por WhatsApp.
+          </p>
+
+          <input
+            type="text"
+            placeholder="🔍 Buscar curso de Robótica, PLC, CAD, Python, PCB..."
+            value={busquedaTienda}
+            onChange={(e) => setBusquedaTienda(e.target.value)}
+            style={{ width: '100%', maxWidth: '520px', padding: '12px 18px', borderRadius: '999px', border: '1px solid #334155', background: '#1e293b', color: '#fff', fontSize: '14px', outline: 'none' }}
+          />
+        </section>
+
+        {/* FILTROS DE CATEGORÍA */}
+        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', padding: '0 20px 30px' }}>
+          {categoriasTienda.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setCatTiendaActiva(cat)}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '999px',
+                border: '1px solid #334155',
+                background: catTiendaActiva === cat ? '#2563eb' : '#1e293b',
+                color: catTiendaActiva === cat ? '#fff' : '#cbd5e1',
+                fontWeight: 'bold',
+                fontSize: '13px',
+                cursor: 'pointer'
+              }}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
+
+        {/* GRILLA DE LOS 10 CURSOS */}
+        <main style={{ maxWidth: '1260px', margin: '0 auto', padding: '0 20px 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '24px' }}>
+          {cursosTiendaFiltrados.map(curso => (
+            <div key={curso.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 25px rgba(0,0,0,0.25)' }}>
+              <div style={{ position: 'relative', height: '185px' }}>
+                <img src={curso.imagen_url} alt={curso.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <span style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(15, 23, 42, 0.9)', color: '#38bdf8', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>
+                  {curso.categoria}
+                </span>
+              </div>
+
+              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '17px', color: '#fff', lineHeight: '1.35' }}>{curso.titulo}</h3>
+                <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: '1.5', margin: '0 0 16px 0', flex: 1 }}>{curso.descripcion}</p>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #334155', paddingTop: '12px', marginBottom: '14px' }}>
+                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>⏱ {curso.duracion || '5 Semanas'}</span>
+                  <strong style={{ fontSize: '20px', color: '#34d399' }}>S/ {Number(curso.precio).toFixed(2)}</strong>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <button
+                    onClick={() => setCursoDemoModal(curso)}
+                    style={{ background: '#0f172a', color: '#e2e8f0', border: '1px solid #475569', padding: '10px', borderRadius: '8px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
+                  >
+                    🎬 Demo y Temario
+                  </button>
+
+                  {estaEnCarrito(curso.id) ? (
+                    <button
+                      onClick={() => setCarritoAbierto(true)}
+                      style={{ background: '#059669', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
+                    >
+                      ✓ En el Carrito
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => agregarAlCarrito(curso)}
+                      style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
+                    >
+                      + Agregar
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </main>
+
+        {/* MODAL DE VIDEO DEMO Y SÍLABO DETALLADO */}
+        {cursoDemoModal && (
+          <div onClick={() => setCursoDemoModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', maxWidth: '680px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '24px', position: 'relative' }}>
+              <button onClick={() => setCursoDemoModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontWeight: 'bold' }}>
+                Cerrar ✕
+              </button>
+
+              <span style={{ color: '#38bdf8', fontSize: '12px', fontWeight: 'bold' }}>{cursoDemoModal.categoria}</span>
+              <h2 style={{ margin: '4px 0 14px 0', fontSize: '22px', color: '#fff' }}>{cursoDemoModal.titulo}</h2>
+
+              {/* Video Demo */}
+              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, borderRadius: '10px', overflow: 'hidden', background: '#000', marginBottom: '20px' }}>
+                <iframe
+                  src={cursoDemoModal.video_demo_url}
+                  title={cursoDemoModal.titulo}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                />
+              </div>
+
+              {/* Temario */}
+              <h4 style={{ color: '#38bdf8', margin: '0 0 10px 0', fontSize: '15px' }}>📋 Sílabo y Temario del Curso:</h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {(Array.isArray(cursoDemoModal.temario) ? cursoDemoModal.temario : []).map((mod, i) => (
+                  <li key={i} style={{ background: '#0f172a', padding: '10px 14px', borderRadius: '8px', borderLeft: '4px solid #2563eb', fontSize: '13px', color: '#e2e8f0' }}>
+                    {mod}
+                  </li>
+                ))}
+              </ul>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #334155', paddingTop: '16px' }}>
+                <div>
+                  <span style={{ fontSize: '12px', color: '#94a3b8', display: 'block' }}>Inversión del curso:</span>
+                  <strong style={{ fontSize: '24px', color: '#34d399' }}>S/ {Number(cursoDemoModal.precio).toFixed(2)}</strong>
+                </div>
+
+                <button
+                  onClick={() => {
+                    agregarAlCarrito(cursoDemoModal);
+                    setCursoDemoModal(null);
+                  }}
+                  style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '12px 22px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}
+                >
+                  🛒 Seleccionar Curso
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DRAWER LATERAL DEL CARRITO DE COMPRAS -> WHATSAPP */}
+        {carritoAbierto && (
+          <div onClick={() => setCarritoAbierto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 250, display: 'flex', justifyContent: 'flex-end' }}>
+            <aside onClick={e => e.stopPropagation()} style={{ background: '#1e293b', width: '100%', maxWidth: '410px', height: '100vh', padding: '24px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #334155', paddingBottom: '14px' }}>
+                <h3 style={{ margin: 0, fontSize: '18px', color: '#fff' }}>🛒 Cursos Seleccionados ({carrito.length})</h3>
+                <button onClick={() => setCarritoAbierto(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+              </div>
+
+              {carrito.length === 0 ? (
+                <div style={{ margin: 'auto 0', textAlign: 'center', color: '#94a3b8' }}>
+                  <p style={{ fontSize: '15px' }}>Tu carrito está vacío.</p>
+                  <span style={{ fontSize: '13px' }}>Agrega los cursos que te interesen para consultar tu matrícula por WhatsApp.</span>
+                </div>
+              ) : (
+                <>
+                  <div style={{ flex: 1, overflowY: 'auto', margin: '16px 0', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {carrito.map(item => (
+                      <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#0f172a', padding: '10px', borderRadius: '8px' }}>
+                        <img src={item.imagen_url} alt={item.titulo} style={{ width: '55px', height: '42px', objectFit: 'cover', borderRadius: '6px' }} />
+                        <div style={{ flex: 1 }}>
+                          <h4 style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#fff' }}>{item.titulo}</h4>
+                          <strong style={{ color: '#34d399', fontSize: '13px' }}>S/ {Number(item.precio).toFixed(2)}</strong>
+                        </div>
+                        <button onClick={() => quitarDelCarrito(item.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '16px' }}>
+                          🗑️
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ borderTop: '1px solid #334155', paddingTop: '14px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', color: '#cbd5e1', marginBottom: '12px' }}>
+                      Tu Nombre Completo (opcional):
+                      <input
+                        type="text"
+                        placeholder="Ej. Samyr Alvaro"
+                        value={nombreInteresado}
+                        onChange={e => setNombreInteresado(e.target.value)}
+                        style={{ width: '100%', marginTop: '6px', padding: '10px', borderRadius: '6px', border: '1px solid #475569', background: '#0f172a', color: '#fff', boxSizing: 'border-box' }}
+                      />
+                    </label>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', fontSize: '16px' }}>
+                      <span>Total Estimado:</span>
+                      <strong style={{ fontSize: '20px', color: '#34d399' }}>S/ {totalCarrito.toFixed(2)}</strong>
+                    </div>
+
+                    <button
+                      onClick={enviarPedidoWhatsApp}
+                      style={{ width: '100%', background: '#22c55e', color: '#052e16', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '15px', cursor: 'pointer' }}
+                    >
+                      💬 Coordinar Compra por WhatsApp
+                    </button>
+                  </div>
+                </>
+              )}
+            </aside>
+          </div>
+        )}
+
+        {/* MODAL DE INICIO DE SESIÓN AL AULA VIRTUAL */}
+        {mostrarModalLogin && (
+          <div onClick={() => setMostrarModalLogin(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#ffffff', color: '#0f172a', padding: '35px 28px', borderRadius: '16px', width: '100%', maxWidth: '410px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
+              <button onClick={() => setMostrarModalLogin(false)} style={{ position: 'absolute', top: '14px', right: '14px', background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748b' }}>✕</button>
+
+              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <h2 style={{ color: '#0f172a', margin: '0 0 6px 0', fontSize: '23px', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
+                <p style={{ color: '#64748b', fontSize: '13px', margin: 0 }}>Acceso exclusivo para estudiantes y docentes matriculados</p>
+              </div>
+
+              <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '6px', color: '#334155' }}>Usuario:</label>
+                  <input 
+                    type="text" 
+                    value={usuario} 
+                    onChange={(e) => setUsuario(e.target.value)} 
+                    required 
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '6px', color: '#334155' }}>Contraseña:</label>
+                  <input 
+                    type="password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                {mensaje && (
+                  <div style={{ color: mensaje.includes('exitoso') || mensaje.includes('Verificando') ? '#0284c7' : '#ef4444', fontSize: '13px', textAlign: 'center', fontWeight: 'bold' }}>
+                    {mensaje}
+                  </div>
+                )}
+
+                <button type="submit" style={{ width: '100%', padding: '12px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
+                  Ingresar al Portal
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
       </div>
     );
   }
 
+  // =========================================================================
+  // INTERIOR DEL AULA VIRTUAL (SE MUESTRA UNA VEZ INICIADA LA SESIÓN)
+  // =========================================================================
   return (
     <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
       
@@ -332,7 +830,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* BOTÓN HAMBURGUESA PARA CELULAR */}
         <button 
           onClick={() => setMenuMovilAbierto(!menuMovilAbierto)}
           style={{ display: 'none', background: 'none', border: 'none', color: '#fff', fontSize: '26px', cursor: 'pointer' }}
@@ -341,7 +838,6 @@ export default function App() {
           ☰
         </button>
 
-        {/* PESTAÑAS */}
         <nav className={`navbar-menu-items ${menuMovilAbierto ? 'abierto' : ''}`} style={{ display: 'flex', gap: '22px', alignItems: 'center' }}>
           <button onClick={() => irASeccion(seccionInicioRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Inicio</button>
           <button onClick={() => irASeccion(seccionCursosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Cursos</button>
@@ -368,36 +864,7 @@ export default function App() {
         </nav>
       </header>
 
-      {/* REGLA DINÁMICA DEL MENÚ CELULAR */}
-      <style>{`
-        @media (max-width: 860px) {
-          .mobile-btn-toggle {
-            display: block !important;
-          }
-          .navbar-menu-items {
-            display: none !important;
-            width: 100%;
-            flex-direction: column;
-            align-items: flex-start !important;
-            padding-top: 15px;
-            gap: 15px !important;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            margin-top: 12px;
-          }
-          .navbar-menu-items.abierto {
-            display: flex !important;
-          }
-          .navbar-user-info {
-            width: 100%;
-            justify-content: space-between;
-            margin-left: 0 !important;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-          }
-        }
-      `}</style>
-
-      {/* CONTENIDO PRINCIPAL */}
+      {/* CONTENIDO PRINCIPAL DEL AULA */}
       <main style={{ flex: 1, padding: '30px 0', display: 'flex', flexDirection: 'column', gap: '40px', width: '100%' }}>
         
         {/* SECCIÓN 1: INICIO & BANNER HERO */}
@@ -421,25 +888,6 @@ export default function App() {
               <div className="hero-banner-image">
                 <img src={bannersHero[bannerActual].img} alt="Hero Banner" />
               </div>
-
-              {/* PUNTITOS INDICADORES */}
-              <div style={{ position: 'absolute', bottom: '15px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px', zIndex: 10 }}>
-                {bannersHero.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setBannerActual(index)}
-                    style={{
-                      width: bannerActual === index ? '22px' : '8px',
-                      height: '8px',
-                      borderRadius: '4px',
-                      border: 'none',
-                      backgroundColor: bannerActual === index ? '#ef4444' : 'rgba(255,255,255,0.5)',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                  />
-                ))}
-              </div>
             </div>
           </div>
         </div>
@@ -449,38 +897,22 @@ export default function App() {
           <div className="dashboard-container">
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>
               <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
-                OFERTA ACADÉMICA & CURSOS
+                MIS CLASES & LABORATORIOS
               </h2>
             </div>
 
-            <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '25px', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+            <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '25px' }}>
               <div className="filter-bar-responsive" style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <button 
                   onClick={() => { setModalidadFiltro('virtual'); setVideoActivo(null); setLaboratorioSeleccionado(null); }}
-                  style={{
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    backgroundColor: modalidadFiltro === 'virtual' ? '#2563eb' : '#f1f5f9',
-                    color: modalidadFiltro === 'virtual' ? '#fff' : '#334155'
-                  }}
+                  style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'virtual' ? '#2563eb' : '#f1f5f9', color: modalidadFiltro === 'virtual' ? '#fff' : '#334155' }}
                 >
                   Modalidad Virtual ({listaClases.filter(c => c.tipo === 'Virtual').length})
                 </button>
 
                 <button 
                   onClick={() => { setModalidadFiltro('presencial'); setVideoActivo(null); setLaboratorioSeleccionado(null); }}
-                  style={{
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    backgroundColor: modalidadFiltro === 'presencial' ? '#059669' : '#f1f5f9',
-                    color: modalidadFiltro === 'presencial' ? '#fff' : '#334155'
-                  }}
+                  style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'presencial' ? '#059669' : '#f1f5f9', color: modalidadFiltro === 'presencial' ? '#fff' : '#334155' }}
                 >
                   Modalidad Presencial ({listaClases.filter(c => c.tipo === 'Presencial').length})
                 </button>
@@ -490,41 +922,11 @@ export default function App() {
                   placeholder="Buscar clase o profesor..." 
                   value={busqueda} 
                   onChange={(e) => setBusqueda(e.target.value)}
-                  style={{ marginLeft: 'auto', padding: '10px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', minWidth: '240px', outline: 'none' }}
+                  style={{ marginLeft: 'auto', padding: '10px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', minWidth: '240px' }}
                 />
-              </div>
-
-              {/* Categorías */}
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
-                <span style={{ fontSize: '13px', color: '#64748b', alignSelf: 'center', fontWeight: 'bold' }}>Categorías:</span>
-                {[
-                  { id: 'todas', label: 'Todas' },
-                  { id: 'ingenieria', label: 'Ingeniería & PLC' },
-                  { id: 'programacion', label: 'Programación & Cloud' },
-                  { id: 'mecatronica', label: 'Mecatrónica & IoT' },
-                  { id: 'potencia', label: 'Potencia & Electrónica' }
-                ].map(cat => (
-                  <button 
-                    key={cat.id}
-                    onClick={() => setCategoriaSeleccionada(cat.id)}
-                    style={{
-                      padding: '6px 12px',
-                      borderRadius: '20px',
-                      border: 'none',
-                      fontSize: '12px',
-                      cursor: 'pointer',
-                      fontWeight: 'bold',
-                      backgroundColor: categoriaSeleccionada === cat.id ? '#0f172a' : '#e2e8f0',
-                      color: categoriaSeleccionada === cat.id ? '#fff' : '#475569'
-                    }}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
               </div>
             </div>
 
-            {/* REPRODUCTOR VIRTUAL */}
             {modalidadFiltro === 'virtual' && videoActivo && (
               <div style={{ background: '#0f172a', padding: '20px', borderRadius: '12px', color: '#fff', marginBottom: '30px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
@@ -539,73 +941,52 @@ export default function App() {
               </div>
             )}
 
-            {/* TARJETAS DE CURSOS */}
             <div className="courses-grid-focus">
-              {clasesFiltradas.length > 0 ? (
-                clasesFiltradas.map((item) => (
-                  <div key={item.id} className="focus-card-item">
-                    <div className="card-image-wrapper">
-                      <img src={item.imgUrl} alt={item.titulo} />
-                      <span className="badge-status">Activo</span>
+              {clasesFiltradas.map((item) => (
+                <div key={item.id} className="focus-card-item">
+                  <div className="card-image-wrapper">
+                    <img src={item.imgUrl} alt={item.titulo} />
+                    <span className="badge-status">Activo</span>
+                  </div>
+                  <div className="card-body-content">
+                    <h3>{item.titulo}</h3>
+                    <p>{item.desc}</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#475569', marginBottom: '15px' }}>
+                      <span><strong>Horario:</strong> {item.horario}</span>
+                      <span><strong>Docente:</strong> {item.instructor}</span>
                     </div>
-
-                    <div className="card-body-content">
-                      <h3>{item.titulo}</h3>
-                      <p>{item.desc}</p>
-                      
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#475569', marginBottom: '15px' }}>
-                        <span><strong>Horario:</strong> {item.horario}</span>
-                        <span><strong>Docente:</strong> {item.instructor}</span>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
-                        {item.tipo === 'Virtual' ? (
-                          <>
-                            <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>
-                              Grabación
-                            </button>
-                            <a href={item.enlaceSede} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none' }}>
-                              Zoom
-                            </a>
-                          </>
-                        ) : (
-                          <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>
-                            Detalles Sede
-                          </button>
-                        )}
-                      </div>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                      {item.tipo === 'Virtual' ? (
+                        <>
+                          <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>Grabación</button>
+                          <a href={item.enlaceSede} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none' }}>Zoom</a>
+                        </>
+                      ) : (
+                        <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>Detalles Sede</button>
+                      )}
                     </div>
                   </div>
-                ))
-              ) : (
-                <p style={{ textAlign: 'center', color: '#64748b', gridColumn: '1 / -1', padding: '30px' }}>
-                  No se encontraron clases que coincidan con la búsqueda.
-                </p>
-              )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* SECCIÓN 3: DOCENTES (EXCLUSIVO PARA ALUMNOS) */}
+        {/* SECCIÓN 3: DOCENTES */}
         {rolUsuario === 'alumno' && (
           <div ref={seccionDocentesRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
               <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
-                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
-                  DOCENTES & INSTRUCTORES
-                </h2>
+                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>DOCENTES & INSTRUCTORES</h2>
               </div>
-
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                 {docentesDestacados.map(docente => (
-                  <div key={docente.id} style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid #cbd5e1', overflow: 'hidden', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                  <div key={docente.id} style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid #cbd5e1', overflow: 'hidden', textAlign: 'center' }}>
                     <img src={docente.foto} alt={docente.nombre} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
                     <div style={{ padding: '15px' }}>
                       <h3 style={{ margin: '0 0 5px 0', fontSize: '15px', color: '#1e293b', fontWeight: 'bold' }}>{docente.nombre}</h3>
                       <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#2563eb', fontWeight: 'bold' }}>{docente.especialidad}</p>
-                      <p style={{ margin: 0, fontSize: '11px', color: '#64748b', background: '#f1f5f9', padding: '6px', borderRadius: '6px' }}>
-                        <strong>Sede:</strong> {docente.sede}
-                      </p>
+                      <p style={{ margin: 0, fontSize: '11px', color: '#64748b', background: '#f1f5f9', padding: '6px', borderRadius: '6px' }}><strong>Sede:</strong> {docente.sede}</p>
                     </div>
                   </div>
                 ))}
@@ -618,23 +999,17 @@ export default function App() {
         <div ref={seccionBibliotecaRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
-              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
-                BIBLIOTECA VIRTUAL & LIBROS INTERACTIVOS (3D)
-              </h2>
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>BIBLIOTECA VIRTUAL & LIBROS INTERACTIVOS (3D)</h2>
             </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
               {listaLibros.map((libro) => (
-                <div key={libro.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
+                <div key={libro.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                   <img src={libro.portada} alt={libro.titulo} style={{ width: '100%', height: '210px', objectFit: 'cover' }} />
                   <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', flex: 1 }}>
                     <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '6px' }}>{libro.categoria}</span>
-                    <h3 style={{ fontSize: '15px', color: '#0f172a', margin: '0 0 8px 0', lineHeight: '1.4', fontWeight: 'bold' }}>{libro.titulo}</h3>
+                    <h3 style={{ fontSize: '15px', color: '#0f172a', margin: '0 0 8px 0', fontWeight: 'bold' }}>{libro.titulo}</h3>
                     <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 15px 0' }}>Autor: {libro.autor}</p>
-                    <button 
-                      onClick={() => setLibroSeleccionado(libro.pdfUrl)}
-                      style={{ marginTop: 'auto', padding: '10px 16px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}
-                    >
+                    <button onClick={() => setLibroSeleccionado(libro.pdfUrl)} style={{ marginTop: 'auto', padding: '10px 16px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
                       Leer en Flipbook 3D
                     </button>
                   </div>
@@ -644,20 +1019,14 @@ export default function App() {
           </div>
         </div>
 
-        {/* SECCIÓN 5: GESTIÓN DE USUARIOS (SÓLO DOCENTES) */}
+        {/* SECCIÓN 5: GESTIÓN DE USUARIOS (DOCENTES) */}
         {rolUsuario === 'docente' && (
           <div ref={seccionUsuariosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
-                  GESTIÓN DE USUARIOS Y ACCESOS
-                </h2>
-                <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
-                  + Nuevo Usuario
-                </button>
+              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE USUARIOS Y ACCESOS</h2>
+                <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>+ Nuevo Usuario</button>
               </div>
-
-              {/* CONTENEDOR CON SCROLL HORIZONTAL TÁCTIL */}
               <div className="table-responsive-wrapper">
                 <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', textAlign: 'left' }}>
                   <thead>
@@ -674,16 +1043,8 @@ export default function App() {
                       <tr key={u.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '13px', color: '#1e293b' }}>
                         <td style={{ padding: '14px', fontWeight: 'bold' }}>{u.usuario}</td>
                         <td style={{ padding: '14px' }}>{u.nombres}</td>
-                        <td style={{ padding: '14px' }}>
-                          <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', backgroundColor: u.rol === 'docente' ? '#e0f2fe' : '#f1f5f9', color: u.rol === 'docente' ? '#0369a1' : '#475569' }}>
-                            {u.rol}
-                          </span>
-                        </td>
-                        <td style={{ padding: '14px' }}>
-                          <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', backgroundColor: u.estado === 'activo' ? '#dcfce7' : '#fee2e2', color: u.estado === 'activo' ? '#166534' : '#991b1b' }}>
-                            {u.estado}
-                          </span>
-                        </td>
+                        <td style={{ padding: '14px' }}>{u.rol}</td>
+                        <td style={{ padding: '14px' }}>{u.estado}</td>
                         <td style={{ padding: '14px', textAlign: 'right', display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
                           <button onClick={() => abrirModalEditarUsuario(u)} style={{ background: '#e2e8f0', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Editar</button>
                           <button onClick={() => toggleEstadoUsuario(u.id)} style={{ background: u.estado === 'activo' ? '#fee2e2' : '#dcfce7', color: u.estado === 'activo' ? '#991b1b' : '#166534', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>
@@ -699,113 +1060,21 @@ export default function App() {
             </div>
           </div>
         )}
-
       </main>
 
-      {/* MODAL DETALLES DE LABORATORIO */}
+      {libroSeleccionado && <PdfFlipbook pdfUrl={libroSeleccionado} alCerrar={() => setLibroSeleccionado(null)} />}
       {laboratorioSeleccionado && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.75)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, backdropFilter: 'blur(5px)', padding: '20px', boxSizing: 'border-box' }}>
-          <div style={{ background: '#ffffff', width: '100%', maxWidth: '750px', maxHeight: '90vh', overflowY: 'auto', padding: '25px', borderRadius: '16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)', boxSizing: 'border-box' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
-              <h3 style={{ margin: 0, color: '#059669', fontSize: '18px', fontWeight: 'bold' }}>Ubicación y Detalle del Laboratorio</h3>
-              <button onClick={() => setLaboratorioSeleccionado(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar X</button>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.75)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px' }}>
+          <div style={{ background: '#fff', maxWidth: '700px', width: '100%', padding: '25px', borderRadius: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+              <h3 style={{ margin: 0, color: '#059669' }}>{laboratorioSeleccionado.titulo}</h3>
+              <button onClick={() => setLaboratorioSeleccionado(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar</button>
             </div>
-            
-            <div className="modal-laboratorio-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px', alignItems: 'center' }}>
-              <div>
-                <h4 style={{ fontSize: '17px', color: '#1e293b', marginBottom: '8px', fontWeight: 'bold' }}>{laboratorioSeleccionado.titulo}</h4>
-                <p style={{ color: '#475569', fontSize: '13px', lineHeight: '1.6', marginBottom: '12px' }}>{laboratorioSeleccionado.desc}</p>
-                <p style={{ fontSize: '13px', margin: '6px 0', color: '#1e293b' }}><strong>Sede y Aula:</strong> {laboratorioSeleccionado.enlaceSede}</p>
-                <p style={{ fontSize: '13px', margin: '6px 0', color: '#1e293b' }}><strong>Horario:</strong> {laboratorioSeleccionado.horario}</p>
-                <p style={{ fontSize: '13px', margin: '6px 0', color: '#1e293b' }}><strong>Docente:</strong> {laboratorioSeleccionado.instructor}</p>
-              </div>
-              <div>
-                <img src={laboratorioSeleccionado.ubicacionImg || laboratorioSeleccionado.imgUrl} alt="Ubicación Laboratorio" style={{ width: '100%', height: '210px', objectFit: 'cover', borderRadius: '10px', border: '1px solid #cbd5e1' }} />
-              </div>
-            </div>
+            <p>{laboratorioSeleccionado.desc}</p>
+            <p><strong>Sede:</strong> {laboratorioSeleccionado.enlaceSede} | <strong>Horario:</strong> {laboratorioSeleccionado.horario}</p>
           </div>
         </div>
       )}
-
-      {/* MODAL DEL VISOR FLIPBOOK */}
-      {libroSeleccionado && (
-        <PdfFlipbook pdfUrl={libroSeleccionado} alCerrar={() => setLibroSeleccionado(null)} />
-      )}
-
-      {/* MODAL CREAR / EDITAR USUARIO */}
-      {modalUsuario && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px', boxSizing: 'border-box' }}>
-          <div style={{ background: '#fff', width: '100%', maxWidth: '440px', padding: '25px', borderRadius: '12px', boxSizing: 'border-box' }}>
-            <h3 style={{ margin: '0 0 15px 0', color: '#0f172a' }}>{modoEdicion ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}</h3>
-            {mensajeUserMsg && <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '12px' }}>{mensajeUserMsg}</p>}
-            
-            <form onSubmit={handleGuardarUsuario} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '5px' }}>Nombre de usuario:</label>
-                <input 
-                  type="text" 
-                  disabled={modoEdicion}
-                  value={usuarioForm.usuario} 
-                  onChange={e => setUsuarioForm({...usuarioForm, usuario: e.target.value})}
-                  required 
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: modoEdicion ? '#f1f5f9' : '#fff', boxSizing: 'border-box' }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '5px' }}>Nombres completos:</label>
-                <input 
-                  type="text" 
-                  value={usuarioForm.nombres} 
-                  onChange={e => setUsuarioForm({...usuarioForm, nombres: e.target.value})}
-                  required 
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '5px' }}>Rol:</label>
-                <select 
-                  value={usuarioForm.rol} 
-                  onChange={e => setUsuarioForm({...usuarioForm, rol: e.target.value})}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
-                >
-                  <option value="alumno">Alumno</option>
-                  <option value="docente">Docente</option>
-                </select>
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-                <button type="submit" style={{ flex: 1, background: '#2563eb', color: '#fff', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Guardar</button>
-                <button type="button" onClick={() => setModalUsuario(false)} style={{ flex: 1, background: '#e2e8f0', color: '#334155', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Cancelar</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL RESETEAR CONTRASEÑA */}
-      {modalResetPass && userToReset && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px', boxSizing: 'border-box' }}>
-          <div style={{ background: '#fff', width: '100%', maxWidth: '390px', padding: '25px', borderRadius: '12px', boxSizing: 'border-box' }}>
-            <h3 style={{ margin: '0 0 8px 0', color: '#0f172a' }}>Restablecer Clave</h3>
-            <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '15px' }}>Nueva clave para el usuario <strong>{userToReset.usuario}</strong>:</p>
-            
-            <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <input 
-                type="password" 
-                value={newPasswordInput} 
-                onChange={e => setNewPasswordInput(e.target.value)} 
-                required 
-                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
-              />
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button type="submit" style={{ flex: 1, background: '#d97706', color: '#fff', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Actualizar</button>
-                <button type="button" onClick={() => setModalResetPass(false)} style={{ flex: 1, background: '#e2e8f0', color: '#334155', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Cancelar</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }
