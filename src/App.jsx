@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import PdfFlipbook from './components/PdfFlipbook';
 
-// ⚠️ CAMBIA ESTE NÚMERO POR EL WHATSAPP OFICIAL (con código de país 51)
-const WHATSAPP_NUMERO = '51987654321';
+// ⚠️ NÚMERO DE WHATSAPP ACTUALIZADO
+const WHATSAPP_NUMERO = '51967107035';
 
 // Catálogo base de respaldo instantáneo (también se sincroniza con Aiven/Render)
 const CATALOGO_INICIAL = [
@@ -251,6 +251,7 @@ export default function App() {
 
     const textoFinal = `${saludo}\nDeseo adquirir los siguientes cursos de Ingeniería Mecatrónica:\n\n${listaTexto}\n\n💰 *Total a pagar: S/ ${totalCarrito.toFixed(2)}*\n\n¿Me podrían brindar los medios de pago e información para habilitar mi acceso al Aula Virtual?`;
 
+    // Redirige directamente a la app de WhatsApp en móviles o web en desktop
     const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`;
     window.open(url, '_blank');
   };
@@ -528,14 +529,11 @@ export default function App() {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#0f172a', color: '#f8fafc', fontFamily: 'system-ui, sans-serif' }}>
         
-        {/* NAVBAR PÚBLICO */}
+        {/* NAVBAR PÚBLICO LIMPIO */}
         <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #1e293b', padding: '14px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div>
-            <span style={{ background: '#2563eb', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '3px 8px', borderRadius: '4px', letterSpacing: '1px' }}>
-              ESPECIALIZACIÓN EN INGENIERÍA MECATRÓNICA
-            </span>
-            <h1 style={{ margin: '4px 0 0 0', fontSize: '20px', color: '#38bdf8', fontWeight: 'bold' }}>
-              Pórtico San Marcos
+            <h1 style={{ margin: '0', fontSize: '22px', color: '#38bdf8', fontWeight: 'bold' }}>
+              Aula Virtual Pórtico San Marcos
             </h1>
           </div>
 
@@ -601,7 +599,7 @@ export default function App() {
           ))}
         </div>
 
-        {/* GRILLA DE LOS 10 CURSOS */}
+        {/* GRILLA DE LOS CURSOS */}
         <main style={{ maxWidth: '1260px', margin: '0 auto', padding: '0 20px 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '24px' }}>
           {cursosTiendaFiltrados.map(curso => (
             <div key={curso.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 25px rgba(0,0,0,0.25)' }}>
@@ -753,9 +751,12 @@ export default function App() {
 
                     <button
                       onClick={enviarPedidoWhatsApp}
-                      style={{ width: '100%', background: '#22c55e', color: '#052e16', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '15px', cursor: 'pointer' }}
+                      style={{ width: '100%', background: '#25D366', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '15px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)' }}
                     >
-                      💬 Coordinar Compra por WhatsApp
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+                      </svg>
+                      Coordinar por WhatsApp
                     </button>
                   </div>
                 </>
