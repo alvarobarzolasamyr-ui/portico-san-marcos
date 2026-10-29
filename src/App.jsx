@@ -48,7 +48,7 @@ const CATALOGO_INICIAL = [
     horario: 'Viernes - 7:00 PM',
     instructor: 'Ing. Carlos Mendoza',
     enlaceSede: 'Campus Central - Laboratorio de Electrónica',
-    ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'
+    ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800'
   },
   {
     id: 3,
@@ -180,7 +180,7 @@ const CATALOGO_INICIAL = [
     horario: 'Martes - 4:00 PM',
     instructor: 'Ing. Luis Alvarado',
     enlaceSede: 'Sede Arequipa - Pabellón B - Lab 2',
-    ubicacionImg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'
+    ubicacionImg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800'
   },
   {
     id: 9,
@@ -247,7 +247,7 @@ export default function App() {
     return guardado ? JSON.parse(guardado) : [];
   });
 
-  // ESTADOS DE SEGURIDAD Y TRATAMIENTO DE DATOS PERSONALES (LEY N° 29733)
+  // ESTADOS DE SEGURIDAD Y TRATAMIENTO DE DATOS SIMPLIFICADO
   const [aceptaDatosLogin, setAceptaDatosLogin] = useState(false);
   const [aceptaDatosCarrito, setAceptaDatosCarrito] = useState(false);
   const [modalPrivacidadAbierto, setModalPrivacidadAbierto] = useState(false);
@@ -255,7 +255,7 @@ export default function App() {
   const [intentosFallidos, setIntentosFallidos] = useState(0);
   const [tiempoBloqueo, setTiempoBloqueo] = useState(0);
 
-  // Temporizador para desbloquear el login tras ataques de fuerza bruta
+  // Temporizador para fuerza bruta
   useEffect(() => {
     if (tiempoBloqueo <= 0) return;
     const timer = setInterval(() => {
@@ -299,7 +299,7 @@ export default function App() {
   const estaEnCarrito = (id) => carrito.some(item => item.id === id);
   const totalCarrito = carrito.reduce((acc, item) => acc + Number(item.precio), 0);
 
-  // ENVÍO DIRECTO A WHATSAPP CON VALIDACIÓN DE TRATAMIENTO DE DATOS
+  // ENVÍO DIRECTO A WHATSAPP
   const enviarPedidoWhatsApp = () => {
     if (carrito.length === 0) return;
     if (!aceptaDatosCarrito) {
@@ -313,7 +313,7 @@ export default function App() {
     const listaTexto = carrito
       .map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`)
       .join('\n');
-    const textoFinal = `${saludo}\nDeseo adquirir los siguientes cursos de Ingeniería Mecatrónica:\n\n${listaTexto}\n\n💰 *Total a pagar: S/ ${totalCarrito.toFixed(2)}*\n\n*(He leído y acepto la Política de Tratamiento de Datos Personales)*\n¿Me podrían brindar los medios de pago e información para habilitar mi acceso al Aula Virtual?`;
+    const textoFinal = `${saludo}\nDeseo adquirir los siguientes cursos de Ingeniería Mecatrónica:\n\n${listaTexto}\n\n💰 *Total a pagar: S/ ${totalCarrito.toFixed(2)}*\n\n*(He leído y acepto la política de datos)*\n¿Me podrían brindar los medios de pago para habilitar mi acceso?`;
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
   };
 
@@ -392,11 +392,11 @@ export default function App() {
   ];
 
   const [listaUsuarios, setListaUsuarios] = useState([
-    { id: 1, usuario: 'jperez', nombres: 'Juan Pérez', rol: 'alumno', estado: 'activo', consentimiento: 'Aceptado (Ley 29733)' },
-    { id: 2, usuario: 'mgomez', nombres: 'María Gómez', rol: 'alumno', estado: 'activo', consentimiento: 'Aceptado (Ley 29733)' },
-    { id: 3, usuario: 'cmendoza', nombres: 'Carlos Mendoza', rol: 'docente', estado: 'activo', consentimiento: 'Aceptado (Ley 29733)' },
-    { id: 4, usuario: 'fbarzola', nombres: 'Fabrizio Barzola', rol: 'docente', estado: 'activo', consentimiento: 'Aceptado (Ley 29733)' },
-    { id: 5, usuario: 'lalvarado', nombres: 'Luis Alvarado', rol: 'docente', estado: 'activo', consentimiento: 'Aceptado (Ley 29733)' }
+    { id: 1, usuario: 'jperez', nombres: 'Juan Pérez', rol: 'alumno', estado: 'activo' },
+    { id: 2, usuario: 'mgomez', nombres: 'María Gómez', rol: 'alumno', estado: 'activo' },
+    { id: 3, usuario: 'cmendoza', nombres: 'Carlos Mendoza', rol: 'docente', estado: 'activo' },
+    { id: 4, usuario: 'fbarzola', nombres: 'Fabrizio Barzola', rol: 'docente', estado: 'activo' },
+    { id: 5, usuario: 'lalvarado', nombres: 'Luis Alvarado', rol: 'docente', estado: 'activo' }
   ]);
   const [modalUsuario, setModalUsuario] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -406,21 +406,18 @@ export default function App() {
   const [userToReset, setUserToReset] = useState(null);
   const [newPasswordInput, setNewPasswordInput] = useState('');
 
-  // LOGIN CONECTADO A RENDER CON SEGURIDAD Y TRATAMIENTO DE DATOS
+  // LOGIN CONECTADO A RENDER CON SEGURIDAD Y TRATAMIENTO DE DATOS SIMPLIFICADO
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-
     if (tiempoBloqueo > 0) return;
-
     if (!aceptaDatosLogin) {
-      setMensaje('Debes aceptar la Política de Tratamiento de Datos Personales para iniciar sesión.');
+      setMensaje('Debes aceptar la Política de Privacidad para continuar.');
       return;
     }
 
-    // Sanitización preventiva del usuario (evita inyección de caracteres maliciosos)
     const usuarioSanitizado = usuario.replace(/[^a-zA-Z0-9._-]/g, '').trim();
 
-    setMensaje('Verificando credenciales cifradas...');
+    setMensaje('Verificando credenciales...');
     try {
       const response = await fetch('https://portico-san-marcos.onrender.com/api/auth/login', {
         method: 'POST',
@@ -440,19 +437,18 @@ export default function App() {
         localStorage.setItem('sesionIniciada', 'true');
         localStorage.setItem('usuarioLogueado', nombreUsr);
         localStorage.setItem('rolUsuario', rolUsr);
-        localStorage.setItem('consentimientoDatos', new Date().toISOString());
       } else {
         const nuevosIntentos = intentosFallidos + 1;
         setIntentosFallidos(nuevosIntentos);
         if (nuevosIntentos >= 3) {
           setTiempoBloqueo(30);
-          setMensaje('⚠️ Demasiados intentos fallidos. Acceso bloqueado por seguridad durante 30 segundos.');
+          setMensaje('⚠️ Demasiados intentos fallidos. Bloqueado por 30 segundos.');
         } else {
-          setMensaje(`${data.message || 'Credenciales incorrectas'} (Intento ${nuevosIntentos}/3)`);
+          setMensaje(`${data.message || 'Credenciales incorrectas'} (${nuevosIntentos}/3)`);
         }
       }
     } catch (error) {
-      setMensaje('Error de conexión segura con el servidor.');
+      setMensaje('Error de conexión con el servidor.');
     }
   };
 
@@ -460,7 +456,6 @@ export default function App() {
     localStorage.removeItem('sesionIniciada');
     localStorage.removeItem('usuarioLogueado');
     localStorage.removeItem('rolUsuario');
-    localStorage.removeItem('consentimientoDatos');
     setSesionIniciada(false);
     setUsuario('');
     setPassword('');
@@ -498,8 +493,7 @@ export default function App() {
           usuario: usuarioForm.usuario.replace(/[^a-zA-Z0-9._-]/g, ''),
           nombres: usuarioForm.nombres,
           rol: usuarioForm.rol,
-          estado: 'activo',
-          consentimiento: 'Aceptado (Ley 29733)'
+          estado: 'activo'
         }
       ]);
       setModalUsuario(false);
@@ -514,61 +508,38 @@ export default function App() {
   const handleResetPassword = (e) => {
     e.preventDefault();
     if (!newPasswordInput) return;
-    if (newPasswordInput.length < 6) {
-      alert('Por seguridad, la contraseña debe tener al menos 6 caracteres.');
-      return;
-    }
-    alert(`Contraseña del usuario '${userToReset.usuario}' actualizada y hasheada con Bcrypt.`);
+    alert(`Contraseña del usuario '${userToReset.usuario}' actualizada con éxito.`);
     setModalResetPass(false);
     setNewPasswordInput('');
     setUserToReset(null);
   };
 
-  // MODAL DE POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES (LEY N° 29733)
+  // VENTANA MODAL DE POLÍTICA SIMPLIFICADA (LEY 29733)
   const renderModalPrivacidad = () => {
     if (!modalPrivacidadAbierto) return null;
     return (
       <div onClick={() => setModalPrivacidadAbierto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.88)', backdropFilter: 'blur(6px)', zIndex: 99999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-        <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', color: '#f8fafc', border: '1px solid #334155', borderRadius: '16px', maxWidth: '640px', width: '100%', maxHeight: '88vh', overflowY: 'auto', padding: '28px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.6)' }}>
-          <button onClick={() => setModalPrivacidadAbierto(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar ✕</button>
+        <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', color: '#f8fafc', border: '1px solid #334155', borderRadius: '16px', maxWidth: '500px', width: '100%', padding: '24px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.6)' }}>
+          <button onClick={() => setModalPrivacidadAbierto(false)} style={{ position: 'absolute', top: '14px', right: '14px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '5px 10px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>Cerrar ✕</button>
           
-          <span style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>
-            CUMPLIMIENTO NORMATIVO PERÚ - LEY N° 29733
-          </span>
-          <h2 style={{ margin: '10px 0 14px 0', fontSize: '21px', color: '#fff' }}>
-            Política de Seguridad y Tratamiento de Datos Personales
-          </h2>
+          <h3 style={{ margin: '0 0 12px 0', fontSize: '18px', color: '#fff' }}>
+            Política de Privacidad (Ley N° 29733)
+          </h3>
 
-          <div style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: '1.65', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <p style={{ margin: 0 }}>
-              En cumplimiento de la <strong>Ley N° 29733 (Ley de Protección de Datos Personales)</strong> y su Reglamento (D.S. N° 003-2013-JUS), <strong>Aula Virtual Pórtico San Marcos</strong> informa a sus estudiantes, docentes y usuarios sobre el tratamiento seguro de su información:
-            </p>
-            <div style={{ background: '#0f172a', padding: '12px 16px', borderRadius: '8px', borderLeft: '4px solid #38bdf8' }}>
-              <strong>1. Finalidad del Tratamiento de Datos:</strong><br />
-              Los datos personales recolectados (nombres, apellidos, usuario institucional y registros académicos) se utilizan única y exclusivamente para la gestión académica, control de acceso al Aula Virtual y coordinación de matrículas.
-            </div>
-            <div style={{ background: '#0f172a', padding: '12px 16px', borderRadius: '8px', borderLeft: '4px solid #34d399' }}>
-              <strong>2. Medidas Técnicas de Seguridad en Base de Datos:</strong><br />
-              • <strong>Cifrado de Contraseñas (Bcrypt):</strong> Ninguna clave se almacena en texto plano; todas las credenciales se procesan mediante algoritmos de hashing irreversible con sal criptográfica (<code>$2b$10$</code>).<br />
-              • <strong>Transporte Seguro (SSL/TLS):</strong> La conexión entre el servidor y la base de datos en la nube (Aiven MySQL) opera bajo modo <code>SSL REQUIRED</code>.<br />
-              • <strong>Prevención de Intrusiones:</strong> El sistema bloquea automáticamente intentos repetidos de acceso no autorizado (fuerza bruta).
-            </div>
-            <div style={{ background: '#0f172a', padding: '12px 16px', borderRadius: '8px', borderLeft: '4px solid #f59e0b' }}>
-              <strong>3. Derechos ARCO del Titular:</strong><br />
-              Todo usuario puede ejercer gratuitamente sus derechos de <strong>Acceso, Rectificación, Cancelación y Oposición (ARCO)</strong> sobre sus datos personales comunicándose con la administración académica de Pórtico San Marcos.
-            </div>
-          </div>
+          <p style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 20px 0' }}>
+            Tus datos personales y credenciales son protegidos mediante cifrado seguro y se utilizan exclusivamente para la gestión académica, control de acceso y coordinación de matrículas dentro del Aula Virtual Pórtico San Marcos. Puedes ejercer tus derechos de acceso o rectificación comunicándote con administración.
+          </p>
 
-          <div style={{ marginTop: '20px', textAlign: 'right', borderTop: '1px solid #334155', paddingTop: '14px' }}>
+          <div style={{ textAlign: 'right' }}>
             <button
               onClick={() => {
                 setAceptaDatosLogin(true);
                 setAceptaDatosCarrito(true);
                 setModalPrivacidadAbierto(false);
               }}
-              style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}
+              style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}
             >
-              ✓ Entendido y Acepto la Política
+              Entendido y Aceptar
             </button>
           </div>
         </div>
@@ -681,7 +652,7 @@ export default function App() {
           </div>
         )}
 
-        {/* CARRITO LATERAL (CON CONSENTIMIENTO DE DATOS PERSONALES) */}
+        {/* CARRITO LATERAL (CON CONSENTIMIENTO BREVE) */}
         {carritoAbierto && (
           <div onClick={() => setCarritoAbierto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 250, display: 'flex', justifyContent: 'flex-end' }}>
             <aside onClick={e => e.stopPropagation()} style={{ background: '#1e293b', width: '100%', maxWidth: '410px', height: '100vh', padding: '24px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
@@ -721,12 +692,12 @@ export default function App() {
                         type="checkbox"
                         checked={aceptaDatosCarrito}
                         onChange={e => setAceptaDatosCarrito(e.target.checked)}
-                        style={{ marginTop: '3px', cursor: 'pointer' }}
+                        style={{ marginTop: '2px', cursor: 'pointer' }}
                       />
                       <span>
-                        Autorizo el tratamiento de mis datos personales según la{' '}
+                        Acepto la{' '}
                         <button type="button" onClick={() => setModalPrivacidadAbierto(true)} style={{ background: 'none', border: 'none', color: '#38bdf8', textDecoration: 'underline', padding: 0, cursor: 'pointer', fontSize: '12px' }}>
-                          Ley N° 29733
+                          Política de Privacidad
                         </button>.
                       </span>
                     </label>
@@ -747,19 +718,16 @@ export default function App() {
           </div>
         )}
 
-        {/* MODAL DE LOGIN FORMAL CON SEGURIDAD Y TRATAMIENTO DE DATOS PERSONALES */}
+        {/* MODAL DE LOGIN LIMPIO Y FORMAL */}
         {mostrarModalLogin && (
           <div onClick={() => setMostrarModalLogin(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)', zIndex: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', padding: '38px 30px', borderRadius: '16px', width: '100%', maxWidth: '430px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', padding: '38px 30px', borderRadius: '16px', width: '100%', maxWidth: '420px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
               
               <button onClick={() => setMostrarModalLogin(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
 
               <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <h2 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '24px', fontWeight: '800' }}>Pórtico San Marcos</h2>
                 <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0, lineHeight: '1.5' }}>Acceso exclusivo para estudiantes y docentes matriculados en la institución.</p>
-                <div style={{ marginTop: '10px', display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(16, 185, 129, 0.12)', color: '#34d399', padding: '4px 10px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
-                  🔒 Cifrado Bcrypt & SSL Activo
-                </div>
               </div>
 
               <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -795,7 +763,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* CHECKBOX DE TRATAMIENTO DE DATOS PERSONALES */}
+                {/* CHECKBOX DE POLÍTICA */}
                 <div style={{ background: '#0f172a', padding: '10px 12px', borderRadius: '8px', border: '1px solid #334155' }}>
                   <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', color: '#cbd5e1', cursor: 'pointer', lineHeight: '1.4' }}>
                     <input
@@ -805,13 +773,13 @@ export default function App() {
                       style={{ marginTop: '2px', cursor: 'pointer' }}
                     />
                     <span>
-                      He leído y acepto la{' '}
+                      Acepto la{' '}
                       <button
                         type="button"
                         onClick={() => setModalPrivacidadAbierto(true)}
                         style={{ background: 'none', border: 'none', color: '#38bdf8', textDecoration: 'underline', padding: 0, cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}
                       >
-                        Política de Tratamiento de Datos Personales (Ley N° 29733)
+                        Política de Privacidad
                       </button>.
                     </span>
                   </label>
@@ -828,7 +796,7 @@ export default function App() {
                   disabled={tiempoBloqueo > 0}
                   style={{ width: '100%', padding: '14px', background: tiempoBloqueo > 0 ? '#475569' : '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '800', fontSize: '15px', cursor: tiempoBloqueo > 0 ? 'not-allowed' : 'pointer', marginTop: '4px', transition: '0.2s' }}
                 >
-                  {tiempoBloqueo > 0 ? `Bloqueado por seguridad (${tiempoBloqueo}s)` : 'Ingresar al Aula Virtual'}
+                  {tiempoBloqueo > 0 ? `Bloqueado (${tiempoBloqueo}s)` : 'Ingresar al Aula Virtual'}
                 </button>
               </form>
             </div>
@@ -851,7 +819,7 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div>
             <h2 style={{ margin: 0, fontSize: '18px', color: '#38bdf8', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
-            <span style={{ fontSize: '11px', color: '#94a3b8' }}>Aula Virtual & Biblioteca 3D | 🔒 Datos Protegidos (Ley 29733)</span>
+            <span style={{ fontSize: '11px', color: '#94a3b8' }}>Aula Virtual & Biblioteca 3D</span>
           </div>
         </div>
 
@@ -1027,26 +995,21 @@ export default function App() {
           </div>
         </div>
 
-        {/* SECCIÓN 5: GESTIÓN DE USUARIOS CON AUDITORÍA DE SEGURIDAD (DOCENTES) */}
+        {/* SECCIÓN 5: GESTIÓN DE USUARIOS (DOCENTES) */}
         {rolUsuario === 'docente' && (
           <div ref={seccionUsuariosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                <div>
-                  <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE USUARIOS Y TRATAMIENTO DE DATOS</h2>
-                  <span style={{ fontSize: '12px', color: '#059669', fontWeight: 'bold' }}>🔒 Base de Datos Aiven protegida con Hash Bcrypt ($2b$10$) y SSL</span>
-                </div>
+              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE USUARIOS Y ACCESOS</h2>
                 <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>+ Nuevo Usuario</button>
               </div>
               <div className="table-responsive-wrapper">
-                <table style={{ width: '100%', minWidth: '720px', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontSize: '13px' }}>
                       <th style={{ padding: '14px' }}>Usuario</th>
                       <th style={{ padding: '14px' }}>Nombres</th>
                       <th style={{ padding: '14px' }}>Rol</th>
-                      <th style={{ padding: '14px' }}>Seguridad Clave</th>
-                      <th style={{ padding: '14px' }}>Datos Personales</th>
                       <th style={{ padding: '14px' }}>Estado</th>
                       <th style={{ padding: '14px', textAlign: 'right' }}>Acciones</th>
                     </tr>
@@ -1057,14 +1020,6 @@ export default function App() {
                         <td style={{ padding: '14px', fontWeight: 'bold' }}>{u.usuario}</td>
                         <td style={{ padding: '14px' }}>{u.nombres}</td>
                         <td style={{ padding: '14px' }}>{u.rol}</td>
-                        <td style={{ padding: '14px' }}>
-                          <span style={{ background: '#dcfce7', color: '#166534', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>
-                            Hash Bcrypt
-                          </span>
-                        </td>
-                        <td style={{ padding: '14px', fontSize: '12px', color: '#0369a1', fontWeight: 'bold' }}>
-                          {u.consentimiento || 'Aceptado (Ley 29733)'}
-                        </td>
                         <td style={{ padding: '14px' }}>{u.estado}</td>
                         <td style={{ padding: '14px', textAlign: 'right', display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
                           <button onClick={() => abrirModalEditarUsuario(u)} style={{ background: '#e2e8f0', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Editar</button>
