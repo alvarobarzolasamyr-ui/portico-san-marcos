@@ -11,7 +11,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ⚠️ CONFIGURACIÓN MERCADO PAGO: Reemplaza este token por tu Access Token real (PRODUCCIÓN)
+// ⚠️ Pon aquí tu token real de Mercado Pago (o cámbialo luego en las variables de entorno de Render)
 const client = new MercadoPagoConfig({ 
   accessToken: process.env.MP_ACCESS_TOKEN || 'APP_USR-AQUI-VA-TU-TOKEN-REAL' 
 });
@@ -40,13 +40,12 @@ app.post('/api/pagos/crear-preferencia', async (req, res) => {
   try {
     const { carrito, nombreUsuario } = req.body;
 
-    // Convertir el carrito al formato de MercadoPago
     const items = carrito.map(curso => ({
       id: curso.id.toString(),
       title: curso.titulo,
       unit_price: Number(curso.precio),
       quantity: 1,
-      currency_id: 'PEN' // Moneda: Soles
+      currency_id: 'PEN'
     }));
 
     const preference = new Preference(client);
@@ -55,7 +54,7 @@ app.post('/api/pagos/crear-preferencia', async (req, res) => {
         items: items,
         payer: { name: nombreUsuario || 'Alumno San Marcos' },
         back_urls: {
-          success: 'https://portico-san-marcos.vercel.app/', // Cambia esto por tu dominio real
+          success: 'https://portico-san-marcos.vercel.app/',
           failure: 'https://portico-san-marcos.vercel.app/',
           pending: 'https://portico-san-marcos.vercel.app/'
         },
@@ -63,7 +62,6 @@ app.post('/api/pagos/crear-preferencia', async (req, res) => {
       }
     });
 
-    // Enviar el link de pago al frontend
     res.json({ urlPago: result.init_point });
   } catch (error) {
     console.error('Error en Mercado Pago:', error);

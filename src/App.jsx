@@ -300,7 +300,7 @@ export default function App() {
       const data = await response.json();
       
       if (data && data.urlPago) {
-        window.location.href = data.urlPago; // Redirección directa y segura a Mercado Pago
+        window.location.href = data.urlPago; 
       } else {
         throw new Error("No se recibió la URL de pago");
       }
@@ -584,7 +584,6 @@ export default function App() {
               <button onClick={() => setMostrarModalLogin(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
 
               <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-                <span style={{ display: 'inline-block', background: 'rgba(37, 99, 235, 0.1)', color: '#38bdf8', padding: '6px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '12px' }}>AULA VIRTUAL</span>
                 <h2 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '24px', fontWeight: '800' }}>Pórtico San Marcos</h2>
                 <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0, lineHeight: '1.5' }}>Acceso exclusivo para estudiantes y docentes matriculados en la institución.</p>
               </div>
