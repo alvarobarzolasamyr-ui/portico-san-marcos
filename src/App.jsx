@@ -285,7 +285,7 @@ export default function App() {
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
   };
 
-  // BOTÓN DE MERCADO PAGO CORREGIDO
+  // BOTÓN DE MERCADO PAGO CORREGIDO CON DIAGNÓSTICO
   const procesarPagoOnline = async () => {
     if (carrito.length === 0) return;
     try {
@@ -295,18 +295,20 @@ export default function App() {
         body: JSON.stringify({ carrito: carrito, nombreUsuario: nombreInteresado })
       });
       
-      if (!response.ok) throw new Error("Error en la respuesta del servidor");
-      
       const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Error interno en el servidor de Render");
+      }
       
       if (data && data.urlPago) {
         window.location.href = data.urlPago; 
       } else {
-        throw new Error("No se recibió la URL de pago");
+        throw new Error("Mercado Pago no devolvió la URL de cobro");
       }
     } catch (error) {
       console.error("Error al procesar pago:", error);
-      alert("Hubo un error de conexión con la pasarela de pagos. Por favor, intenta de nuevo o coordina vía WhatsApp.");
+      alert(`Fallo en el pago: ${error.message}\n\nSi el error es del servidor, revisa los logs en Render o verifica el Access Token.`);
     }
   };
 
@@ -561,7 +563,6 @@ export default function App() {
                       <strong style={{ color: '#34d399' }}>S/ {totalCarrito.toFixed(2)}</strong>
                     </div>
                     
-                    {/* BOTONES DE PAGO REVISADOS */}
                     <button onClick={procesarPagoOnline} style={{ width: '100%', background: '#009ee3', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0, 158, 227, 0.3)' }}>
                       💳 Pagar en Línea (Tarjeta / Yape / Plin)
                     </button>
@@ -630,7 +631,7 @@ export default function App() {
   }
 
   // =========================================================================
-  // VISTA 2: INTERIOR DEL AULA VIRTUAL (TU CÓDIGO ORIGINAL COMPLETO)
+  // VISTA 2: INTERIOR DEL AULA VIRTUAL
   // =========================================================================
   return (
     <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
@@ -702,7 +703,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* SECCIÓN 2: CURSOS Y CLASES (AULA) */}
+        {/* SECCIÓN 2: CURSOS Y CLASES */}
         <div ref={seccionCursosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>
@@ -792,7 +793,7 @@ export default function App() {
           </div>
         )}
 
-        {/* SECCIÓN 4: BIBLIOTECA DIGITAL FLIPBOOK (RESTAURADA) */}
+        {/* SECCIÓN 4: BIBLIOTECA DIGITAL FLIPBOOK */}
         <div ref={seccionBibliotecaRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
