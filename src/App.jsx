@@ -2,10 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import PdfFlipbook from './components/PdfFlipbook';
 
-// ⚠️ NÚMERO DE WHATSAPP
 const WHATSAPP_NUMERO = '51967107035';
 
-// CATÁLOGO MAESTRO UNIFICADO (Alimenta la Tienda Pública y el Aula Interna)
+// CATÁLOGO MAESTRO UNIFICADO (Tienda y Aula)
 const CATALOGO_INICIAL = [
   {
     id: 1,
@@ -23,7 +22,6 @@ const CATALOGO_INICIAL = [
       'Módulo 4: Cinemática Inversa algebraica y geométrica',
       'Módulo 5: Planificación de trayectorias articulares'
     ],
-    // Campos Internos Aula Virtual
     tipo: 'Virtual',
     horario: 'Martes y Jueves - 7:00 PM',
     instructor: 'Ing. Fabrizio Barzola',
@@ -231,17 +229,13 @@ const CATALOGO_INICIAL = [
 ];
 
 export default function App() {
-  // -------------------------------------------------------------
-  // 1. ESTADOS DE SESIÓN (Funcionalidad original)
-  // -------------------------------------------------------------
+  // ESTADOS GENERALES DE SESIÓN Y CATÁLOGO
   const [sesionIniciada, setSesionIniciada] = useState(() => localStorage.getItem('sesionIniciada') === 'true');
   const [usuarioLogueado, setUsuarioLogueado] = useState(() => localStorage.getItem('usuarioLogueado') || '');
   const [rolUsuario, setRolUsuario] = useState(() => localStorage.getItem('rolUsuario') || '');
-
-  // -------------------------------------------------------------
-  // 2. ESTADOS DEL CATÁLOGO UNIFICADO Y TIENDA PÚBLICA
-  // -------------------------------------------------------------
   const [cursosCatalogo, setCursosCatalogo] = useState(CATALOGO_INICIAL);
+  
+  // ESTADOS DE LA TIENDA Y CARRITO
   const [catTiendaActiva, setCatTiendaActiva] = useState('Todos');
   const [busquedaTienda, setBusquedaTienda] = useState('');
   const [cursoDemoModal, setCursoDemoModal] = useState(null);
@@ -253,11 +247,11 @@ export default function App() {
     return guardado ? JSON.parse(guardado) : [];
   });
 
+  // SINCRONIZACIÓN Y PERSISTENCIA
   useEffect(() => {
     localStorage.setItem('carrito_portico', JSON.stringify(carrito));
   }, [carrito]);
 
-  // Consulta al backend para actualizar catálogo manteniendo datos internos (horarios)
   useEffect(() => {
     fetch('https://portico-san-marcos.onrender.com/api/catalogo')
       .then(res => res.json())
@@ -270,10 +264,10 @@ export default function App() {
           setCursosCatalogo(cursosUnificados);
         }
       })
-      .catch(() => console.log('Mostrando catálogo local mientras inicia backend.'));
+      .catch(() => console.log('Usando catálogo local (backend en suspensión).'));
   }, []);
 
-  // Lógica del Carrito
+  // LÓGICA DEL CARRITO
   const agregarAlCarrito = (curso) => {
     if (!carrito.some(item => item.id === curso.id)) setCarrito([...carrito, curso]);
     setCarritoAbierto(true);
@@ -282,7 +276,7 @@ export default function App() {
   const estaEnCarrito = (id) => carrito.some(item => item.id === id);
   const totalCarrito = carrito.reduce((acc, item) => acc + Number(item.precio), 0);
 
-  // Pasarelas de Pago y WhatsApp
+  // BOTÓN DE WHATSAPP
   const enviarPedidoWhatsApp = () => {
     if (carrito.length === 0) return;
     const saludo = nombreInteresado.trim() ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreInteresado.trim()}*.` : `¡Hola *Pórtico San Marcos*! 👋`;
@@ -291,6 +285,7 @@ export default function App() {
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
   };
 
+  // BOTÓN DE MERCADO PAGO CORREGIDO
   const procesarPagoOnline = async () => {
     if (carrito.length === 0) return;
     try {
@@ -299,20 +294,23 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ carrito: carrito, nombreUsuario: nombreInteresado })
       });
+      
+      if (!response.ok) throw new Error("Error en la respuesta del servidor");
+      
       const data = await response.json();
-      if (data.urlPago) {
-        window.location.href = data.urlPago; 
+      
+      if (data && data.urlPago) {
+        window.location.href = data.urlPago; // Redirección directa y segura a Mercado Pago
       } else {
-        alert("El backend está iniciando. Intenta nuevamente en unos segundos.");
+        throw new Error("No se recibió la URL de pago");
       }
     } catch (error) {
-      alert("Error al conectar con Mercado Pago.");
+      console.error("Error al procesar pago:", error);
+      alert("Hubo un error de conexión con la pasarela de pagos. Por favor, intenta de nuevo o coordina vía WhatsApp.");
     }
   };
 
-  // -------------------------------------------------------------
-  // 3. ESTADOS DEL AULA VIRTUAL INTERNA (Tus variables originales)
-  // -------------------------------------------------------------
+  // ESTADOS DEL AULA VIRTUAL
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [modalidadFiltro, setModalidadFiltro] = useState('virtual'); 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todas');
@@ -342,25 +340,25 @@ export default function App() {
 
   const [videoActivo, setVideoActivo] = useState(null);
   const [laboratorioSeleccionado, setLaboratorioSeleccionado] = useState(null);
-  
-  // VARIABLE DEL VISOR 3D FLIPBOOK ORIGINAL
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
 
+  // BIBLIOTECA RESTAURADA COMPLETA (4 LIBROS)
   const listaLibros = [
-    { id: 1, titulo: 'Manual TIA Portal', autor: 'Ing. Carlos Mendoza', categoria: 'ingenieria', portada: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600', pdfUrl: '/manual_plc.pdf' },
-    { id: 2, titulo: 'Guía Práctica ESP32', autor: 'Ing. Fabrizio Barzola', categoria: 'mecatronica', portada: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=600', pdfUrl: '/guia_esp32.pdf' }
+    { id: 1, titulo: 'Manual de Automatización e Industria 4.0 (TIA Portal)', autor: 'Ing. Carlos Mendoza', categoria: 'ingenieria', portada: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600', pdfUrl: '/manual_plc.pdf' },
+    { id: 2, titulo: 'Arquitectura Limpia y Microservicios Node.js', autor: 'Dr. Roberto Gómez', categoria: 'programacion', portada: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600', pdfUrl: '/node_microservicios.pdf' },
+    { id: 3, titulo: 'Guía Práctica de Robótica e IoT (ESP32)', autor: 'Ing. Fabrizio Barzola', categoria: 'mecatronica', portada: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=600', pdfUrl: '/guia_esp32.pdf' },
+    { id: 4, titulo: 'Fundamentos de Neumática ISO 1219', autor: 'Ing. Luis Alvarado', categoria: 'mecatronica', portada: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=600', pdfUrl: '/neumatica_iso1219.pdf' }
   ];
 
-  // DOCENTES ORIGINALES
-  const docentesDestacados = [
-    { id: 1, nombre: 'Ing. Fabrizio Barzola', especialidad: 'Especialista en Robótica', sede: 'Lab 4', foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600' },
-    { id: 2, nombre: 'Ing. Carlos Mendoza', especialidad: 'PLC Siemens', sede: 'Lab Electrónica', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600' }
-  ];
-
-  // GESTIÓN DE USUARIOS ORIGINAL
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [mensaje, setMensaje] = useState('');
+
+  const docentesDestacados = [
+    { id: 1, nombre: 'Ing. Fabrizio Barzola', especialidad: 'Especialista en Robótica', sede: 'Lab 4', foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600' },
+    { id: 2, nombre: 'Ing. Carlos Mendoza', especialidad: 'PLC Siemens', sede: 'Lab Electrónica', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600' },
+    { id: 3, nombre: 'Ing. Luis Alvarado', especialidad: 'Neumática ISO 1219', sede: 'Sede Arequipa', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600' }
+  ];
 
   const [listaUsuarios, setListaUsuarios] = useState([
     { id: 1, usuario: 'jperez', nombres: 'Juan Pérez', rol: 'alumno', estado: 'activo' },
@@ -374,10 +372,10 @@ export default function App() {
   const [userToReset, setUserToReset] = useState(null);
   const [newPasswordInput, setNewPasswordInput] = useState('');
 
-  // Lógica de Login
+  // LOGIN CONECTADO A BACKEND
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    setMensaje('Verificando credenciales...');
+    setMensaje('Verificando credenciales de acceso...');
     try {
       const response = await fetch('https://portico-san-marcos.onrender.com/api/auth/login', {
         method: 'POST',
@@ -396,7 +394,7 @@ export default function App() {
         localStorage.setItem('rolUsuario', data.user.rol || 'alumno');
       } else setMensaje(data.message || 'Credenciales incorrectas');
     } catch (error) {
-      setMensaje('Error de conexión con el backend.');
+      setMensaje('Error de conexión con el servidor.');
     }
   };
 
@@ -406,12 +404,9 @@ export default function App() {
     setUsuario('');
     setPassword('');
     setRolUsuario('');
-    setVideoActivo(null);
-    setLaboratorioSeleccionado(null);
-    setLibroSeleccionado(null);
   };
 
-  // Funciones Tabla Usuarios
+  // FUNCIONES DE GESTIÓN DE USUARIOS
   const abrirModalCrearUsuario = () => {
     setModoEdicion(false); setUsuarioForm({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
     setMensajeUserMsg(''); setModalUsuario(true);
@@ -442,6 +437,7 @@ export default function App() {
     setModalResetPass(false); setNewPasswordInput(''); setUserToReset(null);
   };
 
+  // FILTRADO DEL AULA VIRTUAL
   const clasesInternasFiltradas = cursosCatalogo.filter(item => {
     const tipoFiltro = item.tipo ? item.tipo.toLowerCase() : 'virtual';
     const coincideModalidad = tipoFiltro === modalidadFiltro.toLowerCase();
@@ -472,7 +468,7 @@ export default function App() {
               🛒 Mi Carrito {carrito.length > 0 && <span style={{ background: '#ef4444', marginLeft: '6px', padding: '2px 8px', borderRadius: '999px' }}>{carrito.length}</span>}
             </button>
             <button onClick={() => setMostrarModalLogin(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-              🔐 Ingresar
+              🔐 Ingresar al Aula
             </button>
           </div>
         </header>
@@ -486,7 +482,7 @@ export default function App() {
         {/* FILTROS DE CATEGORÍA */}
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', padding: '0 20px 30px' }}>
           {categoriasTienda.map(cat => (
-            <button key={cat} onClick={() => setCatTiendaActiva(cat)} style={{ padding: '8px 16px', borderRadius: '99px', background: catTiendaActiva === cat ? '#2563eb' : '#1e293b', color: '#fff', border: '1px solid #334155', cursor: 'pointer' }}>{cat}</button>
+            <button key={cat} onClick={() => setCatTiendaActiva(cat)} style={{ padding: '8px 16px', borderRadius: '99px', background: catTiendaActiva === cat ? '#2563eb' : '#1e293b', color: '#fff', border: '1px solid #334155', cursor: 'pointer', fontWeight: 'bold' }}>{cat}</button>
           ))}
         </div>
 
@@ -500,13 +496,13 @@ export default function App() {
               </div>
               <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
                 <h3 style={{ margin: '0 0 8px 0', color: '#fff' }}>{curso.titulo}</h3>
-                <p style={{ color: '#94a3b8', fontSize: '13px', flex: 1 }}>{curso.descripcion}</p>
+                <p style={{ color: '#94a3b8', fontSize: '13px', flex: 1, lineHeight: '1.5' }}>{curso.descripcion}</p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #334155', paddingTop: '12px', marginBottom: '14px' }}>
                   <span style={{ fontSize: '12px', color: '#94a3b8' }}>⏱ {curso.duracion || '5 Semanas'}</span>
                   <strong style={{ fontSize: '20px', color: '#34d399' }}>S/ {Number(curso.precio).toFixed(2)}</strong>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  <button onClick={() => setCursoDemoModal(curso)} style={{ background: '#0f172a', color: '#fff', border: '1px solid #475569', padding: '10px', borderRadius: '8px', cursor: 'pointer' }}>🎬 Demo</button>
+                  <button onClick={() => setCursoDemoModal(curso)} style={{ background: '#0f172a', color: '#fff', border: '1px solid #475569', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>🎬 Demo</button>
                   <button onClick={() => agregarAlCarrito(curso)} style={{ background: estaEnCarrito(curso.id) ? '#059669' : '#2563eb', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
                     {estaEnCarrito(curso.id) ? '✓ En Carrito' : '+ Agregar'}
                   </button>
@@ -520,7 +516,7 @@ export default function App() {
         {cursoDemoModal && (
           <div onClick={() => setCursoDemoModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
             <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', maxWidth: '680px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '24px', position: 'relative' }}>
-              <button onClick={() => setCursoDemoModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer' }}>✕</button>
+              <button onClick={() => setCursoDemoModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
               <h2 style={{ color: '#fff', marginTop: 0 }}>{cursoDemoModal.titulo}</h2>
               <iframe src={cursoDemoModal.video_demo_url} title="demo" style={{ width: '100%', height: '350px', border: 'none', borderRadius: '8px', background: '#000', marginBottom: '15px' }} />
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -559,13 +555,13 @@ export default function App() {
                   </div>
 
                   <div style={{ borderTop: '1px solid #334155', paddingTop: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <input type="text" placeholder="Tu Nombre Completo" value={nombreInteresado} onChange={e => setNombreInteresado(e.target.value)} style={{ padding: '12px', borderRadius: '6px', background: '#0f172a', color: '#fff', border: '1px solid #475569' }} />
+                    <input type="text" placeholder="Tu Nombre Completo" value={nombreInteresado} onChange={e => setNombreInteresado(e.target.value)} style={{ padding: '12px', borderRadius: '6px', background: '#0f172a', color: '#fff', border: '1px solid #475569', outline: 'none' }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '18px' }}>
                       <span style={{ color: '#cbd5e1' }}>Total:</span>
                       <strong style={{ color: '#34d399' }}>S/ {totalCarrito.toFixed(2)}</strong>
                     </div>
                     
-                    {/* BOTONES DE PAGO */}
+                    {/* BOTONES DE PAGO REVISADOS */}
                     <button onClick={procesarPagoOnline} style={{ width: '100%', background: '#009ee3', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0, 158, 227, 0.3)' }}>
                       💳 Pagar en Línea (Tarjeta / Yape / Plin)
                     </button>
@@ -580,16 +576,52 @@ export default function App() {
           </div>
         )}
 
-        {/* MODAL DE LOGIN (PARA ENTRAR AL AULA) */}
+        {/* MODAL DE LOGIN REDISEÑADO (MODO OSCURO / ELEGANTE) */}
         {mostrarModalLogin && (
-          <div onClick={() => setMostrarModalLogin(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', padding: '30px', borderRadius: '12px', width: '90%', maxWidth: '400px' }}>
-              <h2 style={{ color: '#0f172a', marginTop: 0, textAlign: 'center' }}>Pórtico San Marcos</h2>
-              <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <input type="text" placeholder="Usuario" value={usuario} onChange={e => setUsuario(e.target.value)} required style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '6px' }} />
-                <input type="password" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} required style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '6px' }} />
-                <button type="submit" style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Ingresar al Aula</button>
-                {mensaje && <p style={{ color: 'red', fontSize: '13px', textAlign: 'center' }}>{mensaje}</p>}
+          <div onClick={() => setMostrarModalLogin(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)', zIndex: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', padding: '40px 30px', borderRadius: '16px', width: '100%', maxWidth: '420px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
+              
+              <button onClick={() => setMostrarModalLogin(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
+
+              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                <span style={{ display: 'inline-block', background: 'rgba(37, 99, 235, 0.1)', color: '#38bdf8', padding: '6px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '12px' }}>AULA VIRTUAL</span>
+                <h2 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '24px', fontWeight: '800' }}>Pórtico San Marcos</h2>
+                <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0, lineHeight: '1.5' }}>Acceso exclusivo para estudiantes y docentes matriculados en la institución.</p>
+              </div>
+
+              <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#cbd5e1' }}>Usuario / Matrícula:</label>
+                  <input 
+                    type="text" 
+                    value={usuario} 
+                    onChange={(e) => setUsuario(e.target.value)} 
+                    required 
+                    placeholder="Ej: jperez"
+                    style={{ width: '100%', padding: '14px', borderRadius: '8px', border: '1px solid #475569', background: '#0f172a', color: '#fff', fontSize: '15px', boxSizing: 'border-box', outline: 'none' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#cbd5e1' }}>Contraseña:</label>
+                  <input 
+                    type="password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                    placeholder="••••••••"
+                    style={{ width: '100%', padding: '14px', borderRadius: '8px', border: '1px solid #475569', background: '#0f172a', color: '#fff', fontSize: '15px', boxSizing: 'border-box', outline: 'none' }}
+                  />
+                </div>
+
+                {mensaje && (
+                  <div style={{ color: mensaje.includes('exitoso') || mensaje.includes('Verificando') ? '#38bdf8' : '#ef4444', fontSize: '14px', textAlign: 'center', fontWeight: 'bold', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '6px' }}>
+                    {mensaje}
+                  </div>
+                )}
+
+                <button type="submit" style={{ width: '100%', padding: '15px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '800', fontSize: '15px', cursor: 'pointer', marginTop: '10px', transition: '0.2s' }}>
+                  Autenticar e Ingresar
+                </button>
               </form>
             </div>
           </div>
@@ -761,7 +793,7 @@ export default function App() {
           </div>
         )}
 
-        {/* SECCIÓN 4: BIBLIOTECA DIGITAL FLIPBOOK */}
+        {/* SECCIÓN 4: BIBLIOTECA DIGITAL FLIPBOOK (RESTAURADA) */}
         <div ref={seccionBibliotecaRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
