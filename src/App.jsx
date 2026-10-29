@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import PdfFlipbook from './components/PdfFlipbook';
 
-// ⚠️ NÚMERO DE WHATSAPP ACTUALIZADO
+// ⚠️ NÚMERO DE WHATSAPP
 const WHATSAPP_NUMERO = '51967107035';
 
-// CATÁLOGO UNIFICADO: Datos para Tienda (precios, demo) + Datos para Aula Interna (horario, tipo, zoom)
+// CATÁLOGO MAESTRO UNIFICADO (Alimenta la Tienda Pública y el Aula Interna)
 const CATALOGO_INICIAL = [
   {
     id: 1,
@@ -17,11 +17,11 @@ const CATALOGO_INICIAL = [
     imagen_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/fc_cA62Z1kQ',
     temario: [
-      'Módulo 1: Morfología del robot (grados de libertad, articulaciones y actuadores)',
+      'Módulo 1: Morfología del robot (grados de libertad, articulaciones)',
       'Módulo 2: Álgebra matricial y transformaciones espaciales 3D',
-      'Módulo 3: Cinemática Directa y parámetros Denavit-Hartenberg (D-H)',
+      'Módulo 3: Cinemática Directa y parámetros Denavit-Hartenberg',
       'Módulo 4: Cinemática Inversa algebraica y geométrica',
-      'Módulo 5: Planificación de trayectorias articulares y cartesianas'
+      'Módulo 5: Planificación de trayectorias articulares'
     ],
     // Campos Internos Aula Virtual
     tipo: 'Virtual',
@@ -43,8 +43,8 @@ const CATALOGO_INICIAL = [
       'Módulo 1: Leyes de Ohm, Kirchhoff y análisis de mallas/nodos DC',
       'Módulo 2: Componentes pasivos e impedancia en corriente alterna',
       'Módulo 3: Diodos, transistores BJT y MOSFET en conmutación',
-      'Módulo 4: Amplificadores Operacionales (Op-Amps) y filtrado de sensores',
-      'Módulo 5: Electrónica de potencia, reguladores y drivers Puente H'
+      'Módulo 4: Amplificadores Operacionales (Op-Amps) y filtrado',
+      'Módulo 5: Electrónica de potencia y drivers Puente H'
     ],
     tipo: 'Presencial',
     horario: 'Viernes - 7:00 PM',
@@ -62,10 +62,10 @@ const CATALOGO_INICIAL = [
     imagen_url: 'https://images.unsplash.com/photo-1553406830-ef2513450d76?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/fJWR7dBuc18',
     temario: [
-      'Módulo 1: Arquitectura interna (CPU, memoria Flash/RAM y registros)',
-      'Módulo 2: Entradas y salidas digitales (GPIO) y control de actuadores',
-      'Módulo 3: Conversión Analógica-Digital (ADC) y control de velocidad PWM',
-      'Módulo 4: Interrupciones externas y Timers por hardware en tiempo real',
+      'Módulo 1: Arquitectura interna (CPU, memoria Flash/RAM)',
+      'Módulo 2: Entradas y salidas digitales (GPIO) y actuadores',
+      'Módulo 3: Conversión Analógica-Digital (ADC) y señales PWM',
+      'Módulo 4: Interrupciones externas y Timers por hardware',
       'Módulo 5: Protocolos de comunicación UART, I2C y SPI'
     ],
     tipo: 'Virtual',
@@ -76,7 +76,7 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 4,
-    titulo: 'Lógica de Programación para Mecatrónica (C++ y Python)',
+    titulo: 'Lógica de Programación para Mecatrónica',
     categoria: 'Programación',
     descripcion: 'Desarrollo de algoritmos de control de hardware en C++ orientado a objetos y procesamiento matemático en Python.',
     precio: 100.00,
@@ -84,11 +84,11 @@ const CATALOGO_INICIAL = [
     imagen_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/ZzaPdXTrSb8',
     temario: [
-      'Módulo 1: Algoritmos, diagramas de flujo y estructuras de control',
-      'Módulo 2: C++ Parte 1: Tipos de datos, funciones y manejo de punteros',
-      'Módulo 3: C++ Parte 2: Programación Orientada a Objetos para librerías de sensores',
-      'Módulo 4: Python Parte 1: Sintaxis, colecciones y automatización de scripts',
-      'Módulo 5: Python Parte 2: Matrices con NumPy y cálculo de trayectorias'
+      'Módulo 1: Algoritmos y estructuras de control',
+      'Módulo 2: C++ Parte 1: Tipos de datos, funciones y punteros',
+      'Módulo 3: C++ Parte 2: Programación Orientada a Objetos',
+      'Módulo 4: Python Parte 1: Sintaxis y automatización',
+      'Módulo 5: Python Parte 2: Matrices con NumPy'
     ],
     tipo: 'Virtual',
     horario: 'Lunes y Miércoles - 8:00 PM',
@@ -100,16 +100,16 @@ const CATALOGO_INICIAL = [
     id: 5,
     titulo: 'Automatización Industrial y PLCs Multimarca',
     categoria: 'Automatización',
-    descripcion: 'Programación industrial en entornos Siemens TIA Portal, Allen-Bradley y Delta bajo la norma IEC 61131-3.',
+    descripcion: 'Programación industrial en entornos Siemens TIA Portal, Allen-Bradley y Delta bajo norma IEC 61131-3.',
     precio: 150.00,
     duracion: '6 Semanas (24 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/PbAGl_mv5XI',
     temario: [
-      'Módulo 1: Hardware de PLCs: Siemens (S7-1200/1500), Allen-Bradley y Delta',
-      'Módulo 2: Lenguaje Ladder (KOP), temporizadores y contadores en TIA Portal y Studio 5000',
-      'Módulo 3: Diagrama de Bloques de Funciones (FBD) y escalamiento analógico',
-      'Módulo 4: Texto Estructurado (ST/SCL) para algoritmos matemáticos',
+      'Módulo 1: Hardware de PLCs (Siemens, Allen-Bradley, Delta)',
+      'Módulo 2: Lenguaje Ladder (KOP), temporizadores y contadores',
+      'Módulo 3: Diagrama de Bloques de Funciones (FBD)',
+      'Módulo 4: Texto Estructurado (ST/SCL)',
       'Módulo 5: Secuencias industriales paso a paso con Grafcet (SFC)'
     ],
     tipo: 'Virtual',
@@ -122,17 +122,17 @@ const CATALOGO_INICIAL = [
     id: 6,
     titulo: 'Visión Artificial y Procesamiento de Imágenes',
     categoria: 'Inteligencia Artificial',
-    descripcion: 'Clasificación de piezas industriales, detección de bordes y seguimiento de objetos en tiempo real con Python y OpenCV.',
+    descripcion: 'Clasificación de piezas industriales, detección de bordes y seguimiento de objetos en tiempo real con Python.',
     precio: 140.00,
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/oXlwWbU8l2o',
     temario: [
-      'Módulo 1: Espacios de color (RGB, HSV) y matrices de píxeles',
-      'Módulo 2: Filtrado de ruido y detección de bordes Canny con OpenCV',
-      'Módulo 3: Segmentación y reconocimiento de geometrías en fajas transportadoras',
-      'Módulo 4: Object Tracking y extracción de coordenadas para robots',
-      'Módulo 5: Redes neuronales básicas para control de calidad visual'
+      'Módulo 1: Espacios de color y matrices de píxeles',
+      'Módulo 2: Filtrado de ruido y detección de bordes Canny',
+      'Módulo 3: Segmentación y reconocimiento de geometrías',
+      'Módulo 4: Object Tracking y extracción de coordenadas',
+      'Módulo 5: Redes neuronales básicas para calidad visual'
     ],
     tipo: 'Virtual',
     horario: 'Viernes - 6:00 PM',
@@ -151,10 +151,10 @@ const CATALOGO_INICIAL = [
     video_demo_url: 'https://www.youtube.com/embed/35YuILUlfGs',
     temario: [
       'Módulo 1: Simbología esquemática y encapsulados SMD vs THT',
-      'Módulo 2: Captura de esquemáticos electrónicos en software EDA (KiCad/Altium)',
-      'Módulo 3: Reglas de ruteo PCB, cálculo de ancho de pistas y planos GND',
-      'Módulo 4: Diseño de etapas de potencia y aislamiento con optoacopladores',
-      'Módulo 5: Exportación de archivos Gerber, BOM y preparación DFM'
+      'Módulo 2: Captura de esquemáticos electrónicos en software EDA',
+      'Módulo 3: Reglas de ruteo PCB y planos de tierra (GND)',
+      'Módulo 4: Diseño de etapas de potencia y optoacopladores',
+      'Módulo 5: Exportación de archivos Gerber y preparación DFM'
     ],
     tipo: 'Presencial',
     horario: 'Miércoles - 4:00 PM',
@@ -164,7 +164,7 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 8,
-    titulo: 'Simulación de Sistemas Neumáticos y Electroneumáticos',
+    titulo: 'Simulación de Sistemas Neumáticos',
     categoria: 'Automatización',
     descripcion: 'Diseño de circuitos secuenciales por método cascada, válvulas direccionales y control por relés en FluidSIM.',
     precio: 105.00,
@@ -172,10 +172,10 @@ const CATALOGO_INICIAL = [
     imagen_url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/2f_ca121kFQ',
     temario: [
-      'Módulo 1: Tratamiento del aire comprimido y unidad de mantenimiento FRL',
-      'Módulo 2: Válvulas distribuidoras (3/2, 5/2, 5/3) y cilindros neumáticos (ISO 1219)',
-      'Módulo 3: Diseño de mandos secuenciales por método Cascada y Paso a Paso',
-      'Módulo 4: Electroneumática con relés, sensores magnéticos y electroválvulas',
+      'Módulo 1: Tratamiento del aire comprimido y FRL',
+      'Módulo 2: Válvulas distribuidoras y cilindros (ISO 1219)',
+      'Módulo 3: Diseño de mandos secuenciales (Cascada / Paso a Paso)',
+      'Módulo 4: Electroneumática con relés y electroválvulas',
       'Módulo 5: Sistemas de vacío, ventosas y actuadores de giro'
     ],
     tipo: 'Presencial',
@@ -188,17 +188,17 @@ const CATALOGO_INICIAL = [
     id: 9,
     titulo: 'Manufactura Aditiva e Impresión 3D',
     categoria: 'Manufactura',
-    descripcion: 'Configuración avanzada de laminadores, selección de polímeros técnicos (PLA, PETG, ABS, TPU) y diseño de tolerancias.',
+    descripcion: 'Configuración avanzada de laminadores, selección de polímeros técnicos (PLA, PETG, ABS, TPU) y tolerancias.',
     precio: 90.00,
     duracion: '4 Semanas (16 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/Vx0Z6LplaMU',
     temario: [
       'Módulo 1: Tecnologías FDM, SLA y cinemática de impresoras 3D',
-      'Módulo 2: Propiedades mecánicas y térmicas de filamentos (PLA, ABS, PETG, TPU)',
-      'Módulo 3: Parámetros de laminado en Cura/PrusaSlicer (Infill, perímetros y soportes)',
-      'Módulo 4: Diseño paramétrico de tolerancias y ajustes para piezas móviles',
-      'Módulo 5: Diagnóstico de fallas (Warping, Stringing) y calibración mecánica'
+      'Módulo 2: Propiedades mecánicas de filamentos',
+      'Módulo 3: Parámetros de laminado (Infill, perímetros, soportes)',
+      'Módulo 4: Diseño paramétrico de tolerancias para piezas móviles',
+      'Módulo 5: Diagnóstico de fallas (Warping) y calibración mecánica'
     ],
     tipo: 'Presencial',
     horario: 'Jueves - 5:00 PM',
@@ -210,17 +210,17 @@ const CATALOGO_INICIAL = [
     id: 10,
     titulo: 'Diseño Mecánico y Modelado CAD 3D',
     categoria: 'Diseño Mecánico',
-    descripcion: 'Modelado paramétrico en Autodesk Inventor, cajas reductoras de engranajes, cálculo AGMA y análisis de esfuerzos FEA.',
+    descripcion: 'Modelado paramétrico en Autodesk Inventor, cajas reductoras de engranajes, cálculo AGMA y esfuerzos FEA.',
     precio: 135.00,
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/ddU98eb21wY',
     temario: [
-      'Módulo 1: Lectura de planos industriales, cortes y tolerancias geométricas (GD&T)',
-      'Módulo 2: Modelado paramétrico 3D (extrusión, revolución, barrido y nervios)',
-      'Módulo 3: Ensamblaje de caja reductora de engranajes rectos de 3 ejes',
-      'Módulo 4: Simulación de esfuerzos (FEA) y validación de engranajes bajo norma AGMA',
-      'Módulo 5: Planos de fabricación detallados, lista de materiales (BOM) y exportación STEP'
+      'Módulo 1: Lectura de planos y tolerancias geométricas (GD&T)',
+      'Módulo 2: Modelado paramétrico 3D (extrusión, revolución)',
+      'Módulo 3: Ensamblaje de caja reductora de engranajes rectos',
+      'Módulo 4: Simulación de esfuerzos (FEA) y norma AGMA',
+      'Módulo 5: Planos de fabricación y lista de materiales (BOM)'
     ],
     tipo: 'Virtual',
     horario: 'Lunes - 7:00 PM',
@@ -231,21 +231,17 @@ const CATALOGO_INICIAL = [
 ];
 
 export default function App() {
-  // Persistencia de sesión
-  const [sesionIniciada, setSesionIniciada] = useState(() => {
-    return localStorage.getItem('sesionIniciada') === 'true';
-  });
-  const [usuarioLogueado, setUsuarioLogueado] = useState(() => {
-    return localStorage.getItem('usuarioLogueado') || '';
-  });
-  const [rolUsuario, setRolUsuario] = useState(() => {
-    return localStorage.getItem('rolUsuario') || '';
-  });
+  // -------------------------------------------------------------
+  // 1. ESTADOS DE SESIÓN (Funcionalidad original)
+  // -------------------------------------------------------------
+  const [sesionIniciada, setSesionIniciada] = useState(() => localStorage.getItem('sesionIniciada') === 'true');
+  const [usuarioLogueado, setUsuarioLogueado] = useState(() => localStorage.getItem('usuarioLogueado') || '');
+  const [rolUsuario, setRolUsuario] = useState(() => localStorage.getItem('rolUsuario') || '');
 
-  // ESTADO UNIFICADO: Sirve tanto para la tienda pública como para el aula interna
+  // -------------------------------------------------------------
+  // 2. ESTADOS DEL CATÁLOGO UNIFICADO Y TIENDA PÚBLICA
+  // -------------------------------------------------------------
   const [cursosCatalogo, setCursosCatalogo] = useState(CATALOGO_INICIAL);
-  
-  // ESTADOS PÚBLICOS
   const [catTiendaActiva, setCatTiendaActiva] = useState('Todos');
   const [busquedaTienda, setBusquedaTienda] = useState('');
   const [cursoDemoModal, setCursoDemoModal] = useState(null);
@@ -261,7 +257,7 @@ export default function App() {
     localStorage.setItem('carrito_portico', JSON.stringify(carrito));
   }, [carrito]);
 
-  // Cargar catálogo desde Render / Aiven y MEZCLARLO con datos locales para no perder horarios
+  // Consulta al backend para actualizar catálogo manteniendo datos internos (horarios)
   useEffect(() => {
     fetch('https://portico-san-marcos.onrender.com/api/catalogo')
       .then(res => res.json())
@@ -274,46 +270,54 @@ export default function App() {
           setCursosCatalogo(cursosUnificados);
         }
       })
-      .catch(() => {
-        console.log('Mostrando catálogo base mientras despierta el servidor.');
-      });
+      .catch(() => console.log('Mostrando catálogo local mientras inicia backend.'));
   }, []);
 
-  // Funciones del carrito
+  // Lógica del Carrito
   const agregarAlCarrito = (curso) => {
-    if (!carrito.some(item => item.id === curso.id)) {
-      setCarrito([...carrito, curso]);
-    }
+    if (!carrito.some(item => item.id === curso.id)) setCarrito([...carrito, curso]);
     setCarritoAbierto(true);
   };
-  const quitarDelCarrito = (id) => {
-    setCarrito(carrito.filter(item => item.id !== id));
-  };
+  const quitarDelCarrito = (id) => setCarrito(carrito.filter(item => item.id !== id));
   const estaEnCarrito = (id) => carrito.some(item => item.id === id);
   const totalCarrito = carrito.reduce((acc, item) => acc + Number(item.precio), 0);
 
+  // Pasarelas de Pago y WhatsApp
   const enviarPedidoWhatsApp = () => {
     if (carrito.length === 0) return;
-    const saludo = nombreInteresado.trim()
-      ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreInteresado.trim()}*.`
-      : `¡Hola *Pórtico San Marcos*! 👋`;
-    const listaTexto = carrito
-      .map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`)
-      .join('\n');
-    const textoFinal = `${saludo}\nDeseo adquirir los siguientes cursos de Ingeniería Mecatrónica:\n\n${listaTexto}\n\n💰 *Total a pagar: S/ ${totalCarrito.toFixed(2)}*\n\n¿Me podrían brindar los medios de pago e información para habilitar mi acceso al Aula Virtual?`;
-    
-    // Enlaza directamente a la app de WhatsApp
-    const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`;
-    window.open(url, '_blank');
+    const saludo = nombreInteresado.trim() ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreInteresado.trim()}*.` : `¡Hola *Pórtico San Marcos*! 👋`;
+    const listaTexto = carrito.map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`).join('\n');
+    const textoFinal = `${saludo}\nDeseo adquirir los siguientes cursos de Mecatrónica:\n\n${listaTexto}\n\n💰 *Total a pagar: S/ ${totalCarrito.toFixed(2)}*\n\n¿Me podrían brindar los medios de pago para habilitar mi acceso?`;
+    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
   };
 
-  // ESTADOS DEL AULA INTERNA
+  const procesarPagoOnline = async () => {
+    if (carrito.length === 0) return;
+    try {
+      const response = await fetch('https://portico-san-marcos.onrender.com/api/pagos/crear-preferencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ carrito: carrito, nombreUsuario: nombreInteresado })
+      });
+      const data = await response.json();
+      if (data.urlPago) {
+        window.location.href = data.urlPago; 
+      } else {
+        alert("El backend está iniciando. Intenta nuevamente en unos segundos.");
+      }
+    } catch (error) {
+      alert("Error al conectar con Mercado Pago.");
+    }
+  };
+
+  // -------------------------------------------------------------
+  // 3. ESTADOS DEL AULA VIRTUAL INTERNA (Tus variables originales)
+  // -------------------------------------------------------------
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [modalidadFiltro, setModalidadFiltro] = useState('virtual'); 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todas');
   const [busqueda, setBusqueda] = useState('');
   
-  // REFERENCIAS PARA EL DESPLAZAMIENTO FLUIDO (SMOOTH SCROLL)
   const seccionInicioRef = useRef(null);
   const seccionCursosRef = useRef(null);
   const seccionDocentesRef = useRef(null);
@@ -322,128 +326,58 @@ export default function App() {
 
   const irASeccion = (ref) => {
     setMenuMovilAbierto(false);
-    if (ref && ref.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (ref && ref.current) ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
   
-  // CARRUSEL DE BANNERS HERO CON PUNTITOS
   const [bannerActual, setBannerActual] = useState(0);
   const bannersHero = [
-    {
-      tag: 'PÓRTICO SAN MARCOS | AULA VIRTUAL',
-      titulo: 'Excelencia Académica y Tecnológica,',
-      subtitulo: 'Formación de alto impacto para el futuro.',
-      statsNum: '+ 35 MIL',
-      statsTxt: 'Estudiantes Registrados',
-      img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop'
-    },
-    {
-      tag: 'BIBLIOTECA VIRTUAL & LIBROS INTERACTIVOS',
-      titulo: 'Accede a Textos y Manuales Técnicos,',
-      subtitulo: 'Visor estilo Flipbook digital para tus estudios.',
-      statsNum: '100%',
-      statsTxt: 'Material Digital Gratuito',
-      img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=800&auto=format&fit=crop'
-    },
-    {
-      tag: 'LABORATORIOS DE AUTOMATIZACIÓN Y ROBÓTICA',
-      titulo: 'Sesiones Prácticas en Banco de Pruebas,',
-      subtitulo: 'Infraestructura acreditada de primer nivel.',
-      statsNum: '+ 150',
-      statsTxt: 'Prácticas Habilitadas',
-      img: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=800&auto=format&fit=crop'
-    }
+    { tag: 'PÓRTICO SAN MARCOS', titulo: 'Excelencia Tecnológica,', subtitulo: 'Formación para el futuro.', statsNum: '+ 35 MIL', statsTxt: 'Estudiantes Registrados', img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800' },
+    { tag: 'BIBLIOTECA VIRTUAL', titulo: 'Accede a Textos y Manuales,', subtitulo: 'Visor estilo Flipbook digital.', statsNum: '100%', statsTxt: 'Material Gratuito', img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=800' }
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setBannerActual((prev) => (prev + 1) % bannersHero.length);
-    }, 5000);
+    const interval = setInterval(() => setBannerActual((prev) => (prev + 1) % bannersHero.length), 5000);
     return () => clearInterval(interval);
   }, [bannersHero.length]);
 
-  // ESTADOS MULTIMEDIA Y MODALES DEL AULA
   const [videoActivo, setVideoActivo] = useState(null);
   const [laboratorioSeleccionado, setLaboratorioSeleccionado] = useState(null);
+  
+  // VARIABLE DEL VISOR 3D FLIPBOOK ORIGINAL
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
 
   const listaLibros = [
-    {
-      id: 1,
-      titulo: 'Manual de Automatización e Industria 4.0 con TIA Portal',
-      autor: 'Ing. Carlos Mendoza',
-      categoria: 'ingenieria',
-      portada: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600&auto=format&fit=crop',
-      pdfUrl: '/manual_plc.pdf'
-    },
-    {
-      id: 2,
-      titulo: 'Arquitectura Limpia y Microservicios con Node.js',
-      autor: 'Dr. Roberto Gómez',
-      categoria: 'programacion',
-      portada: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop',
-      pdfUrl: '/node_microservicios.pdf'
-    },
-    {
-      id: 3,
-      titulo: 'Guía Práctica de Robótica e IoT con ESP32',
-      autor: 'Ing. Fabrizio Barzola',
-      categoria: 'mecatronica',
-      portada: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=600&auto=format&fit=crop',
-      pdfUrl: '/guia_esp32.pdf'
-    },
-    {
-      id: 4,
-      titulo: 'Fundamentos de Neumática e Hidráulica ISO 1219',
-      autor: 'Ing. Luis Alvarado',
-      categoria: 'mecatronica',
-      portada: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=600&auto=format&fit=crop',
-      pdfUrl: '/neumatica_iso1219.pdf'
-    }
+    { id: 1, titulo: 'Manual TIA Portal', autor: 'Ing. Carlos Mendoza', categoria: 'ingenieria', portada: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600', pdfUrl: '/manual_plc.pdf' },
+    { id: 2, titulo: 'Guía Práctica ESP32', autor: 'Ing. Fabrizio Barzola', categoria: 'mecatronica', portada: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=600', pdfUrl: '/guia_esp32.pdf' }
   ];
 
-  // LOGIN STATES
+  // DOCENTES ORIGINALES
+  const docentesDestacados = [
+    { id: 1, nombre: 'Ing. Fabrizio Barzola', especialidad: 'Especialista en Robótica', sede: 'Lab 4', foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600' },
+    { id: 2, nombre: 'Ing. Carlos Mendoza', especialidad: 'PLC Siemens', sede: 'Lab Electrónica', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600' }
+  ];
+
+  // GESTIÓN DE USUARIOS ORIGINAL
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [mensaje, setMensaje] = useState('');
 
-  // LISTA DE DOCENTES
-  const docentesDestacados = [
-    { id: 1, nombre: 'Ing. Fabrizio Barzola', especialidad: 'Especialista en Robótica, ESP32 y Microcontroladores', sede: 'Campus Central - Lab 4', foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop' },
-    { id: 2, nombre: 'Ing. Carlos Mendoza', especialidad: 'Experto en PLC Siemens TIA Portal y Electrónica de Potencia', sede: 'Campus Central - Lab Electrónica', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop' },
-    { id: 3, nombre: 'Ing. Luis Alvarado', especialidad: 'Consultor en Neumática, Electroneumática e ISO 1219', sede: 'Sede Arequipa - Pabellón B', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop' },
-    { id: 4, nombre: 'Dra. María Fernández', especialidad: 'Doctora en Procesamiento Digital de Señales y MATLAB', sede: 'Campus Virtual', foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop' }
-  ];
-
-  // MÓDULO DE USUARIOS
   const [listaUsuarios, setListaUsuarios] = useState([
     { id: 1, usuario: 'jperez', nombres: 'Juan Pérez', rol: 'alumno', estado: 'activo' },
-    { id: 2, usuario: 'mgomez', nombres: 'María Gómez', rol: 'alumno', estado: 'activo' },
-    { id: 3, usuario: 'cmendoza', nombres: 'Carlos Mendoza', rol: 'docente', estado: 'activo' },
-    { id: 4, usuario: 'fbarzola', nombres: 'Fabrizio Barzola', rol: 'docente', estado: 'activo' },
-    { id: 5, usuario: 'lalvarado', nombres: 'Luis Alvarado', rol: 'docente', estado: 'activo' }
+    { id: 4, usuario: 'fbarzola', nombres: 'Fabrizio Barzola', rol: 'docente', estado: 'activo' }
   ]);
-
   const [modalUsuario, setModalUsuario] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [usuarioForm, setUsuarioForm] = useState({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
   const [mensajeUserMsg, setMensajeUserMsg] = useState('');
-
   const [modalResetPass, setModalResetPass] = useState(false);
   const [userToReset, setUserToReset] = useState(null);
   const [newPasswordInput, setNewPasswordInput] = useState('');
 
-  const guardarSesionLocal = (nombres, rol) => {
-    localStorage.setItem('sesionIniciada', 'true');
-    localStorage.setItem('usuarioLogueado', nombres);
-    localStorage.setItem('rolUsuario', rol);
-  };
-
+  // Lógica de Login
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setMensaje('Verificando credenciales...');
-
     try {
       const response = await fetch('https://portico-san-marcos.onrender.com/api/auth/login', {
         method: 'POST',
@@ -451,30 +385,23 @@ export default function App() {
         body: JSON.stringify({ usuario, password })
       });
       const data = await response.json();
-
       if (response.ok && data.success) {
-        const nombreUsr = data.user.nombres || data.user.usuario;
-        const rolUsr = data.user.rol || 'alumno';
-
-        setUsuarioLogueado(nombreUsr);
-        setRolUsuario(rolUsr);
+        setUsuarioLogueado(data.user.nombres || data.user.usuario);
+        setRolUsuario(data.user.rol || 'alumno');
         setSesionIniciada(true);
         setMostrarModalLogin(false);
         setMensaje('');
-
-        guardarSesionLocal(nombreUsr, rolUsr);
-      } else {
-        setMensaje(data.message || 'Credenciales incorrectas');
-      }
+        localStorage.setItem('sesionIniciada', 'true');
+        localStorage.setItem('usuarioLogueado', data.user.nombres || data.user.usuario);
+        localStorage.setItem('rolUsuario', data.user.rol || 'alumno');
+      } else setMensaje(data.message || 'Credenciales incorrectas');
     } catch (error) {
-      setMensaje('No se pudo conectar con el servidor backend');
+      setMensaje('Error de conexión con el backend.');
     }
   };
 
   const cerrarSesion = () => {
-    localStorage.removeItem('sesionIniciada');
-    localStorage.removeItem('usuarioLogueado');
-    localStorage.removeItem('rolUsuario');
+    localStorage.clear();
     setSesionIniciada(false);
     setUsuario('');
     setPassword('');
@@ -484,307 +411,166 @@ export default function App() {
     setLibroSeleccionado(null);
   };
 
+  // Funciones Tabla Usuarios
   const abrirModalCrearUsuario = () => {
-    setModoEdicion(false);
-    setUsuarioForm({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
-    setMensajeUserMsg('');
-    setModalUsuario(true);
+    setModoEdicion(false); setUsuarioForm({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
+    setMensajeUserMsg(''); setModalUsuario(true);
   };
   const abrirModalEditarUsuario = (u) => {
-    setModoEdicion(true);
-    setUsuarioForm({ id: u.id, usuario: u.usuario, password: '', nombres: u.nombres, rol: u.rol });
-    setMensajeUserMsg('');
-    setModalUsuario(true);
+    setModoEdicion(true); setUsuarioForm({ id: u.id, usuario: u.usuario, password: '', nombres: u.nombres, rol: u.rol });
+    setMensajeUserMsg(''); setModalUsuario(true);
   };
   const handleGuardarUsuario = (e) => {
-    e.preventDefault();
-    setMensajeUserMsg('');
+    e.preventDefault(); setMensajeUserMsg('');
     if (!modoEdicion) {
-      const existe = listaUsuarios.some(u => u.usuario.toLowerCase() === usuarioForm.usuario.toLowerCase());
-      if (existe) {
-        setMensajeUserMsg('El nombre de usuario ya existe en la base de datos.');
-        return;
+      if (listaUsuarios.some(u => u.usuario.toLowerCase() === usuarioForm.usuario.toLowerCase())) {
+        setMensajeUserMsg('El usuario ya existe.'); return;
       }
-      const nuevo = { id: Date.now(), usuario: usuarioForm.usuario, nombres: usuarioForm.nombres, rol: usuarioForm.rol, estado: 'activo' };
-      setListaUsuarios([...listaUsuarios, nuevo]);
+      setListaUsuarios([...listaUsuarios, { id: Date.now(), usuario: usuarioForm.usuario, nombres: usuarioForm.nombres, rol: usuarioForm.rol, estado: 'activo' }]);
       setModalUsuario(false);
     } else {
-      setListaUsuarios(listaUsuarios.map(u => 
-        u.id === usuarioForm.id ? { ...u, nombres: usuarioForm.nombres, rol: usuarioForm.rol } : u
-      ));
+      setListaUsuarios(listaUsuarios.map(u => u.id === usuarioForm.id ? { ...u, nombres: usuarioForm.nombres, rol: usuarioForm.rol } : u));
       setModalUsuario(false);
     }
   };
   const toggleEstadoUsuario = (id) => {
-    setListaUsuarios(listaUsuarios.map(u => {
-      if (u.id === id) {
-        return { ...u, estado: u.estado === 'activo' ? 'inactivo' : 'activo' };
-      }
-      return u;
-    }));
+    setListaUsuarios(listaUsuarios.map(u => u.id === id ? { ...u, estado: u.estado === 'activo' ? 'inactivo' : 'activo' } : u));
   };
   const handleResetPassword = (e) => {
-    e.preventDefault();
-    if (!newPasswordInput) return;
-    alert(`Contraseña del usuario '${userToReset.usuario}' restablecida con éxito.`);
-    setModalResetPass(false);
-    setNewPasswordInput('');
-    setUserToReset(null);
+    e.preventDefault(); if (!newPasswordInput) return;
+    alert(`Contraseña restablecida con éxito.`);
+    setModalResetPass(false); setNewPasswordInput(''); setUserToReset(null);
   };
 
-  // FILTRADO DE CLASES INTERNAS USANDO EL CATÁLOGO UNIFICADO
   const clasesInternasFiltradas = cursosCatalogo.filter(item => {
     const tipoFiltro = item.tipo ? item.tipo.toLowerCase() : 'virtual';
     const coincideModalidad = tipoFiltro === modalidadFiltro.toLowerCase();
     const coincideCategoria = categoriaSeleccionada === 'todas' || item.categoria === categoriaSeleccionada;
-    
     const busqMin = busqueda.toLowerCase();
-    const coincideBusqueda = item.titulo.toLowerCase().includes(busqMin) || 
-                             (item.instructor && item.instructor.toLowerCase().includes(busqMin));
-
+    const coincideBusqueda = item.titulo.toLowerCase().includes(busqMin) || (item.instructor && item.instructor.toLowerCase().includes(busqMin));
     return coincideModalidad && coincideCategoria && coincideBusqueda;
   });
 
   // =========================================================================
-  // ETAPA PREVIA AL LOGIN: TIENDA VIRTUAL DE CURSOS
+  // VISTA 1: TIENDA VIRTUAL (PRE-LOGIN)
   // =========================================================================
   if (!sesionIniciada) {
     const categoriasTienda = ['Todos', ...new Set(cursosCatalogo.map(c => c.categoria))];
     const cursosTiendaFiltrados = cursosCatalogo.filter(c => {
       const matchCat = catTiendaActiva === 'Todos' || c.categoria === catTiendaActiva;
-      const matchTxt = c.titulo.toLowerCase().includes(busquedaTienda.toLowerCase()) ||
-                       c.descripcion.toLowerCase().includes(busquedaTienda.toLowerCase());
+      const matchTxt = c.titulo.toLowerCase().includes(busquedaTienda.toLowerCase()) || c.descripcion.toLowerCase().includes(busquedaTienda.toLowerCase());
       return matchCat && matchTxt;
     });
 
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#0f172a', color: '#f8fafc', fontFamily: 'system-ui, sans-serif' }}>
-        
-        {/* NAVBAR PÚBLICO LIMPIO */}
-        <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #1e293b', padding: '14px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <h1 style={{ margin: '0', fontSize: '22px', color: '#38bdf8', fontWeight: 'bold' }}>
-              Aula Virtual Pórtico San Marcos
-            </h1>
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button
-              onClick={() => setCarritoAbierto(true)}
-              style={{ background: '#1e293b', color: '#fff', border: '1px solid #334155', padding: '10px 16px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-            >
-              🛒 Mi Carrito
-              {carrito.length > 0 && (
-                <span style={{ background: '#ef4444', color: '#fff', fontSize: '12px', padding: '2px 8px', borderRadius: '999px' }}>
-                  {carrito.length}
-                </span>
-              )}
+        {/* NAVBAR */}
+        <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.95)', borderBottom: '1px solid #1e293b', padding: '14px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1 style={{ margin: '0', fontSize: '22px', color: '#38bdf8', fontWeight: 'bold' }}>Aula Virtual Pórtico San Marcos</h1>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button onClick={() => setCarritoAbierto(true)} style={{ background: '#1e293b', color: '#fff', border: '1px solid #334155', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer' }}>
+              🛒 Mi Carrito {carrito.length > 0 && <span style={{ background: '#ef4444', marginLeft: '6px', padding: '2px 8px', borderRadius: '999px' }}>{carrito.length}</span>}
             </button>
-
-            <button
-              onClick={() => setMostrarModalLogin(true)}
-              style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
-            >
-              🔐 Ingresar al Aula Virtual
+            <button onClick={() => setMostrarModalLogin(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+              🔐 Ingresar
             </button>
           </div>
         </header>
 
-        {/* HERO DE CATÁLOGO */}
-        <section style={{ textAlign: 'center', padding: '50px 20px 30px', maxWidth: '850px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '34px', margin: '0 0 12px 0', color: '#ffffff', fontWeight: '800' }}>
-            Catálogo de Cursos de Ingeniería Mecatrónica
-          </h2>
-          <p style={{ color: '#94a3b8', fontSize: '16px', lineHeight: '1.6', margin: '0 0 25px 0' }}>
-            Explora el temario oficial, visualiza una clase demostrativa de cada especialidad y agrega los cursos de tu interés al carrito para coordinar tu matrícula directamente por WhatsApp.
-          </p>
-
-          <input
-            type="text"
-            placeholder="🔍 Buscar curso de Robótica, PLC, CAD, Python, PCB..."
-            value={busquedaTienda}
-            onChange={(e) => setBusquedaTienda(e.target.value)}
-            style={{ width: '100%', maxWidth: '520px', padding: '12px 18px', borderRadius: '999px', border: '1px solid #334155', background: '#1e293b', color: '#fff', fontSize: '14px', outline: 'none' }}
-          />
+        {/* HERO Y BUSCADOR */}
+        <section style={{ textAlign: 'center', padding: '50px 20px', maxWidth: '850px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '34px', color: '#fff', marginBottom: '15px' }}>Catálogo de Cursos de Ingeniería Mecatrónica</h2>
+          <input type="text" placeholder="🔍 Buscar curso..." value={busquedaTienda} onChange={(e) => setBusquedaTienda(e.target.value)} style={{ width: '100%', maxWidth: '520px', padding: '12px 18px', borderRadius: '99px', background: '#1e293b', color: '#fff', border: '1px solid #334155', outline: 'none' }} />
         </section>
 
         {/* FILTROS DE CATEGORÍA */}
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', padding: '0 20px 30px' }}>
           {categoriasTienda.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setCatTiendaActiva(cat)}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '999px',
-                border: '1px solid #334155',
-                background: catTiendaActiva === cat ? '#2563eb' : '#1e293b',
-                color: catTiendaActiva === cat ? '#fff' : '#cbd5e1',
-                fontWeight: 'bold',
-                fontSize: '13px',
-                cursor: 'pointer'
-              }}
-            >
-              {cat}
-            </button>
+            <button key={cat} onClick={() => setCatTiendaActiva(cat)} style={{ padding: '8px 16px', borderRadius: '99px', background: catTiendaActiva === cat ? '#2563eb' : '#1e293b', color: '#fff', border: '1px solid #334155', cursor: 'pointer' }}>{cat}</button>
           ))}
         </div>
 
-        {/* GRILLA DE LOS CURSOS (PÚBLICO) */}
+        {/* GRILLA DE CURSOS EN TIENDA */}
         <main style={{ maxWidth: '1260px', margin: '0 auto', padding: '0 20px 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '24px' }}>
           {cursosTiendaFiltrados.map(curso => (
-            <div key={curso.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 25px rgba(0,0,0,0.25)' }}>
-              <div style={{ position: 'relative', height: '185px' }}>
-                <img src={curso.imagen_url} alt={curso.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <span style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(15, 23, 42, 0.9)', color: '#38bdf8', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>
-                  {curso.categoria}
-                </span>
+            <div key={curso.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ position: 'relative' }}>
+                <img src={curso.imagen_url} alt={curso.titulo} style={{ width: '100%', height: '185px', objectFit: 'cover' }} />
+                <span style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(15,23,42,0.9)', color: '#38bdf8', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>{curso.categoria}</span>
               </div>
-
               <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                <h3 style={{ margin: '0 0 8px 0', fontSize: '17px', color: '#fff', lineHeight: '1.35' }}>{curso.titulo}</h3>
-                <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: '1.5', margin: '0 0 16px 0', flex: 1 }}>{curso.descripcion}</p>
-
+                <h3 style={{ margin: '0 0 8px 0', color: '#fff' }}>{curso.titulo}</h3>
+                <p style={{ color: '#94a3b8', fontSize: '13px', flex: 1 }}>{curso.descripcion}</p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #334155', paddingTop: '12px', marginBottom: '14px' }}>
                   <span style={{ fontSize: '12px', color: '#94a3b8' }}>⏱ {curso.duracion || '5 Semanas'}</span>
                   <strong style={{ fontSize: '20px', color: '#34d399' }}>S/ {Number(curso.precio).toFixed(2)}</strong>
                 </div>
-
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  <button
-                    onClick={() => setCursoDemoModal(curso)}
-                    style={{ background: '#0f172a', color: '#e2e8f0', border: '1px solid #475569', padding: '10px', borderRadius: '8px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
-                  >
-                    🎬 Demo y Temario
+                  <button onClick={() => setCursoDemoModal(curso)} style={{ background: '#0f172a', color: '#fff', border: '1px solid #475569', padding: '10px', borderRadius: '8px', cursor: 'pointer' }}>🎬 Demo</button>
+                  <button onClick={() => agregarAlCarrito(curso)} style={{ background: estaEnCarrito(curso.id) ? '#059669' : '#2563eb', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                    {estaEnCarrito(curso.id) ? '✓ En Carrito' : '+ Agregar'}
                   </button>
-
-                  {estaEnCarrito(curso.id) ? (
-                    <button
-                      onClick={() => setCarritoAbierto(true)}
-                      style={{ background: '#059669', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
-                    >
-                      ✓ En el Carrito
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => agregarAlCarrito(curso)}
-                      style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}
-                    >
-                      + Agregar
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
           ))}
         </main>
 
-        {/* MODAL DE VIDEO DEMO Y SÍLABO */}
+        {/* MODAL DEL VIDEO DEMO Y SÍLABO */}
         {cursoDemoModal && (
           <div onClick={() => setCursoDemoModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
             <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', maxWidth: '680px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '24px', position: 'relative' }}>
-              <button onClick={() => setCursoDemoModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontWeight: 'bold' }}>
-                Cerrar ✕
-              </button>
-
-              <span style={{ color: '#38bdf8', fontSize: '12px', fontWeight: 'bold' }}>{cursoDemoModal.categoria}</span>
-              <h2 style={{ margin: '4px 0 14px 0', fontSize: '22px', color: '#fff' }}>{cursoDemoModal.titulo}</h2>
-
-              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, borderRadius: '10px', overflow: 'hidden', background: '#000', marginBottom: '20px' }}>
-                <iframe
-                  src={cursoDemoModal.video_demo_url}
-                  title={cursoDemoModal.titulo}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                />
-              </div>
-
-              <h4 style={{ color: '#38bdf8', margin: '0 0 10px 0', fontSize: '15px' }}>📋 Sílabo y Temario del Curso:</h4>
+              <button onClick={() => setCursoDemoModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer' }}>✕</button>
+              <h2 style={{ color: '#fff', marginTop: 0 }}>{cursoDemoModal.titulo}</h2>
+              <iframe src={cursoDemoModal.video_demo_url} title="demo" style={{ width: '100%', height: '350px', border: 'none', borderRadius: '8px', background: '#000', marginBottom: '15px' }} />
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {(Array.isArray(cursoDemoModal.temario) ? cursoDemoModal.temario : []).map((mod, i) => (
-                  <li key={i} style={{ background: '#0f172a', padding: '10px 14px', borderRadius: '8px', borderLeft: '4px solid #2563eb', fontSize: '13px', color: '#e2e8f0' }}>
-                    {mod}
-                  </li>
+                  <li key={i} style={{ background: '#0f172a', padding: '10px 14px', borderRadius: '8px', borderLeft: '4px solid #2563eb', fontSize: '13px', color: '#e2e8f0' }}>{mod}</li>
                 ))}
               </ul>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #334155', paddingTop: '16px' }}>
-                <div>
-                  <span style={{ fontSize: '12px', color: '#94a3b8', display: 'block' }}>Inversión del curso:</span>
-                  <strong style={{ fontSize: '24px', color: '#34d399' }}>S/ {Number(cursoDemoModal.precio).toFixed(2)}</strong>
-                </div>
-
-                <button
-                  onClick={() => {
-                    agregarAlCarrito(cursoDemoModal);
-                    setCursoDemoModal(null);
-                  }}
-                  style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '12px 22px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}
-                >
-                  🛒 Seleccionar Curso
-                </button>
-              </div>
             </div>
           </div>
         )}
 
-        {/* DRAWER LATERAL DEL CARRITO */}
+        {/* CARRITO Y PAGOS (MERCADO PAGO + WHATSAPP) */}
         {carritoAbierto && (
           <div onClick={() => setCarritoAbierto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 250, display: 'flex', justifyContent: 'flex-end' }}>
-            <aside onClick={e => e.stopPropagation()} style={{ background: '#1e293b', width: '100%', maxWidth: '410px', height: '100vh', padding: '24px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #334155', paddingBottom: '14px' }}>
-                <h3 style={{ margin: 0, fontSize: '18px', color: '#fff' }}>🛒 Cursos Seleccionados ({carrito.length})</h3>
-                <button onClick={() => setCarritoAbierto(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+            <aside onClick={e => e.stopPropagation()} style={{ background: '#1e293b', width: '100%', maxWidth: '410px', height: '100vh', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '14px' }}>
+                <h3 style={{ color: '#fff', margin: 0 }}>🛒 Carrito ({carrito.length})</h3>
+                <button onClick={() => setCarritoAbierto(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '20px', cursor: 'pointer' }}>✕</button>
               </div>
 
               {carrito.length === 0 ? (
-                <div style={{ margin: 'auto 0', textAlign: 'center', color: '#94a3b8' }}>
-                  <p style={{ fontSize: '15px' }}>Tu carrito está vacío.</p>
-                  <span style={{ fontSize: '13px' }}>Agrega los cursos que te interesen para consultar tu matrícula por WhatsApp.</span>
-                </div>
+                <p style={{ color: '#94a3b8', textAlign: 'center', marginTop: '40px' }}>Tu carrito está vacío.</p>
               ) : (
                 <>
-                  <div style={{ flex: 1, overflowY: 'auto', margin: '16px 0', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ flex: 1, overflowY: 'auto', margin: '20px 0' }}>
                     {carrito.map(item => (
-                      <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#0f172a', padding: '10px', borderRadius: '8px' }}>
-                        <img src={item.imagen_url} alt={item.titulo} style={{ width: '55px', height: '42px', objectFit: 'cover', borderRadius: '6px' }} />
+                      <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#0f172a', padding: '10px', marginBottom: '10px', borderRadius: '8px' }}>
+                        <img src={item.imagen_url} alt="img" style={{ width: '50px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}/>
                         <div style={{ flex: 1 }}>
-                          <h4 style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#fff' }}>{item.titulo}</h4>
-                          <strong style={{ color: '#34d399', fontSize: '13px' }}>S/ {Number(item.precio).toFixed(2)}</strong>
+                          <h4 style={{ color: '#fff', margin: '0 0 5px 0', fontSize: '13px' }}>{item.titulo}</h4>
+                          <span style={{ color: '#34d399', fontSize: '13px', fontWeight: 'bold' }}>S/ {Number(item.precio).toFixed(2)}</span>
                         </div>
-                        <button onClick={() => quitarDelCarrito(item.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '16px' }}>
-                          🗑️
-                        </button>
+                        <button onClick={() => quitarDelCarrito(item.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '16px' }}>🗑️</button>
                       </div>
                     ))}
                   </div>
 
-                  <div style={{ borderTop: '1px solid #334155', paddingTop: '14px' }}>
-                    <label style={{ display: 'block', fontSize: '12px', color: '#cbd5e1', marginBottom: '12px' }}>
-                      Tu Nombre Completo (opcional):
-                      <input
-                        type="text"
-                        placeholder="Ej. Samyr Alvaro"
-                        value={nombreInteresado}
-                        onChange={e => setNombreInteresado(e.target.value)}
-                        style={{ width: '100%', marginTop: '6px', padding: '10px', borderRadius: '6px', border: '1px solid #475569', background: '#0f172a', color: '#fff', boxSizing: 'border-box' }}
-                      />
-                    </label>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', fontSize: '16px' }}>
-                      <span>Total Estimado:</span>
-                      <strong style={{ fontSize: '20px', color: '#34d399' }}>S/ {totalCarrito.toFixed(2)}</strong>
+                  <div style={{ borderTop: '1px solid #334155', paddingTop: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <input type="text" placeholder="Tu Nombre Completo" value={nombreInteresado} onChange={e => setNombreInteresado(e.target.value)} style={{ padding: '12px', borderRadius: '6px', background: '#0f172a', color: '#fff', border: '1px solid #475569' }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '18px' }}>
+                      <span style={{ color: '#cbd5e1' }}>Total:</span>
+                      <strong style={{ color: '#34d399' }}>S/ {totalCarrito.toFixed(2)}</strong>
                     </div>
-
-                    <button
-                      onClick={enviarPedidoWhatsApp}
-                      style={{ width: '100%', background: '#25D366', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '15px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)' }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
-                      </svg>
+                    
+                    {/* BOTONES DE PAGO */}
+                    <button onClick={procesarPagoOnline} style={{ width: '100%', background: '#009ee3', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0, 158, 227, 0.3)' }}>
+                      💳 Pagar en Línea (Tarjeta / Yape / Plin)
+                    </button>
+                    <button onClick={enviarPedidoWhatsApp} style={{ width: '100%', background: '#25D366', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '14px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
                       Coordinar por WhatsApp
                     </button>
                   </div>
@@ -794,59 +580,26 @@ export default function App() {
           </div>
         )}
 
-        {/* MODAL DE INICIO DE SESIÓN */}
+        {/* MODAL DE LOGIN (PARA ENTRAR AL AULA) */}
         {mostrarModalLogin && (
-          <div onClick={() => setMostrarModalLogin(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#ffffff', color: '#0f172a', padding: '35px 28px', borderRadius: '16px', width: '100%', maxWidth: '410px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
-              <button onClick={() => setMostrarModalLogin(false)} style={{ position: 'absolute', top: '14px', right: '14px', background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748b' }}>✕</button>
-
-              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                <h2 style={{ color: '#0f172a', margin: '0 0 6px 0', fontSize: '23px', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
-                <p style={{ color: '#64748b', fontSize: '13px', margin: 0 }}>Acceso exclusivo para estudiantes y docentes matriculados</p>
-              </div>
-
-              <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '6px', color: '#334155' }}>Usuario:</label>
-                  <input 
-                    type="text" 
-                    value={usuario} 
-                    onChange={(e) => setUsuario(e.target.value)} 
-                    required 
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '6px', color: '#334155' }}>Contraseña:</label>
-                  <input 
-                    type="password" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    required 
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
-                  />
-                </div>
-
-                {mensaje && (
-                  <div style={{ color: mensaje.includes('exitoso') || mensaje.includes('Verificando') ? '#0284c7' : '#ef4444', fontSize: '13px', textAlign: 'center', fontWeight: 'bold' }}>
-                    {mensaje}
-                  </div>
-                )}
-
-                <button type="submit" style={{ width: '100%', padding: '12px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer' }}>
-                  Ingresar al Portal
-                </button>
+          <div onClick={() => setMostrarModalLogin(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', padding: '30px', borderRadius: '12px', width: '90%', maxWidth: '400px' }}>
+              <h2 style={{ color: '#0f172a', marginTop: 0, textAlign: 'center' }}>Pórtico San Marcos</h2>
+              <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <input type="text" placeholder="Usuario" value={usuario} onChange={e => setUsuario(e.target.value)} required style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '6px' }} />
+                <input type="password" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} required style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '6px' }} />
+                <button type="submit" style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Ingresar al Aula</button>
+                {mensaje && <p style={{ color: 'red', fontSize: '13px', textAlign: 'center' }}>{mensaje}</p>}
               </form>
             </div>
           </div>
         )}
-
       </div>
     );
   }
 
   // =========================================================================
-  // INTERIOR DEL AULA VIRTUAL (SE MUESTRA UNA VEZ INICIADA LA SESIÓN)
+  // VISTA 2: INTERIOR DEL AULA VIRTUAL (TU CÓDIGO ORIGINAL COMPLETO)
   // =========================================================================
   return (
     <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
@@ -871,13 +624,10 @@ export default function App() {
         <nav className={`navbar-menu-items ${menuMovilAbierto ? 'abierto' : ''}`} style={{ display: 'flex', gap: '22px', alignItems: 'center' }}>
           <button onClick={() => irASeccion(seccionInicioRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Inicio</button>
           <button onClick={() => irASeccion(seccionCursosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Cursos</button>
-          
           {rolUsuario === 'alumno' && (
             <button onClick={() => irASeccion(seccionDocentesRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Docentes</button>
           )}
-
           <button onClick={() => irASeccion(seccionBibliotecaRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Biblioteca 3D</button>
-
           {rolUsuario === 'docente' && (
             <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios</button>
           )}
@@ -894,10 +644,9 @@ export default function App() {
         </nav>
       </header>
 
-      {/* CONTENIDO PRINCIPAL DEL AULA */}
       <main style={{ flex: 1, padding: '30px 0', display: 'flex', flexDirection: 'column', gap: '40px', width: '100%' }}>
         
-        {/* SECCIÓN 1: INICIO & BANNER HERO */}
+        {/* SECCIÓN 1: CARRUSEL HERO */}
         <div ref={seccionInicioRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div className="focus-hero-banner-main">
@@ -922,38 +671,22 @@ export default function App() {
           </div>
         </div>
 
-        {/* SECCIÓN 2: CURSOS Y OFERTA ACADÉMICA (AHORA USA EL CATÁLOGO COMPLETO) */}
+        {/* SECCIÓN 2: CURSOS Y CLASES (AULA) */}
         <div ref={seccionCursosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>
-              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
-                MIS CLASES & LABORATORIOS
-              </h2>
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>MIS CLASES & LABORATORIOS</h2>
             </div>
 
             <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '25px' }}>
               <div className="filter-bar-responsive" style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <button 
-                  onClick={() => { setModalidadFiltro('virtual'); setVideoActivo(null); setLaboratorioSeleccionado(null); }}
-                  style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'virtual' ? '#2563eb' : '#f1f5f9', color: modalidadFiltro === 'virtual' ? '#fff' : '#334155' }}
-                >
+                <button onClick={() => { setModalidadFiltro('virtual'); setVideoActivo(null); setLaboratorioSeleccionado(null); }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'virtual' ? '#2563eb' : '#f1f5f9', color: modalidadFiltro === 'virtual' ? '#fff' : '#334155' }}>
                   Modalidad Virtual ({cursosCatalogo.filter(c => (c.tipo || 'Virtual') === 'Virtual').length})
                 </button>
-
-                <button 
-                  onClick={() => { setModalidadFiltro('presencial'); setVideoActivo(null); setLaboratorioSeleccionado(null); }}
-                  style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'presencial' ? '#059669' : '#f1f5f9', color: modalidadFiltro === 'presencial' ? '#fff' : '#334155' }}
-                >
+                <button onClick={() => { setModalidadFiltro('presencial'); setVideoActivo(null); setLaboratorioSeleccionado(null); }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'presencial' ? '#059669' : '#f1f5f9', color: modalidadFiltro === 'presencial' ? '#fff' : '#334155' }}>
                   Modalidad Presencial ({cursosCatalogo.filter(c => c.tipo === 'Presencial').length})
                 </button>
-
-                <input 
-                  type="text" 
-                  placeholder="Buscar clase o profesor..." 
-                  value={busqueda} 
-                  onChange={(e) => setBusqueda(e.target.value)}
-                  style={{ marginLeft: 'auto', padding: '10px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', minWidth: '240px' }}
-                />
+                <input type="text" placeholder="Buscar clase o profesor..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ marginLeft: 'auto', padding: '10px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', minWidth: '240px' }} />
               </div>
             </div>
 
@@ -962,9 +695,7 @@ export default function App() {
               <div style={{ background: '#0f172a', padding: '20px', borderRadius: '12px', color: '#fff', marginBottom: '30px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                   <h3 style={{ margin: 0, color: '#38bdf8' }}>Reproduciendo Sesión: {videoActivo.titulo}</h3>
-                  <button onClick={() => setVideoActivo(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
-                    Cerrar Video
-                  </button>
+                  <button onClick={() => setVideoActivo(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar Video</button>
                 </div>
                 <video controls autoPlay style={{ width: '100%', maxHeight: '420px', borderRadius: '8px', background: '#000' }}>
                   <source src={videoActivo.videoUrl || videoActivo.video_demo_url} type="video/mp4" />
@@ -974,41 +705,35 @@ export default function App() {
 
             {/* GRILLA DE CLASES INTERNAS */}
             <div className="courses-grid-focus">
-              {clasesInternasFiltradas.length > 0 ? (
-                clasesInternasFiltradas.map((item) => {
-                  const esVirtual = (item.tipo || 'Virtual') === 'Virtual';
-                  return (
-                    <div key={item.id} className="focus-card-item">
-                      <div className="card-image-wrapper">
-                        <img src={item.imagen_url} alt={item.titulo} />
-                        <span className="badge-status">Activo</span>
+              {clasesInternasFiltradas.map((item) => {
+                const esVirtual = (item.tipo || 'Virtual') === 'Virtual';
+                return (
+                  <div key={item.id} className="focus-card-item">
+                    <div className="card-image-wrapper">
+                      <img src={item.imagen_url} alt={item.titulo} />
+                      <span className="badge-status">Activo</span>
+                    </div>
+                    <div className="card-body-content">
+                      <h3>{item.titulo}</h3>
+                      <p>{item.descripcion}</p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#475569', marginBottom: '15px' }}>
+                        <span><strong>Horario:</strong> {item.horario || 'Por definir'}</span>
+                        <span><strong>Docente:</strong> {item.instructor || 'Staff Académico'}</span>
                       </div>
-                      <div className="card-body-content">
-                        <h3>{item.titulo}</h3>
-                        <p>{item.descripcion}</p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#475569', marginBottom: '15px' }}>
-                          <span><strong>Horario:</strong> {item.horario || 'Por definir'}</span>
-                          <span><strong>Docente:</strong> {item.instructor || 'Staff Académico'}</span>
-                        </div>
-                        <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
-                          {esVirtual ? (
-                            <>
-                              <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>Grabación</button>
-                              <a href={item.enlaceSede || '#'} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none' }}>Zoom</a>
-                            </>
-                          ) : (
-                            <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>Detalles Sede</button>
-                          )}
-                        </div>
+                      <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                        {esVirtual ? (
+                          <>
+                            <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>Grabación</button>
+                            <a href={item.enlaceSede || '#'} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none' }}>Zoom</a>
+                          </>
+                        ) : (
+                          <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>Detalles Sede</button>
+                        )}
                       </div>
                     </div>
-                  );
-                })
-              ) : (
-                <p style={{ textAlign: 'center', color: '#64748b', gridColumn: '1 / -1', padding: '30px' }}>
-                  No se encontraron clases que coincidan con la búsqueda.
-                </p>
-              )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -1036,11 +761,11 @@ export default function App() {
           </div>
         )}
 
-        {/* SECCIÓN 4: BIBLIOTECA DIGITAL Y VISOR 3D */}
+        {/* SECCIÓN 4: BIBLIOTECA DIGITAL FLIPBOOK */}
         <div ref={seccionBibliotecaRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
-              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>BIBLIOTECA VIRTUAL & LIBROS INTERACTIVOS (3D)</h2>
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>BIBLIOTECA VIRTUAL (FLIPBOOK 3D)</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
               {listaLibros.map((libro) => (
@@ -1103,6 +828,7 @@ export default function App() {
         )}
       </main>
 
+      {/* MODALES DEL AULA INTERNA */}
       {libroSeleccionado && <PdfFlipbook pdfUrl={libroSeleccionado} alCerrar={() => setLibroSeleccionado(null)} />}
       
       {laboratorioSeleccionado && (
@@ -1114,6 +840,43 @@ export default function App() {
             </div>
             <p>{laboratorioSeleccionado.descripcion}</p>
             <p><strong>Sede:</strong> {laboratorioSeleccionado.enlaceSede} | <strong>Horario:</strong> {laboratorioSeleccionado.horario}</p>
+          </div>
+        </div>
+      )}
+
+      {modalUsuario && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px', boxSizing: 'border-box' }}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: '440px', padding: '25px', borderRadius: '12px' }}>
+            <h3 style={{ margin: '0 0 15px 0' }}>{modoEdicion ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}</h3>
+            {mensajeUserMsg && <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '12px' }}>{mensajeUserMsg}</p>}
+            <form onSubmit={handleGuardarUsuario} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <input type="text" disabled={modoEdicion} placeholder="Usuario" value={usuarioForm.usuario} onChange={e => setUsuarioForm({...usuarioForm, usuario: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: modoEdicion ? '#f1f5f9' : '#fff' }} />
+              <input type="text" placeholder="Nombres completos" value={usuarioForm.nombres} onChange={e => setUsuarioForm({...usuarioForm, nombres: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              <select value={usuarioForm.rol} onChange={e => setUsuarioForm({...usuarioForm, rol: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
+                <option value="alumno">Alumno</option>
+                <option value="docente">Docente</option>
+              </select>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" style={{ flex: 1, background: '#2563eb', color: '#fff', padding: '10px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>Guardar</button>
+                <button type="button" onClick={() => setModalUsuario(false)} style={{ flex: 1, background: '#e2e8f0', padding: '10px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {modalResetPass && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px' }}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: '390px', padding: '25px', borderRadius: '12px' }}>
+            <h3 style={{ margin: '0 0 8px 0' }}>Restablecer Clave</h3>
+            <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '15px' }}>Nueva clave para <strong>{userToReset.usuario}</strong>:</p>
+            <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <input type="password" value={newPasswordInput} onChange={e => setNewPasswordInput(e.target.value)} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" style={{ flex: 1, background: '#d97706', color: '#fff', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer' }}>Actualizar</button>
+                <button type="button" onClick={() => setModalResetPass(false)} style={{ flex: 1, background: '#e2e8f0', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer' }}>Cancelar</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { MercadoPagoConfig, Preference } = require('mercadopago');
 require('dotenv').config();
 
 const db = require('./config/db');
@@ -10,10 +11,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ⚠️ CONFIGURACIÓN MERCADO PAGO: Reemplaza este token por tu Access Token real (PRODUCCIÓN)
+const client = new MercadoPagoConfig({ 
+  accessToken: process.env.MP_ACCESS_TOKEN || 'APP_USR-AQUI-VA-TU-TOKEN-REAL' 
+});
+
 // Usar las rutas de autenticación
 app.use('/api/auth', authRoutes);
 
-// Ruta pública del catálogo de cursos (Sin necesidad de Login)
+// Ruta pública del catálogo de cursos
 app.get('/api/catalogo', (req, res) => {
   db.query('SELECT * FROM catalogo_cursos ORDER BY id ASC', (err, results) => {
     if (err) {
@@ -27,6 +33,42 @@ app.get('/api/catalogo', (req, res) => {
     }));
     res.json(cursos);
   });
+});
+
+// NUEVA RUTA: Generar link de pago con Mercado Pago
+app.post('/api/pagos/crear-preferencia', async (req, res) => {
+  try {
+    const { carrito, nombreUsuario } = req.body;
+
+    // Convertir el carrito al formato de MercadoPago
+    const items = carrito.map(curso => ({
+      id: curso.id.toString(),
+      title: curso.titulo,
+      unit_price: Number(curso.precio),
+      quantity: 1,
+      currency_id: 'PEN' // Moneda: Soles
+    }));
+
+    const preference = new Preference(client);
+    const result = await preference.create({
+      body: {
+        items: items,
+        payer: { name: nombreUsuario || 'Alumno San Marcos' },
+        back_urls: {
+          success: 'https://portico-san-marcos.vercel.app/', // Cambia esto por tu dominio real
+          failure: 'https://portico-san-marcos.vercel.app/',
+          pending: 'https://portico-san-marcos.vercel.app/'
+        },
+        auto_return: 'approved'
+      }
+    });
+
+    // Enviar el link de pago al frontend
+    res.json({ urlPago: result.init_point });
+  } catch (error) {
+    console.error('Error en Mercado Pago:', error);
+    res.status(500).json({ error: 'Error al generar la pasarela de pago' });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
