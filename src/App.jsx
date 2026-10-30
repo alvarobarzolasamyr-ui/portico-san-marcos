@@ -19,7 +19,9 @@ const CATALOGO_INICIAL = [
     temario: [
       'Módulo 1: Morfología del robot (grados de libertad, articulaciones y actuadores)',
       'Módulo 2: Álgebra matricial y transformaciones espaciales 3D',
-      'Módulo 3: Cinemática Directa y parámetros Denavit-Hartenberg (D-H)'
+      'Módulo 3: Cinemática Directa y parámetros Denavit-Hartenberg (D-H)',
+      'Módulo 4: Cinemática Inversa algebraica y geométrica',
+      'Módulo 5: Planificación de trayectorias articulares y cartesianas'
     ],
     tipo: 'Virtual',
     horario: 'Martes y Jueves - 7:00 PM',
@@ -39,7 +41,10 @@ const CATALOGO_INICIAL = [
     video_demo_url: 'https://www.youtube.com/embed/r9GC50r2Ge8',
     temario: [
       'Módulo 1: Leyes de Ohm, Kirchhoff y análisis de mallas/nodos DC',
-      'Módulo 2: Componentes pasivos e impedancia en corriente alterna'
+      'Módulo 2: Componentes pasivos e impedancia en corriente alterna',
+      'Módulo 3: Diodos, transistores BJT y MOSFET en conmutación',
+      'Módulo 4: Amplificadores Operacionales (Op-Amps) y filtrado de sensores',
+      'Módulo 5: Electrónica de potencia, reguladores y drivers Puente H'
     ],
     tipo: 'Presencial',
     horario: 'Viernes - 7:00 PM',
@@ -57,7 +62,13 @@ const CATALOGO_INICIAL = [
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1553406830-ef2513450d76?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/fJWR7dBuc18',
-    temario: ['Módulo 1: Arquitectura interna (CPU, memoria Flash/RAM y registros)'],
+    temario: [
+      'Módulo 1: Arquitectura interna (CPU, memoria Flash/RAM y registros)',
+      'Módulo 2: Entradas y salidas digitales (GPIO) y control de actuadores',
+      'Módulo 3: Conversión Analógica-Digital (ADC) y control de velocidad PWM',
+      'Módulo 4: Interrupciones externas y Timers por hardware en tiempo real',
+      'Módulo 5: Protocolos de comunicación UART, I2C y SPI'
+    ],
     tipo: 'Virtual',
     horario: 'Sábados - 3:00 PM',
     instructor: 'Ing. Fabrizio Barzola',
@@ -74,7 +85,13 @@ const CATALOGO_INICIAL = [
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/ZzaPdXTrSb8',
-    temario: ['Módulo 1: Algoritmos, diagramas de flujo y estructuras de control'],
+    temario: [
+      'Módulo 1: Algoritmos, diagramas de flujo y estructuras de control',
+      'Módulo 2: C++ Parte 1: Tipos de datos, funciones y manejo de punteros',
+      'Módulo 3: C++ Parte 2: Programación Orientada a Objetos para librerías de sensores',
+      'Módulo 4: Python Parte 1: Sintaxis, colecciones y automatización de scripts',
+      'Módulo 5: Python Parte 2: Matrices con NumPy y cálculo de trayectorias'
+    ],
     tipo: 'Virtual',
     horario: 'Lunes y Miércoles - 8:00 PM',
     instructor: 'Dra. María Fernández',
@@ -91,7 +108,13 @@ const CATALOGO_INICIAL = [
     duracion: '6 Semanas (24 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/PbAGl_mv5XI',
-    temario: ['Módulo 1: Hardware de PLCs: Siemens, Allen-Bradley y Delta'],
+    temario: [
+      'Módulo 1: Hardware de PLCs: Siemens (S7-1200/1500), Allen-Bradley y Delta',
+      'Módulo 2: Lenguaje Ladder (KOP), temporizadores y contadores en TIA Portal y Studio 5000',
+      'Módulo 3: Diagrama de Bloques de Funciones (FBD) y escalamiento analógico',
+      'Módulo 4: Texto Estructurado (ST/SCL) para algoritmos matemáticos',
+      'Módulo 5: Secuencias industriales paso a paso con Grafcet (SFC)'
+    ],
     tipo: 'Virtual',
     horario: 'Martes y Jueves - 8:00 PM',
     instructor: 'Ing. Carlos Mendoza',
@@ -108,7 +131,13 @@ const CATALOGO_INICIAL = [
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/oXlwWbU8l2o',
-    temario: ['Módulo 1: Espacios de color y matrices de píxeles'],
+    temario: [
+      'Módulo 1: Espacios de color (RGB, HSV) y matrices de píxeles',
+      'Módulo 2: Filtrado de ruido y detección de bordes Canny con OpenCV',
+      'Módulo 3: Segmentación y reconocimiento de geometrías en fajas transportadoras',
+      'Módulo 4: Object Tracking y extracción de coordenadas para robots',
+      'Módulo 5: Redes neuronales básicas para control de calidad visual'
+    ],
     tipo: 'Virtual',
     horario: 'Viernes - 6:00 PM',
     instructor: 'Dra. María Fernández',
@@ -125,7 +154,13 @@ const CATALOGO_INICIAL = [
     duracion: '4 Semanas (16 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/35YuILUlfGs',
-    temario: ['Módulo 1: Simbología esquemática y encapsulados SMD vs THT'],
+    temario: [
+      'Módulo 1: Simbología esquemática y encapsulados SMD vs THT',
+      'Módulo 2: Captura de esquemáticos electrónicos en software EDA (KiCad/Altium)',
+      'Módulo 3: Reglas de ruteo PCB, cálculo de ancho de pistas y planos GND',
+      'Módulo 4: Diseño de etapas de potencia y aislamiento con optoacopladores',
+      'Módulo 5: Exportación de archivos Gerber, BOM y preparación DFM'
+    ],
     tipo: 'Presencial',
     horario: 'Miércoles - 4:00 PM',
     instructor: 'Ing. Carlos Mendoza',
@@ -142,7 +177,13 @@ const CATALOGO_INICIAL = [
     duracion: '4 Semanas (16 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/2f_ca121kFQ',
-    temario: ['Módulo 1: Tratamiento del aire comprimido'],
+    temario: [
+      'Módulo 1: Tratamiento del aire comprimido y unidad de mantenimiento FRL',
+      'Módulo 2: Válvulas distribuidoras (3/2, 5/2, 5/3) y cilindros neumáticos (ISO 1219)',
+      'Módulo 3: Diseño de mandos secuenciales por método Cascada y Paso a Paso',
+      'Módulo 4: Electroneumática con relés, sensores magnéticos y electroválvulas',
+      'Módulo 5: Sistemas de vacío, ventosas y actuadores de giro'
+    ],
     tipo: 'Presencial',
     horario: 'Martes - 4:00 PM',
     instructor: 'Ing. Luis Alvarado',
@@ -159,7 +200,13 @@ const CATALOGO_INICIAL = [
     duracion: '4 Semanas (16 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/Vx0Z6LplaMU',
-    temario: ['Módulo 1: Tecnologías FDM, SLA y cinemática'],
+    temario: [
+      'Módulo 1: Tecnologías FDM, SLA y cinemática de impresoras 3D',
+      'Módulo 2: Propiedades mecánicas y térmicas de filamentos (PLA, ABS, PETG, TPU)',
+      'Módulo 3: Parámetros de laminado en Cura/PrusaSlicer (Infill, perímetros y soportes)',
+      'Módulo 4: Diseño paramétrico de tolerancias y ajustes para piezas móviles',
+      'Módulo 5: Diagnóstico de fallas (Warping, Stringing) y calibración mecánica'
+    ],
     tipo: 'Presencial',
     horario: 'Jueves - 5:00 PM',
     instructor: 'Ing. Fabrizio Barzola',
@@ -176,7 +223,13 @@ const CATALOGO_INICIAL = [
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/ddU98eb21wY',
-    temario: ['Módulo 1: Lectura de planos industriales'],
+    temario: [
+      'Módulo 1: Lectura de planos industriales, cortes y tolerancias geométricas (GD&T)',
+      'Módulo 2: Modelado paramétrico 3D (extrusión, revolución, barrido y nervios)',
+      'Módulo 3: Ensamblaje de caja reductora de engranajes rectos de 3 ejes',
+      'Módulo 4: Simulación de esfuerzos (FEA) y validación de engranajes bajo norma AGMA',
+      'Módulo 5: Planos de fabricación detallados, lista de materiales (BOM) y exportación STEP'
+    ],
     tipo: 'Virtual',
     horario: 'Lunes - 7:00 PM',
     instructor: 'Ing. Luis Alvarado',
@@ -187,7 +240,7 @@ const CATALOGO_INICIAL = [
 ];
 
 export default function App() {
-  // ESTADOS DE SESIÓN Y CATÁLOGO
+  // ESTADOS GENERALES DE SESIÓN Y CATÁLOGO
   const [sesionIniciada, setSesionIniciada] = useState(() => localStorage.getItem('sesionIniciada') === 'true');
   const [usuarioLogueado, setUsuarioLogueado] = useState(() => localStorage.getItem('usuarioLogueado') || '');
   const [usernameActual, setUsernameActual] = useState(() => localStorage.getItem('usernameActual') || '');
@@ -219,7 +272,7 @@ export default function App() {
   const [nuevoCursoForm, setNuevoCursoForm] = useState({
     titulo: '', categoria: 'Robótica', descripcion: '', precio: '120',
     duracion: '5 Semanas (20 Horas)', imagen_url: '', video_demo_url: '',
-    temarioTexto: 'Módulo 1: Fundamentos',
+    temarioTexto: 'Módulo 1: Fundamentos\nMódulo 2: Laboratorio Práctico',
     tipo: 'Virtual', horario: 'Martes y Jueves - 7:00 PM',
     instructor: 'Ing. Fabrizio Barzola', enlaceSede: 'https://zoom.us/j/9876543210'
   });
@@ -254,6 +307,7 @@ export default function App() {
     localStorage.setItem('carrito_portico', JSON.stringify(carrito));
   }, [carrito]);
 
+  // Cargar catálogo desde Render / Aiven
   const cargarCatalogoDesdeBD = () => {
     fetch(`${API_BASE}/catalogo`)
       .then(res => res.json())
@@ -271,17 +325,6 @@ export default function App() {
         }
       })
       .catch(() => console.log('Usando catálogo local de respaldo.'));
-  };
-
-  const cargarUsuariosDesdeBD = () => {
-    fetch(`${API_BASE}/usuarios`)
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setListaUsuarios(data);
-        }
-      })
-      .catch(() => console.log('Error al cargar lista de usuarios reales'));
   };
 
   const cargarMatriculasDesdeBD = () => {
@@ -303,13 +346,32 @@ export default function App() {
       .catch(() => {});
   };
 
+  // ESTADO LOCAL DE USUARIOS PRECARGADOS (NUNCA ESTARÁ VACÍO)
+  const [listaUsuarios, setListaUsuarios] = useState([
+    { id: 1, usuario: 'jperez', nombres: 'Juan Pérez', rol: 'alumno', estado: 'activo' },
+    { id: 2, usuario: 'mgomez', nombres: 'María Gómez', rol: 'alumno', estado: 'activo' },
+    { id: 3, usuario: 'cmendoza', nombres: 'Carlos Mendoza', rol: 'docente', estado: 'activo' },
+    { id: 4, usuario: 'fbarzola', nombres: 'Fabrizio Barzola', rol: 'docente', estado: 'activo' },
+    { id: 5, usuario: 'lalvarado', nombres: 'Luis Alvarado', rol: 'docente', estado: 'activo' },
+    { id: 6, usuario: 'admin', nombres: 'Administrador General', rol: 'admin', estado: 'activo' },
+    { id: 7, usuario: 'dflores', nombres: 'Diego Flores', rol: 'alumno', estado: 'activo' },
+    { id: 8, usuario: 'jsalazar', nombres: 'Jorge Salazar', rol: 'docente', estado: 'activo' }
+  ]);
+  
+  const [modalUsuario, setModalUsuario] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [usuarioForm, setUsuarioForm] = useState({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
+  const [mensajeUserMsg, setMensajeUserMsg] = useState('');
+  const [modalResetPass, setModalResetPass] = useState(false);
+  const [userToReset, setUserToReset] = useState(null);
+  const [newPasswordInput, setNewPasswordInput] = useState('');
+
   useEffect(() => {
     cargarCatalogoDesdeBD();
   }, []);
 
   useEffect(() => {
     if (sesionIniciada && usernameActual) {
-      cargarUsuariosDesdeBD();
       cargarMatriculasDesdeBD();
       cargarMensajesDesdeBD(usernameActual);
     }
@@ -330,18 +392,14 @@ export default function App() {
       return;
     }
     const nombreLimpio = nombreInteresado.replace(/[<>]/g, '').trim();
-    const saludo = nombreLimpio
-      ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreLimpio}*.`
-      : `¡Hola *Pórtico San Marcos*! 👋`;
-    const listaTexto = carrito
-      .map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`)
-      .join('\n');
+    const saludo = nombreLimpio ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreLimpio}*.` : `¡Hola *Pórtico San Marcos*! 👋`;
+    const listaTexto = carrito.map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`).join('\n');
     const textoFinal = `${saludo}\nDeseo adquirir los siguientes cursos:\n\n${listaTexto}\n\n💰 *Total a pagar: S/ ${totalCarrito.toFixed(2)}*\n\n*(He leído y acepto la política de datos)*`;
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
   };
 
   // =========================================================================
-  // FUNCIONES DEL PERFIL ADMIN
+  // FUNCIONES DEL PERFIL ADMIN: AÑADIR, HABILITAR Y DESHABILITAR CURSOS
   // =========================================================================
   const handleCrearCursoBD = async (e) => {
     e.preventDefault();
@@ -501,18 +559,10 @@ export default function App() {
 
   const docentesDestacados = [
     { id: 1, nombre: 'Ing. Fabrizio Barzola', especialidad: 'Especialista en Robótica', sede: 'Lab 4', foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop' },
-    { id: 2, nombre: 'Ing. Carlos Mendoza', especialidad: 'Experto en PLC Siemens', sede: 'Lab Electrónica', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop' }
+    { id: 2, nombre: 'Ing. Carlos Mendoza', especialidad: 'Experto en PLC Siemens', sede: 'Lab Electrónica', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop' },
+    { id: 3, nombre: 'Ing. Luis Alvarado', especialidad: 'Consultor en Neumática, Electroneumática e ISO 1219', sede: 'Sede Arequipa - Pabellón B', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop' },
+    { id: 4, nombre: 'Dra. María Fernández', especialidad: 'Doctora en Procesamiento Digital de Señales y MATLAB', sede: 'Campus Virtual', foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop' }
   ];
-
-  const [listaUsuarios, setListaUsuarios] = useState([]);
-  
-  const [modalUsuario, setModalUsuario] = useState(false);
-  const [modoEdicion, setModoEdicion] = useState(false);
-  const [usuarioForm, setUsuarioForm] = useState({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
-  const [mensajeUserMsg, setMensajeUserMsg] = useState('');
-  const [modalResetPass, setModalResetPass] = useState(false);
-  const [userToReset, setUserToReset] = useState(null);
-  const [newPasswordInput, setNewPasswordInput] = useState('');
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -643,7 +693,7 @@ export default function App() {
   };
 
   // =========================================================================
-  // PERMISOS DE ADMINISTRADOR ESTRICTOS
+  // PERMISOS DE ADMINISTRADOR ESTRICTOS (SOLO ADMIN CREA/MODIFICA CURSOS Y USUARIOS)
   // =========================================================================
   const esAdmin = rolUsuario === 'admin';
 
@@ -661,7 +711,9 @@ export default function App() {
     return coincideModalidad && coincideCategoria && coincideBusqueda;
   });
 
-  // VISTA 1: TIENDA VIRTUAL (PRE-LOGIN)
+  // =========================================================================
+  // VISTA 1: TIENDA VIRTUAL (PRE-LOGIN) - SOLO MUESTRA CURSOS HABILITADOS
+  // =========================================================================
   if (!sesionIniciada) {
     const cursosActivosTienda = cursosCatalogo.filter(c => c.estado !== 'inactivo');
     const categoriasTienda = ['Todos', ...new Set(cursosActivosTienda.map(c => c.categoria))];
@@ -803,7 +855,9 @@ export default function App() {
     );
   }
 
+  // =========================================================================
   // VISTA 2: INTERIOR DEL AULA VIRTUAL
+  // =========================================================================
   return (
     <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
       
@@ -820,6 +874,7 @@ export default function App() {
           <button onClick={() => irASeccion(seccionBibliotecaRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Biblioteca</button>
           <button onClick={() => irASeccion(seccionMensajesRef)} style={{ background: 'none', border: 'none', color: '#34d399', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>💬 Mensajería</button>
           
+          {/* SÓLO EL ADMIN VE LA PESTAÑA DE GESTIÓN DE USUARIOS */}
           {esAdmin && <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios y Matrículas</button>}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginLeft: '10px' }}>
@@ -846,6 +901,7 @@ export default function App() {
           </div>
         </div>
 
+        {/* PERFIL DEL ALUMNO: CURSOS MATRICULADOS */}
         {rolUsuario === 'alumno' && (
           <div ref={seccionPerfilRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
@@ -860,6 +916,18 @@ export default function App() {
                         <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold' }}>{curso.categoria}</span>
                         <h4 style={{ margin: '6px 0 8px 0', fontSize: '16px', color: '#0f172a' }}>{curso.titulo}</h4>
                         <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#334155' }}><strong>Docente:</strong> {curso.instructor}</p>
+                        
+                        {/* AÑADIDO: BOTONES DE GRABACIÓN Y ZOOM DENTRO DEL PERFIL DEL ALUMNO */}
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                          {(curso.tipo || 'Virtual') === 'Virtual' ? (
+                            <>
+                              <button className="card-action-btn" style={{ flex: 1, padding: '8px', fontSize: '12px' }} onClick={() => setVideoActivo(curso)}>Ver Grabación</button>
+                              <a href={curso.enlaceSede || '#'} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', padding: '8px', fontSize: '12px', textDecoration: 'none', textAlign: 'center' }}>Ir a Zoom</a>
+                            </>
+                          ) : (
+                            <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(curso)} style={{ backgroundColor: '#059669', width: '100%', padding: '8px', fontSize: '12px' }}>Ver Sede Física</button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -869,12 +937,27 @@ export default function App() {
           </div>
         )}
 
+        {/* CATÁLOGO DE CLASES (GRABACIONES Y SEDES PARA TODOS) */}
         <div ref={seccionCursosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>{esAdmin ? 'ADMINISTRACIÓN DE CURSOS' : 'MIS CLASES & LABORATORIOS'}</h2>
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>{esAdmin ? 'ADMINISTRACIÓN DE CURSOS' : 'CATÁLOGO DE CLASES & LABORATORIOS'}</h2>
+              {/* SOLO ADMIN PUEDE AÑADIR CURSOS */}
               {esAdmin && <button onClick={() => setModalNuevoCurso(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>+ Añadir Nuevo Curso</button>}
             </div>
+
+            {/* AÑADIDO: REPRODUCTOR DE VIDEO INCORPORADO */}
+            {videoActivo && (
+              <div style={{ background: '#0f172a', padding: '20px', borderRadius: '12px', color: '#fff', marginBottom: '30px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                  <h3 style={{ margin: 0, color: '#38bdf8' }}>Reproduciendo Sesión: {videoActivo.titulo}</h3>
+                  <button onClick={() => setVideoActivo(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar Video</button>
+                </div>
+                <video controls autoPlay style={{ width: '100%', maxHeight: '420px', borderRadius: '8px', background: '#000' }}>
+                  <source src={videoActivo.videoUrl || videoActivo.video_demo_url} type="video/mp4" />
+                </video>
+              </div>
+            )}
 
             <div className="courses-grid-focus">
               {clasesInternasFiltradas.map((item) => {
@@ -889,10 +972,20 @@ export default function App() {
                     <div className="card-body-content">
                       <h3>{item.titulo}</h3>
                       <p>{item.descripcion}</p>
+                      
+                      {/* AÑADIDO: BOTONES DE ACCESO A CLASES PARA TODOS */}
                       <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
-                        {esVirtual ? <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>Grabación</button> : <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>Sede</button>}
+                        {esVirtual ? (
+                          <>
+                            <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>Grabación</button>
+                            <a href={item.enlaceSede || '#'} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none', textAlign: 'center' }}>Zoom</a>
+                          </>
+                        ) : (
+                          <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>Ver Sede</button>
+                        )}
                       </div>
                       
+                      {/* SOLO ADMIN PUEDE HABILITAR O DESHABILITAR CURSOS */}
                       {esAdmin && (
                         <button onClick={() => handleToggleEstadoCurso(item)} style={{ width: '100%', padding: '8px', marginTop: '10px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', background: estaInactivo ? '#dcfce7' : '#fee2e2', color: estaInactivo ? '#166534' : '#991b1b' }}>
                           {estaInactivo ? '✓ Habilitar Curso en Tienda' : '✕ Deshabilitar Curso'}
@@ -902,6 +995,31 @@ export default function App() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </div>
+
+        {/* BIBLIOTECA VIRTUAL FLIPBOOK */}
+        <div ref={seccionBibliotecaRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
+          <div className="dashboard-container">
+            <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>BIBLIOTECA VIRTUAL (FLIPBOOK 3D)</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
+              {listaLibros.map((libro) => (
+                <div key={libro.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                  <img src={libro.portada} alt={libro.titulo} style={{ width: '100%', height: '210px', objectFit: 'cover' }} />
+                  <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '6px' }}>{libro.categoria}</span>
+                    <h3 style={{ fontSize: '15px', color: '#0f172a', margin: '0 0 8px 0', fontWeight: 'bold' }}>{libro.titulo}</h3>
+                    <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 15px 0' }}>Autor: {libro.autor}</p>
+                    {/* AÑADIDO: BOTÓN FUNCIONAL DEL FLIPBOOK */}
+                    <button onClick={() => setLibroSeleccionado(libro.pdfUrl)} style={{ marginTop: 'auto', padding: '10px 16px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
+                      Leer en Flipbook 3D
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
