@@ -270,32 +270,21 @@ export default function App() {
   // NUEVOS ESTADOS: ADMIN DE CURSOS, MATRÍCULAS Y MENSAJERÍA BD
   const [modalNuevoCurso, setModalNuevoCurso] = useState(false);
   const [nuevoCursoForm, setNuevoCursoForm] = useState({
-    titulo: '',
-    categoria: 'Robótica',
-    descripcion: '',
-    precio: '120',
-    duracion: '5 Semanas (20 Horas)',
-    imagen_url: '',
-    video_demo_url: '',
+    titulo: '', categoria: 'Robótica', descripcion: '', precio: '120',
+    duracion: '5 Semanas (20 Horas)', imagen_url: '', video_demo_url: '',
     temarioTexto: 'Módulo 1: Fundamentos\nMódulo 2: Laboratorio Práctico',
-    tipo: 'Virtual',
-    horario: 'Martes y Jueves - 7:00 PM',
-    instructor: 'Ing. Fabrizio Barzola',
-    enlaceSede: 'https://zoom.us/j/9876543210'
+    tipo: 'Virtual', horario: 'Martes y Jueves - 7:00 PM',
+    instructor: 'Ing. Fabrizio Barzola', enlaceSede: 'https://zoom.us/j/9876543210'
   });
 
   // Matrículas (cursos por estudiante)
-  const [matriculas, setMatriculas] = useState([
-    { usuario_alumno: 'jperez', curso_id: 1 },
-    { usuario_alumno: 'jperez', curso_id: 3 },
-    { usuario_alumno: 'mgomez', curso_id: 4 }
-  ]);
-  const [alumnoSeleccionadoMatricula, setAlumnoSeleccionadoMatricula] = useState('jperez');
+  const [matriculas, setMatriculas] = useState([]);
+  const [alumnoSeleccionadoMatricula, setAlumnoSeleccionadoMatricula] = useState('');
   const [cursoSeleccionadoMatricula, setCursoSeleccionadoMatricula] = useState(1);
 
   // Mensajería con Base de Datos
   const [mensajesBD, setMensajesBD] = useState([]);
-  const [destinatarioMsg, setDestinatarioMsg] = useState('admin');
+  const [destinatarioMsg, setDestinatarioMsg] = useState('');
   const [asuntoMsg, setAsuntoMsg] = useState('');
   const [contenidoMsg, setContenidoMsg] = useState('');
   const [estadoEnvioMsg, setEstadoEnvioMsg] = useState('');
@@ -340,14 +329,24 @@ export default function App() {
       .catch(() => console.log('Usando catálogo local de respaldo.'));
   };
 
+  // Cargar lista de usuarios desde la Base de Datos
+  const cargarUsuariosDesdeBD = () => {
+    fetch(`${API_BASE}/usuarios`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setListaUsuarios(data);
+        }
+      })
+      .catch(() => console.log('Error al cargar lista de usuarios reales'));
+  };
+
   // Cargar matrículas desde BD
   const cargarMatriculasDesdeBD = () => {
     fetch(`${API_BASE}/matriculas`)
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setMatriculas(data);
-        }
+        if (Array.isArray(data)) setMatriculas(data);
       })
       .catch(() => {});
   };
@@ -358,22 +357,22 @@ export default function App() {
     fetch(`${API_BASE}/mensajes/${usr}`)
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) {
-          setMensajesBD(data);
-        }
+        if (Array.isArray(data)) setMensajesBD(data);
       })
       .catch(() => {});
   };
 
+  // Ejecución inicial
   useEffect(() => {
     cargarCatalogoDesdeBD();
-    cargarMatriculasDesdeBD();
   }, []);
 
+  // Al iniciar sesión, cargar los datos seguros desde BD
   useEffect(() => {
     if (sesionIniciada && usernameActual) {
-      cargarMensajesDesdeBD(usernameActual);
+      cargarUsuariosDesdeBD();
       cargarMatriculasDesdeBD();
+      cargarMensajesDesdeBD(usernameActual);
     }
   }, [sesionIniciada, usernameActual]);
 
@@ -461,6 +460,8 @@ export default function App() {
   // =========================================================================
   const handleAsignarCursoAlumno = async (e) => {
     e.preventDefault();
+    if (!alumnoSeleccionadoMatricula) return alert("Selecciona un alumno.");
+    
     const nuevaMat = { usuario_alumno: alumnoSeleccionadoMatricula, curso_id: Number(cursoSeleccionadoMatricula) };
     if (!matriculas.some(m => m.usuario_alumno === nuevaMat.usuario_alumno && Number(m.curso_id) === nuevaMat.curso_id)) {
       setMatriculas([...matriculas, nuevaMat]);
@@ -491,7 +492,7 @@ export default function App() {
   // =========================================================================
   const handleEnviarMensajeBD = async (e) => {
     e.preventDefault();
-    if (!contenidoMsg.trim()) return;
+    if (!contenidoMsg.trim() || !destinatarioMsg) return;
     setEstadoEnvioMsg('Enviando mensaje...');
 
     const nuevoMensaje = {
@@ -520,7 +521,7 @@ export default function App() {
       setMensajesBD([nuevoMensaje, ...mensajesBD]);
       setAsuntoMsg('');
       setContenidoMsg('');
-      setEstadoEnvioMsg('✓ Mensaje registrado.');
+      setEstadoEnvioMsg('✓ Mensaje registrado de forma local.');
     }
   };
 
@@ -600,14 +601,9 @@ export default function App() {
     { id: 4, nombre: 'Dra. María Fernández', especialidad: 'Doctora en Procesamiento Digital de Señales y MATLAB', sede: 'Campus Virtual', foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop' }
   ];
 
-  const [listaUsuarios, setListaUsuarios] = useState([
-    { id: 1, usuario: 'jperez', nombres: 'Juan Pérez', rol: 'alumno', estado: 'activo' },
-    { id: 2, usuario: 'mgomez', nombres: 'María Gómez', rol: 'alumno', estado: 'activo' },
-    { id: 3, usuario: 'cmendoza', nombres: 'Carlos Mendoza', rol: 'docente', estado: 'activo' },
-    { id: 4, usuario: 'fbarzola', nombres: 'Fabrizio Barzola', rol: 'docente', estado: 'activo' },
-    { id: 5, usuario: 'lalvarado', nombres: 'Luis Alvarado', rol: 'docente', estado: 'activo' },
-    { id: 6, usuario: 'admin', nombres: 'Administrador General', rol: 'admin', estado: 'activo' }
-  ]);
+  // ESTADO LOCAL DE USUARIOS (inicialmente vacío, se llena con cargarUsuariosDesdeBD)
+  const [listaUsuarios, setListaUsuarios] = useState([]);
+  
   const [modalUsuario, setModalUsuario] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [usuarioForm, setUsuarioForm] = useState({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
@@ -700,16 +696,14 @@ export default function App() {
         setMensajeUserMsg('El usuario ya existe.');
         return;
       }
-      setListaUsuarios([
-        ...listaUsuarios,
-        {
-          id: Date.now(),
-          usuario: usuarioForm.usuario.replace(/[^a-zA-Z0-9._-]/g, ''),
-          nombres: usuarioForm.nombres,
-          rol: usuarioForm.rol,
-          estado: 'activo'
-        }
-      ]);
+      const nuevoUsr = {
+        id: Date.now(),
+        usuario: usuarioForm.usuario.replace(/[^a-zA-Z0-9._-]/g, ''),
+        nombres: usuarioForm.nombres,
+        rol: usuarioForm.rol,
+        estado: 'activo'
+      };
+      setListaUsuarios([...listaUsuarios, nuevoUsr]);
       setModalUsuario(false);
     } else {
       setListaUsuarios(listaUsuarios.map(u => u.id === usuarioForm.id ? { ...u, nombres: usuarioForm.nombres, rol: usuarioForm.rol } : u));
@@ -761,7 +755,7 @@ export default function App() {
     );
   };
 
-  // Permisos de Administración (Admin o Docente)
+  // Permisos de Administración
   const esAdmin = rolUsuario === 'admin' || rolUsuario === 'docente';
 
   // Cursos matriculados del estudiante actual
@@ -951,7 +945,7 @@ export default function App() {
 
               <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <h2 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '24px', fontWeight: '800' }}>Pórtico San Marcos</h2>
-                <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0, lineHeight: '1.5' }}>Acceso exclusivo para estudiantes, docentes y administradores.</p>
+                <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0, lineHeight: '1.5' }}>Acceso exclusivo para estudiantes y docentes matriculados en la institución.</p>
               </div>
 
               <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -1299,7 +1293,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* SECCIÓN 5: MENSAJERÍA INTERNA CON BASE DE DATOS (PARA TODOS LOS PERFILES) */}
+        {/* SECCIÓN 5: MENSAJERÍA INTERNA (AHORA LEE DIRECTO DESDE LA BD) */}
         <div ref={seccionMensajesRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
@@ -1312,18 +1306,26 @@ export default function App() {
               {/* Formulario para redactar mensaje */}
               <form onSubmit={handleEnviarMensajeBD} style={{ background: '#ffffff', padding: '22px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <h3 style={{ margin: 0, fontSize: '17px', color: '#0f172a' }}>Redactar Nuevo Mensaje</h3>
+                
+                {/* LA LISTA AHORA SE ARMA SOLA CON LOS USUARIOS REALES DE LA BASE DE DATOS */}
                 <div>
                   <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '6px' }}>Destinatario (Perfil):</label>
-                  <select value={destinatarioMsg} onChange={e => setDestinatarioMsg(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px' }}>
-                    <option value="admin">Administrador General (@admin)</option>
-                    <option value="fbarzola">Ing. Fabrizio Barzola (@fbarzola - Docente)</option>
-                    <option value="cmendoza">Ing. Carlos Mendoza (@cmendoza - Docente)</option>
-                    <option value="lalvarado">Ing. Luis Alvarado (@lalvarado - Docente)</option>
-                    <option value="jperez">Juan Pérez (@jperez - Estudiante)</option>
-                    <option value="mgomez">María Gómez (@mgomez - Estudiante)</option>
+                  <select value={destinatarioMsg} onChange={e => setDestinatarioMsg(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px' }}>
+                    <option value="">-- Selecciona a quién enviar el mensaje --</option>
+                    
+                    {/* Renderiza todos los usuarios de Aiven (excluyéndote a ti mismo) */}
+                    {listaUsuarios
+                      .filter(u => u.usuario !== usernameActual)
+                      .map(u => (
+                        <option key={u.id} value={u.usuario}>
+                          {u.nombres} (@{u.usuario} - {u.rol})
+                        </option>
+                      ))
+                    }
                     <option value="todos">📢 Todos los Usuarios (Aviso General)</option>
                   </select>
                 </div>
+                
                 <div>
                   <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '6px' }}>Asunto:</label>
                   <input type="text" placeholder="Ej. Consulta sobre matrícula o laboratorio" value={asuntoMsg} onChange={e => setAsuntoMsg(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }} />
@@ -1381,7 +1383,10 @@ export default function App() {
               <form onSubmit={handleAsignarCursoAlumno} style={{ background: '#fff', padding: '18px', borderRadius: '12px', border: '1px solid #cbd5e1', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: '200px' }}>
                   <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#334155', marginBottom: '6px' }}>Seleccionar Estudiante:</label>
+                  
+                  {/* AQUÍ TAMBIÉN SE REFLEJAN LOS ESTUDIANTES DE TU BASE DE DATOS */}
                   <select value={alumnoSeleccionadoMatricula} onChange={e => setAlumnoSeleccionadoMatricula(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                    <option value="">-- Seleccionar alumno --</option>
                     {listaUsuarios.filter(u => u.rol === 'alumno').map(u => (
                       <option key={u.id} value={u.usuario}>{u.nombres} (@{u.usuario})</option>
                     ))}
@@ -1543,8 +1548,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {renderModalPrivacidad()}
     </div>
   );
 }
