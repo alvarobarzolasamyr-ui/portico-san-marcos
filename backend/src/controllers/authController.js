@@ -1,50 +1,37 @@
 const db = require('../config/db');
-const bcrypt = require('bcryptjs'); // Usamos la librería segura para Render
+const bcrypt = require('bcryptjs'); // Usamos la librería a prueba de fallos en Render
 
-// ==========================================
-// 1. INICIO DE SESIÓN PROTEGIDO (ANTI-CRASH)
-// ==========================================
 exports.loginUser = async (req, res) => {
   const { usuario, password } = req.body;
-  
-  if (!usuario || !password) {
-    return res.status(400).json({ success: false, message: 'Faltan credenciales' });
-  }
-
   try {
-    console.log('Intentando iniciar sesión para:', usuario);
+    console.log('Intentando iniciar sesión para el usuario:', usuario);
+    
     const [rows] = await db.query(
       'SELECT id, usuario, password, nombres, rol, estado FROM usuarios WHERE usuario = ?',
       [usuario]
     );
 
     if (rows.length === 0) {
-      console.log('Usuario no encontrado en BD.');
+      console.log('Usuario no encontrado en la base de datos.');
       return res.status(401).json({ success: false, message: 'Usuario o contraseña incorrectos' });
     }
 
     const user = rows[0];
+    console.log('Usuario encontrado, verificando contraseña...');
 
-    // Verificar si la cuenta está activa ANTES de chequear el hash
-    if (user.estado !== 'activo') {
-      console.log('Cuenta inactiva.');
-      return res.status(403).json({ success: false, message: 'Tu cuenta se encuentra inactiva' });
-    }
-
-    // Verificar si tiene contraseña (evita crash)
-    if (!user.password) {
-      return res.status(401).json({ success: false, message: 'Usuario sin contraseña registrada' });
-    }
-
-    // Comparación segura (Escudo protector)
     const passwordValido = await bcrypt.compare(password, user.password);
 
     if (!passwordValido) {
-      console.log('La contraseña no coincide.');
+      console.log('La contraseña no coincide con el hash.');
       return res.status(401).json({ success: false, message: 'Usuario o contraseña incorrectos' });
     }
 
-    console.log('¡Login exitoso para:', usuario);
+    if (user.estado !== 'activo') {
+      console.log('La cuenta está inactiva.');
+      return res.status(403).json({ success: false, message: 'Tu cuenta se encuentra inactiva' });
+    }
+
+    console.log('¡Inicio de sesión exitoso!');
     res.json({
       success: true,
       message: 'Inicio de sesión exitoso',
@@ -55,16 +42,12 @@ exports.loginUser = async (req, res) => {
         rol: user.rol
       }
     });
-
   } catch (error) {
-    console.error('❌ ERROR EVITADO EN LOGIN:', error.message);
-    res.status(500).json({ success: false, message: 'Error de validación en BD. Si la cuenta es antigua, solicita reset de clave.' });
+    console.error('❌ ERROR CRÍTICO EN LOGIN:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor', errorDetalle: error.message });
   }
 };
 
-// ==========================================
-// 2. GESTIÓN DE USUARIOS
-// ==========================================
 exports.getUsers = async (req, res) => {
   try {
     const [rows] = await db.query('SELECT id, usuario, nombres, rol, estado FROM usuarios');
@@ -81,13 +64,15 @@ exports.createUser = async (req, res) => {
     if (existing.length > 0) {
       return res.status(400).json({ success: false, message: 'El usuario ya existe' });
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
     await db.query(
       'INSERT INTO usuarios (usuario, password, nombres, rol, estado) VALUES (?, ?, ?, ?, "activo")',
       [usuario, hashedPassword, nombres, rol || 'alumno']
     );
-    res.json({ success: true, message: 'Usuario registrado' });
+    res.json({ success: true, message: 'Usuario registrado con éxito' });
   } catch (error) {
+    console.error('Error en createUser:', error);
     res.status(500).json({ success: false, message: 'Error en el servidor' });
   }
 };
@@ -105,7 +90,7 @@ exports.updateUser = async (req, res) => {
 
 exports.toggleUserStatus = async (req, res) => {
   const { id } = req.params;
-  const { estado } = req.body; // 'activo' o 'inactivo'
+  const { estado } = req.body;
   try {
     await db.query('UPDATE usuarios SET estado = ? WHERE id = ?', [estado, id]);
     res.json({ success: true, message: 'Estado actualizado' });
@@ -118,20 +103,18 @@ exports.resetPassword = async (req, res) => {
   const { id } = req.params;
   const { password } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
     await db.query('UPDATE usuarios SET password = ? WHERE id = ?', [hashedPassword, id]);
-    res.json({ success: true, message: 'Contraseña restablecida con Bcrypt' });
+    res.json({ success: true, message: 'Contraseña restablecida' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al cambiar contraseña' });
   }
 };
 
-// ==========================================
-// 3. MIGRACIÓN Y CREACIÓN MASIVA ORIGINAL
-// ==========================================
+// --- RUTA MÁGICA PARA REPARAR CONTRASEÑAS Y CREAR AL ADMIN EN AIVEN ---
 exports.migrarAiven = async (req, res) => {
   try {
-    // Asegurar tabla
     await db.query(`
       CREATE TABLE IF NOT EXISTS usuarios (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -144,7 +127,7 @@ exports.migrarAiven = async (req, res) => {
       )
     `);
 
-    // Lista de docentes, alumnos (MÁS EL ADMIN)
+    // El admin está aquí para que se encripte correctamente
     const usuariosAMigrar = [
       { nombres: 'Administrador General', apellidos: 'Admin', usuario: 'admin', passPlana: 'admin123', rol: 'admin' },
       { nombres: 'Carlos', apellidos: 'Mendoza', usuario: 'cendoza', passPlana: 'carlos2026', rol: 'docente' },
@@ -159,11 +142,8 @@ exports.migrarAiven = async (req, res) => {
       { nombres: 'Diego', apellidos: 'Flores', usuario: 'dflores', passPlana: 'dflores2026', rol: 'alumno' }
     ];
 
-    // Insertar/Actualizar
     for (const user of usuariosAMigrar) {
       const hashedPassword = await bcrypt.hash(user.passPlana, 10);
-      
-      // Si el usuario existe, se actualiza su hash (para arreglar claves corruptas previas)
       const sqlUpsert = `
         INSERT INTO usuarios (nombres, apellidos, usuario, password, estado, rol) 
         VALUES (?, ?, ?, ?, 'activo', ?)
@@ -174,14 +154,12 @@ exports.migrarAiven = async (req, res) => {
 
     res.send(`
       <div style="font-family: sans-serif; text-align: center; padding: 40px;">
-        <h2 style="color: #16a34a;">¡Usuarios y contraseñas reparadas en Aiven!</h2>
-        <p>Todos los usuarios (incluyendo el Admin) han sido encriptados correctamente.</p>
-        <p><strong>Admin:</strong> admin / admin123</p>
-        <p><strong>Diego Flores:</strong> dflores / dflores2026</p>
+        <h2 style="color: #16a34a;">¡Usuarios reparados con éxito en Aiven!</h2>
+        <p>Ya puedes iniciar sesión con <strong>admin</strong> (clave: admin123) y <strong>dflores</strong> (clave: dflores2026).</p>
       </div>
     `);
   } catch (error) {
-    console.error('Error durante la migración:', error);
+    console.error('Error durante la migración a Aiven:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
