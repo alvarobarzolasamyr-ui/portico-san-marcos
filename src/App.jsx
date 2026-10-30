@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import PdfFlipbook from './components/PdfFlipbook';
 
+const API_BASE = 'https://portico-san-marcos.onrender.com/api';
 const WHATSAPP_NUMERO = '51967107035';
 
 // CATÁLOGO MAESTRO UNIFICADO (Tienda Pública y Aula Interna)
@@ -26,7 +27,8 @@ const CATALOGO_INICIAL = [
     horario: 'Martes y Jueves - 7:00 PM',
     instructor: 'Ing. Fabrizio Barzola',
     enlaceSede: 'https://zoom.us/j/9876543210',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
+    estado: 'activo'
   },
   {
     id: 2,
@@ -48,7 +50,8 @@ const CATALOGO_INICIAL = [
     horario: 'Viernes - 7:00 PM',
     instructor: 'Ing. Carlos Mendoza',
     enlaceSede: 'Campus Central - Laboratorio de Electrónica',
-    ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800'
+    ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800',
+    estado: 'activo'
   },
   {
     id: 3,
@@ -70,7 +73,8 @@ const CATALOGO_INICIAL = [
     horario: 'Sábados - 3:00 PM',
     instructor: 'Ing. Fabrizio Barzola',
     enlaceSede: 'https://zoom.us/j/1234567890',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
+    estado: 'activo'
   },
   {
     id: 4,
@@ -92,7 +96,8 @@ const CATALOGO_INICIAL = [
     horario: 'Lunes y Miércoles - 8:00 PM',
     instructor: 'Dra. María Fernández',
     enlaceSede: 'https://meet.google.com/abc-defg-hij',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
+    estado: 'activo'
   },
   {
     id: 5,
@@ -114,7 +119,8 @@ const CATALOGO_INICIAL = [
     horario: 'Martes y Jueves - 8:00 PM',
     instructor: 'Ing. Carlos Mendoza',
     enlaceSede: 'https://zoom.us/j/9876543210',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
+    estado: 'activo'
   },
   {
     id: 6,
@@ -136,7 +142,8 @@ const CATALOGO_INICIAL = [
     horario: 'Viernes - 6:00 PM',
     instructor: 'Dra. María Fernández',
     enlaceSede: 'https://zoom.us/j/5556667770',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
+    estado: 'activo'
   },
   {
     id: 7,
@@ -158,7 +165,8 @@ const CATALOGO_INICIAL = [
     horario: 'Miércoles - 4:00 PM',
     instructor: 'Ing. Carlos Mendoza',
     enlaceSede: 'Campus Central - Laboratorio de Electrónica',
-    ubicacionImg: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800'
+    ubicacionImg: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800',
+    estado: 'activo'
   },
   {
     id: 8,
@@ -180,7 +188,8 @@ const CATALOGO_INICIAL = [
     horario: 'Martes - 4:00 PM',
     instructor: 'Ing. Luis Alvarado',
     enlaceSede: 'Sede Arequipa - Pabellón B - Lab 2',
-    ubicacionImg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800'
+    ubicacionImg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800',
+    estado: 'activo'
   },
   {
     id: 9,
@@ -202,7 +211,8 @@ const CATALOGO_INICIAL = [
     horario: 'Jueves - 5:00 PM',
     instructor: 'Ing. Fabrizio Barzola',
     enlaceSede: 'Campus Central - Taller Mecánico',
-    ubicacionImg: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=800'
+    ubicacionImg: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=800',
+    estado: 'activo'
   },
   {
     id: 10,
@@ -224,7 +234,8 @@ const CATALOGO_INICIAL = [
     horario: 'Lunes - 7:00 PM',
     instructor: 'Ing. Luis Alvarado',
     enlaceSede: 'https://zoom.us/j/1234567890',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
+    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
+    estado: 'activo'
   }
 ];
 
@@ -232,6 +243,7 @@ export default function App() {
   // ESTADOS DE SESIÓN Y CATÁLOGO
   const [sesionIniciada, setSesionIniciada] = useState(() => localStorage.getItem('sesionIniciada') === 'true');
   const [usuarioLogueado, setUsuarioLogueado] = useState(() => localStorage.getItem('usuarioLogueado') || '');
+  const [usernameActual, setUsernameActual] = useState(() => localStorage.getItem('usernameActual') || '');
   const [rolUsuario, setRolUsuario] = useState(() => localStorage.getItem('rolUsuario') || '');
   const [cursosCatalogo, setCursosCatalogo] = useState(CATALOGO_INICIAL);
   
@@ -255,6 +267,39 @@ export default function App() {
   const [intentosFallidos, setIntentosFallidos] = useState(0);
   const [tiempoBloqueo, setTiempoBloqueo] = useState(0);
 
+  // NUEVOS ESTADOS: ADMIN DE CURSOS, MATRÍCULAS Y MENSAJERÍA BD
+  const [modalNuevoCurso, setModalNuevoCurso] = useState(false);
+  const [nuevoCursoForm, setNuevoCursoForm] = useState({
+    titulo: '',
+    categoria: 'Robótica',
+    descripcion: '',
+    precio: '120',
+    duracion: '5 Semanas (20 Horas)',
+    imagen_url: '',
+    video_demo_url: '',
+    temarioTexto: 'Módulo 1: Fundamentos\nMódulo 2: Laboratorio Práctico',
+    tipo: 'Virtual',
+    horario: 'Martes y Jueves - 7:00 PM',
+    instructor: 'Ing. Fabrizio Barzola',
+    enlaceSede: 'https://zoom.us/j/9876543210'
+  });
+
+  // Matrículas (cursos por estudiante)
+  const [matriculas, setMatriculas] = useState([
+    { usuario_alumno: 'jperez', curso_id: 1 },
+    { usuario_alumno: 'jperez', curso_id: 3 },
+    { usuario_alumno: 'mgomez', curso_id: 4 }
+  ]);
+  const [alumnoSeleccionadoMatricula, setAlumnoSeleccionadoMatricula] = useState('jperez');
+  const [cursoSeleccionadoMatricula, setCursoSeleccionadoMatricula] = useState(1);
+
+  // Mensajería con Base de Datos
+  const [mensajesBD, setMensajesBD] = useState([]);
+  const [destinatarioMsg, setDestinatarioMsg] = useState('admin');
+  const [asuntoMsg, setAsuntoMsg] = useState('');
+  const [contenidoMsg, setContenidoMsg] = useState('');
+  const [estadoEnvioMsg, setEstadoEnvioMsg] = useState('');
+
   // Temporizador para fuerza bruta
   useEffect(() => {
     if (tiempoBloqueo <= 0) return;
@@ -275,20 +320,62 @@ export default function App() {
     localStorage.setItem('carrito_portico', JSON.stringify(carrito));
   }, [carrito]);
 
-  useEffect(() => {
-    fetch('https://portico-san-marcos.onrender.com/api/catalogo')
+  // Cargar catálogo desde Render / Aiven
+  const cargarCatalogoDesdeBD = () => {
+    fetch(`${API_BASE}/catalogo`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           const cursosUnificados = data.map(dbCurso => {
             const cursoLocal = CATALOGO_INICIAL.find(c => c.id === dbCurso.id) || {};
-            return { ...cursoLocal, ...dbCurso };
+            return {
+              ...cursoLocal,
+              ...dbCurso,
+              estado: dbCurso.estado || cursoLocal.estado || 'activo'
+            };
           });
           setCursosCatalogo(cursosUnificados);
         }
       })
       .catch(() => console.log('Usando catálogo local de respaldo.'));
+  };
+
+  // Cargar matrículas desde BD
+  const cargarMatriculasDesdeBD = () => {
+    fetch(`${API_BASE}/matriculas`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setMatriculas(data);
+        }
+      })
+      .catch(() => {});
+  };
+
+  // Cargar mensajes desde BD para el perfil activo
+  const cargarMensajesDesdeBD = (usr) => {
+    if (!usr) return;
+    fetch(`${API_BASE}/mensajes/${usr}`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setMensajesBD(data);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    cargarCatalogoDesdeBD();
+    cargarMatriculasDesdeBD();
   }, []);
+
+  useEffect(() => {
+    if (sesionIniciada && usernameActual) {
+      cargarMensajesDesdeBD(usernameActual);
+      cargarMatriculasDesdeBD();
+    }
+  }, [sesionIniciada, usernameActual]);
 
   // FUNCIONES DEL CARRITO
   const agregarAlCarrito = (curso) => {
@@ -303,7 +390,7 @@ export default function App() {
   const enviarPedidoWhatsApp = () => {
     if (carrito.length === 0) return;
     if (!aceptaDatosCarrito) {
-      alert('Por favor, acepta la Política de Tratamiento de Datos Personales antes de continuar.');
+      alert('Por favor, acepta la Política de Privacidad antes de continuar.');
       return;
     }
     const nombreLimpio = nombreInteresado.replace(/[<>]/g, '').trim();
@@ -317,6 +404,126 @@ export default function App() {
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
   };
 
+  // =========================================================================
+  // FUNCIONES DEL PERFIL ADMIN: AÑADIR, HABILITAR Y DESHABILITAR CURSOS EN BD
+  // =========================================================================
+  const handleCrearCursoBD = async (e) => {
+    e.preventDefault();
+    const temarioArray = nuevoCursoForm.temarioTexto
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean);
+
+    const payload = {
+      ...nuevoCursoForm,
+      precio: Number(nuevoCursoForm.precio),
+      temario: temarioArray
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/catalogo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      const nuevoCursoObj = {
+        ...payload,
+        id: data.id || Date.now(),
+        imagen_url: payload.imagen_url || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80',
+        video_demo_url: payload.video_demo_url || 'https://www.youtube.com/embed/fc_cA62Z1kQ',
+        estado: 'activo'
+      };
+      setCursosCatalogo([...cursosCatalogo, nuevoCursoObj]);
+      setModalNuevoCurso(false);
+      alert('Curso guardado exitosamente en la Base de Datos.');
+    } catch (error) {
+      alert('Error al conectar con el servidor para guardar el curso.');
+    }
+  };
+
+  const handleToggleEstadoCurso = async (curso) => {
+    const nuevoEstado = curso.estado === 'inactivo' ? 'activo' : 'inactivo';
+    setCursosCatalogo(cursosCatalogo.map(c => c.id === curso.id ? { ...c, estado: nuevoEstado } : c));
+    try {
+      await fetch(`${API_BASE}/catalogo/${curso.id}/estado`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: nuevoEstado })
+      });
+    } catch (error) {
+      console.error('Error actualizando estado en BD:', error);
+    }
+  };
+
+  // =========================================================================
+  // FUNCIONES DE MATRÍCULA (CURSOS QUE LLEVA CADA ESTUDIANTE)
+  // =========================================================================
+  const handleAsignarCursoAlumno = async (e) => {
+    e.preventDefault();
+    const nuevaMat = { usuario_alumno: alumnoSeleccionadoMatricula, curso_id: Number(cursoSeleccionadoMatricula) };
+    if (!matriculas.some(m => m.usuario_alumno === nuevaMat.usuario_alumno && Number(m.curso_id) === nuevaMat.curso_id)) {
+      setMatriculas([...matriculas, nuevaMat]);
+    }
+    try {
+      await fetch(`${API_BASE}/matriculas`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevaMat)
+      });
+      alert(`Curso asignado al perfil del estudiante @${alumnoSeleccionadoMatricula}`);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleQuitarCursoAlumno = async (usuario_alumno, curso_id) => {
+    setMatriculas(matriculas.filter(m => !(m.usuario_alumno === usuario_alumno && Number(m.curso_id) === Number(curso_id))));
+    try {
+      await fetch(`${API_BASE}/matriculas/${usuario_alumno}/${curso_id}`, { method: 'DELETE' });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // =========================================================================
+  // FUNCIONES DE MENSAJERÍA CON BASE DE DATOS
+  // =========================================================================
+  const handleEnviarMensajeBD = async (e) => {
+    e.preventDefault();
+    if (!contenidoMsg.trim()) return;
+    setEstadoEnvioMsg('Enviando mensaje...');
+
+    const nuevoMensaje = {
+      remitente: usernameActual || usuarioLogueado,
+      rol_remitente: rolUsuario,
+      destinatario: destinatarioMsg,
+      asunto: asuntoMsg.trim() || 'Consulta Académica',
+      contenido: contenidoMsg.trim(),
+      fecha_envio: new Date().toISOString()
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/mensajes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoMensaje)
+      });
+      if (res.ok) {
+        setMensajesBD([nuevoMensaje, ...mensajesBD]);
+        setAsuntoMsg('');
+        setContenidoMsg('');
+        setEstadoEnvioMsg('✓ Mensaje enviado y guardado en la Base de Datos.');
+        setTimeout(() => setEstadoEnvioMsg(''), 3500);
+      }
+    } catch (err) {
+      setMensajesBD([nuevoMensaje, ...mensajesBD]);
+      setAsuntoMsg('');
+      setContenidoMsg('');
+      setEstadoEnvioMsg('✓ Mensaje registrado.');
+    }
+  };
+
   // ESTADOS DEL AULA VIRTUAL INTERNA
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [modalidadFiltro, setModalidadFiltro] = useState('virtual'); 
@@ -324,9 +531,11 @@ export default function App() {
   const [busqueda, setBusqueda] = useState('');
   
   const seccionInicioRef = useRef(null);
+  const seccionPerfilRef = useRef(null);
   const seccionCursosRef = useRef(null);
   const seccionDocentesRef = useRef(null);
   const seccionBibliotecaRef = useRef(null);
+  const seccionMensajesRef = useRef(null);
   const seccionUsuariosRef = useRef(null);
 
   const irASeccion = (ref) => {
@@ -396,7 +605,8 @@ export default function App() {
     { id: 2, usuario: 'mgomez', nombres: 'María Gómez', rol: 'alumno', estado: 'activo' },
     { id: 3, usuario: 'cmendoza', nombres: 'Carlos Mendoza', rol: 'docente', estado: 'activo' },
     { id: 4, usuario: 'fbarzola', nombres: 'Fabrizio Barzola', rol: 'docente', estado: 'activo' },
-    { id: 5, usuario: 'lalvarado', nombres: 'Luis Alvarado', rol: 'docente', estado: 'activo' }
+    { id: 5, usuario: 'lalvarado', nombres: 'Luis Alvarado', rol: 'docente', estado: 'activo' },
+    { id: 6, usuario: 'admin', nombres: 'Administrador General', rol: 'admin', estado: 'activo' }
   ]);
   const [modalUsuario, setModalUsuario] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -406,7 +616,7 @@ export default function App() {
   const [userToReset, setUserToReset] = useState(null);
   const [newPasswordInput, setNewPasswordInput] = useState('');
 
-  // LOGIN CONECTADO A RENDER CON SEGURIDAD Y TRATAMIENTO DE DATOS SIMPLIFICADO
+  // LOGIN CONECTADO A RENDER
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (tiempoBloqueo > 0) return;
@@ -416,10 +626,10 @@ export default function App() {
     }
 
     const usuarioSanitizado = usuario.replace(/[^a-zA-Z0-9._-]/g, '').trim();
-
     setMensaje('Verificando credenciales...');
+
     try {
-      const response = await fetch('https://portico-san-marcos.onrender.com/api/auth/login', {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario: usuarioSanitizado, password })
@@ -427,8 +637,9 @@ export default function App() {
       const data = await response.json();
       if (response.ok && data.success) {
         const nombreUsr = data.user.nombres || data.user.usuario;
-        const rolUsr = data.user.rol || 'alumno';
+        const rolUsr = data.user.usuario === 'admin' ? 'admin' : (data.user.rol || 'alumno');
         setUsuarioLogueado(nombreUsr);
+        setUsernameActual(data.user.usuario);
         setRolUsuario(rolUsr);
         setSesionIniciada(true);
         setMostrarModalLogin(false);
@@ -436,6 +647,7 @@ export default function App() {
         setIntentosFallidos(0);
         localStorage.setItem('sesionIniciada', 'true');
         localStorage.setItem('usuarioLogueado', nombreUsr);
+        localStorage.setItem('usernameActual', data.user.usuario);
         localStorage.setItem('rolUsuario', rolUsr);
       } else {
         const nuevosIntentos = intentosFallidos + 1;
@@ -455,11 +667,13 @@ export default function App() {
   const cerrarSesion = () => {
     localStorage.removeItem('sesionIniciada');
     localStorage.removeItem('usuarioLogueado');
+    localStorage.removeItem('usernameActual');
     localStorage.removeItem('rolUsuario');
     setSesionIniciada(false);
     setUsuario('');
     setPassword('');
     setRolUsuario('');
+    setUsernameActual('');
     setVideoActivo(null);
     setLaboratorioSeleccionado(null);
     setLibroSeleccionado(null);
@@ -547,8 +761,17 @@ export default function App() {
     );
   };
 
-  // FILTRADO DEL AULA VIRTUAL
+  // Permisos de Administración (Admin o Docente)
+  const esAdmin = rolUsuario === 'admin' || rolUsuario === 'docente';
+
+  // Cursos matriculados del estudiante actual
+  const misCursosMatriculados = cursosCatalogo.filter(c =>
+    matriculas.some(m => m.usuario_alumno === usernameActual && Number(m.curso_id) === Number(c.id))
+  );
+
+  // Filtrado de clases internas (Admin ve incluso los deshabilitados para poder habilitarlos)
   const clasesInternasFiltradas = cursosCatalogo.filter(item => {
+    if (!esAdmin && item.estado === 'inactivo') return false;
     const tipoFiltro = item.tipo ? item.tipo.toLowerCase() : 'virtual';
     const coincideModalidad = tipoFiltro === modalidadFiltro.toLowerCase();
     const coincideCategoria = categoriaSeleccionada === 'todas' || item.categoria === categoriaSeleccionada;
@@ -558,11 +781,12 @@ export default function App() {
   });
 
   // =========================================================================
-  // VISTA 1: TIENDA VIRTUAL (PRE-LOGIN)
+  // VISTA 1: TIENDA VIRTUAL (PRE-LOGIN) - SOLO MUESTRA CURSOS HABILITADOS
   // =========================================================================
   if (!sesionIniciada) {
-    const categoriasTienda = ['Todos', ...new Set(cursosCatalogo.map(c => c.categoria))];
-    const cursosTiendaFiltrados = cursosCatalogo.filter(c => {
+    const cursosActivosTienda = cursosCatalogo.filter(c => c.estado !== 'inactivo');
+    const categoriasTienda = ['Todos', ...new Set(cursosActivosTienda.map(c => c.categoria))];
+    const cursosTiendaFiltrados = cursosActivosTienda.filter(c => {
       const matchCat = catTiendaActiva === 'Todos' || c.categoria === catTiendaActiva;
       const matchTxt = c.titulo.toLowerCase().includes(busquedaTienda.toLowerCase()) || c.descripcion.toLowerCase().includes(busquedaTienda.toLowerCase());
       return matchCat && matchTxt;
@@ -652,7 +876,7 @@ export default function App() {
           </div>
         )}
 
-        {/* CARRITO LATERAL (CON CONSENTIMIENTO BREVE) */}
+        {/* CARRITO LATERAL */}
         {carritoAbierto && (
           <div onClick={() => setCarritoAbierto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 250, display: 'flex', justifyContent: 'flex-end' }}>
             <aside onClick={e => e.stopPropagation()} style={{ background: '#1e293b', width: '100%', maxWidth: '410px', height: '100vh', padding: '24px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
@@ -727,7 +951,7 @@ export default function App() {
 
               <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <h2 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '24px', fontWeight: '800' }}>Pórtico San Marcos</h2>
-                <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0, lineHeight: '1.5' }}>Acceso exclusivo para estudiantes y docentes matriculados en la institución.</p>
+                <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0, lineHeight: '1.5' }}>Acceso exclusivo para estudiantes, docentes y administradores.</p>
               </div>
 
               <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -809,7 +1033,7 @@ export default function App() {
   }
 
   // =========================================================================
-  // VISTA 2: INTERIOR DEL AULA VIRTUAL
+  // VISTA 2: INTERIOR DEL AULA VIRTUAL (ESTUDIANTE, DOCENTE Y ADMIN)
   // =========================================================================
   return (
     <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
@@ -831,15 +1055,21 @@ export default function App() {
           ☰
         </button>
 
-        <nav className={`navbar-menu-items ${menuMovilAbierto ? 'abierto' : ''}`} style={{ display: 'flex', gap: '22px', alignItems: 'center' }}>
+        <nav className={`navbar-menu-items ${menuMovilAbierto ? 'abierto' : ''}`} style={{ display: 'flex', gap: '18px', alignItems: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => irASeccion(seccionInicioRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Inicio</button>
-          <button onClick={() => irASeccion(seccionCursosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Cursos</button>
+          {rolUsuario === 'alumno' && (
+            <button onClick={() => irASeccion(seccionPerfilRef)} style={{ background: 'none', border: 'none', color: '#38bdf8', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Mi Perfil y Cursos</button>
+          )}
+          <button onClick={() => irASeccion(seccionCursosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>
+            {esAdmin ? 'Administrar Cursos' : 'Catálogo'}
+          </button>
           {rolUsuario === 'alumno' && (
             <button onClick={() => irASeccion(seccionDocentesRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Docentes</button>
           )}
           <button onClick={() => irASeccion(seccionBibliotecaRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Biblioteca 3D</button>
-          {rolUsuario === 'docente' && (
-            <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios</button>
+          <button onClick={() => irASeccion(seccionMensajesRef)} style={{ background: 'none', border: 'none', color: '#34d399', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>💬 Mensajería</button>
+          {esAdmin && (
+            <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios y Matrículas</button>
           )}
 
           <div className="navbar-user-info" style={{ display: 'flex', alignItems: 'center', gap: '15px', marginLeft: '10px' }}>
@@ -881,20 +1111,68 @@ export default function App() {
           </div>
         </div>
 
-        {/* SECCIÓN 2: CURSOS Y CLASES */}
+        {/* SECCIÓN PERFIL DEL ESTUDIANTE: CURSOS QUE LLEVA */}
+        {rolUsuario === 'alumno' && (
+          <div ref={seccionPerfilRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
+            <div className="dashboard-container">
+              <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '14px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
+                      🎓 MI PERFIL DE ESTUDIANTE: CURSOS MATRICULADOS
+                    </h2>
+                    <span style={{ fontSize: '13px', color: '#475569' }}>
+                      Alumno: <strong>{usuarioLogueado}</strong> (@{usernameActual}) | Cursos inscritos: <strong>{misCursosMatriculados.length}</strong>
+                    </span>
+                  </div>
+                </div>
+
+                {misCursosMatriculados.length === 0 ? (
+                  <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
+                    Aún no tienes cursos asignados en tu ficha de matrícula. Comunícate con el Administrador por la sección de Mensajería.
+                  </p>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '16px' }}>
+                    {misCursosMatriculados.map(curso => (
+                      <div key={curso.id} style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderLeft: '5px solid #2563eb', borderRadius: '10px', padding: '16px' }}>
+                        <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold', textTransform: 'uppercase' }}>{curso.categoria} • {curso.tipo || 'Virtual'}</span>
+                        <h4 style={{ margin: '6px 0 8px 0', fontSize: '16px', color: '#0f172a' }}>{curso.titulo}</h4>
+                        <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#334155' }}><strong>Docente:</strong> {curso.instructor || 'Ing. Fabrizio Barzola'}</p>
+                        <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#334155' }}><strong>Horario:</strong> {curso.horario || 'Martes y Jueves - 7:00 PM'}</p>
+                        <p style={{ margin: 0, fontSize: '12px', color: '#059669', fontWeight: 'bold' }}>✓ Matrícula Activa en Base de Datos</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SECCIÓN 2: CURSOS Y PANEL ADMIN (AÑADIR / HABILITAR / DESHABILITAR) */}
         <div ref={seccionCursosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
-            <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>
-              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>MIS CLASES & LABORATORIOS</h2>
+            <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
+                {esAdmin ? 'ADMINISTRACIÓN DE CURSOS EN BASE DE DATOS' : 'MIS CLASES & LABORATORIOS'}
+              </h2>
+              {esAdmin && (
+                <button
+                  onClick={() => setModalNuevoCurso(true)}
+                  style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}
+                >
+                  + Añadir Nuevo Curso a BD
+                </button>
+              )}
             </div>
 
             <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '25px' }}>
               <div className="filter-bar-responsive" style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <button onClick={() => { setModalidadFiltro('virtual'); setVideoActivo(null); setLaboratorioSeleccionado(null); }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'virtual' ? '#2563eb' : '#f1f5f9', color: modalidadFiltro === 'virtual' ? '#fff' : '#334155' }}>
-                  Modalidad Virtual ({cursosCatalogo.filter(c => (c.tipo || 'Virtual') === 'Virtual').length})
+                  Modalidad Virtual ({cursosCatalogo.filter(c => (c.tipo || 'Virtual') === 'Virtual' && (esAdmin || c.estado !== 'inactivo')).length})
                 </button>
                 <button onClick={() => { setModalidadFiltro('presencial'); setVideoActivo(null); setLaboratorioSeleccionado(null); }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'presencial' ? '#059669' : '#f1f5f9', color: modalidadFiltro === 'presencial' ? '#fff' : '#334155' }}>
-                  Modalidad Presencial ({cursosCatalogo.filter(c => c.tipo === 'Presencial').length})
+                  Modalidad Presencial ({cursosCatalogo.filter(c => c.tipo === 'Presencial' && (esAdmin || c.estado !== 'inactivo')).length})
                 </button>
                 <input type="text" placeholder="Buscar clase o profesor..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ marginLeft: 'auto', padding: '10px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', minWidth: '240px' }} />
               </div>
@@ -917,11 +1195,14 @@ export default function App() {
             <div className="courses-grid-focus">
               {clasesInternasFiltradas.map((item) => {
                 const esVirtual = (item.tipo || 'Virtual') === 'Virtual';
+                const estaInactivo = item.estado === 'inactivo';
                 return (
-                  <div key={item.id} className="focus-card-item">
+                  <div key={item.id} className="focus-card-item" style={{ opacity: estaInactivo ? 0.65 : 1 }}>
                     <div className="card-image-wrapper">
                       <img src={item.imagen_url} alt={item.titulo} />
-                      <span className="badge-status">Activo</span>
+                      <span className="badge-status" style={{ background: estaInactivo ? '#ef4444' : '#10b981' }}>
+                        {estaInactivo ? 'Deshabilitado' : 'Habilitado'}
+                      </span>
                     </div>
                     <div className="card-body-content">
                       <h3>{item.titulo}</h3>
@@ -929,15 +1210,38 @@ export default function App() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#475569', marginBottom: '15px' }}>
                         <span><strong>Horario:</strong> {item.horario || 'Por definir'}</span>
                         <span><strong>Docente:</strong> {item.instructor || 'Staff Académico'}</span>
+                        <span><strong>Precio Tienda:</strong> S/ {Number(item.precio || 100).toFixed(2)}</span>
                       </div>
-                      <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
-                        {esVirtual ? (
-                          <>
-                            <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>Grabación</button>
-                            <a href={item.enlaceSede || '#'} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none' }}>Zoom</a>
-                          </>
-                        ) : (
-                          <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>Detalles Sede</button>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          {esVirtual ? (
+                            <>
+                              <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>Grabación</button>
+                              <a href={item.enlaceSede || '#'} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none' }}>Zoom</a>
+                            </>
+                          ) : (
+                            <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>Detalles Sede</button>
+                          )}
+                        </div>
+
+                        {/* BOTÓN EXCLUSIVO DEL ADMIN PARA HABILITAR / DESHABILITAR EN BD */}
+                        {esAdmin && (
+                          <button
+                            onClick={() => handleToggleEstadoCurso(item)}
+                            style={{
+                              width: '100%',
+                              padding: '8px',
+                              borderRadius: '6px',
+                              border: 'none',
+                              fontWeight: 'bold',
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                              background: estaInactivo ? '#dcfce7' : '#fee2e2',
+                              color: estaInactivo ? '#166534' : '#991b1b'
+                            }}
+                          >
+                            {estaInactivo ? '✓ Habilitar Curso en Tienda' : '✕ Deshabilitar Curso'}
+                          </button>
                         )}
                       </div>
                     </div>
@@ -995,41 +1299,158 @@ export default function App() {
           </div>
         </div>
 
-        {/* SECCIÓN 5: GESTIÓN DE USUARIOS (DOCENTES) */}
-        {rolUsuario === 'docente' && (
+        {/* SECCIÓN 5: MENSAJERÍA INTERNA CON BASE DE DATOS (PARA TODOS LOS PERFILES) */}
+        <div ref={seccionMensajesRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
+          <div className="dashboard-container">
+            <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
+                💬 MENSAJERÍA INTERNA (SINCRONIZADA CON BASE DE DATOS)
+              </h2>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+              {/* Formulario para redactar mensaje */}
+              <form onSubmit={handleEnviarMensajeBD} style={{ background: '#ffffff', padding: '22px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <h3 style={{ margin: 0, fontSize: '17px', color: '#0f172a' }}>Redactar Nuevo Mensaje</h3>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '6px' }}>Destinatario (Perfil):</label>
+                  <select value={destinatarioMsg} onChange={e => setDestinatarioMsg(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px' }}>
+                    <option value="admin">Administrador General (@admin)</option>
+                    <option value="fbarzola">Ing. Fabrizio Barzola (@fbarzola - Docente)</option>
+                    <option value="cmendoza">Ing. Carlos Mendoza (@cmendoza - Docente)</option>
+                    <option value="lalvarado">Ing. Luis Alvarado (@lalvarado - Docente)</option>
+                    <option value="jperez">Juan Pérez (@jperez - Estudiante)</option>
+                    <option value="mgomez">María Gómez (@mgomez - Estudiante)</option>
+                    <option value="todos">📢 Todos los Usuarios (Aviso General)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '6px' }}>Asunto:</label>
+                  <input type="text" placeholder="Ej. Consulta sobre matrícula o laboratorio" value={asuntoMsg} onChange={e => setAsuntoMsg(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '6px' }}>Mensaje:</label>
+                  <textarea rows="4" placeholder="Escribe tu mensaje aquí..." value={contenidoMsg} onChange={e => setContenidoMsg(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box', resize: 'vertical' }} />
+                </div>
+                {estadoEnvioMsg && <span style={{ fontSize: '12px', color: '#059669', fontWeight: 'bold' }}>{estadoEnvioMsg}</span>}
+                <button type="submit" style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>
+                  Enviar Mensaje
+                </button>
+              </form>
+
+              {/* Bandeja de entrada / enviados */}
+              <div style={{ background: '#ffffff', padding: '22px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', maxHeight: '420px', overflowY: 'auto' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                  <h3 style={{ margin: 0, fontSize: '17px', color: '#0f172a' }}>Bandeja de Mensajes (@{usernameActual || usuarioLogueado})</h3>
+                  <button onClick={() => cargarMensajesDesdeBD(usernameActual)} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '5px 10px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}>↻ Actualizar</button>
+                </div>
+
+                {mensajesBD.length === 0 ? (
+                  <p style={{ color: '#64748b', fontSize: '13px', margin: 'auto 0', textAlign: 'center' }}>
+                    No hay mensajes registrados para tu perfil todavía.
+                  </p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {mensajesBD.map((m, idx) => (
+                      <div key={m.id || idx} style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', borderLeft: m.remitente === usernameActual ? '4px solid #10b981' : '4px solid #2563eb' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#64748b', marginBottom: '4px' }}>
+                          <span><strong>De:</strong> @{m.remitente} ({m.rol_remitente}) ➔ <strong>Para:</strong> @{m.destinatario}</span>
+                          <span>{m.fecha_envio ? new Date(m.fecha_envio).toLocaleDateString() : 'Hoy'}</span>
+                        </div>
+                        <strong style={{ display: 'block', fontSize: '13px', color: '#0f172a', marginBottom: '4px' }}>{m.asunto}</strong>
+                        <p style={{ margin: 0, fontSize: '13px', color: '#334155' }}>{m.contenido}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SECCIÓN 6: GESTIÓN DE USUARIOS Y ASIGNACIÓN DE CURSOS A ESTUDIANTES (ADMIN / DOCENTE) */}
+        {esAdmin && (
           <div ref={seccionUsuariosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE USUARIOS Y ACCESOS</h2>
+              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE PERFILES Y CURSOS POR ESTUDIANTE</h2>
                 <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>+ Nuevo Usuario</button>
               </div>
+
+              {/* Panel para asignar cursos al perfil de un estudiante */}
+              <form onSubmit={handleAsignarCursoAlumno} style={{ background: '#fff', padding: '18px', borderRadius: '12px', border: '1px solid #cbd5e1', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#334155', marginBottom: '6px' }}>Seleccionar Estudiante:</label>
+                  <select value={alumnoSeleccionadoMatricula} onChange={e => setAlumnoSeleccionadoMatricula(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                    {listaUsuarios.filter(u => u.rol === 'alumno').map(u => (
+                      <option key={u.id} value={u.usuario}>{u.nombres} (@{u.usuario})</option>
+                    ))}
+                  </select>
+                </div>
+                <div style={{ flex: 2, minWidth: '240px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#334155', marginBottom: '6px' }}>Curso que lleva el estudiante:</label>
+                  <select value={cursoSeleccionadoMatricula} onChange={e => setCursoSeleccionadoMatricula(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                    {cursosCatalogo.map(c => (
+                      <option key={c.id} value={c.id}>{c.titulo}</option>
+                    ))}
+                  </select>
+                </div>
+                <button type="submit" style={{ background: '#059669', color: '#fff', border: 'none', padding: '11px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                  + Asignar Curso al Perfil
+                </button>
+              </form>
+
               <div className="table-responsive-wrapper">
-                <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <table style={{ width: '100%', minWidth: '720px', borderCollapse: 'collapse', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontSize: '13px' }}>
                       <th style={{ padding: '14px' }}>Usuario</th>
                       <th style={{ padding: '14px' }}>Nombres</th>
                       <th style={{ padding: '14px' }}>Rol</th>
+                      <th style={{ padding: '14px' }}>Cursos que lleva (Matrícula)</th>
                       <th style={{ padding: '14px' }}>Estado</th>
                       <th style={{ padding: '14px', textAlign: 'right' }}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {listaUsuarios.map(u => (
-                      <tr key={u.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '13px', color: '#1e293b' }}>
-                        <td style={{ padding: '14px', fontWeight: 'bold' }}>{u.usuario}</td>
-                        <td style={{ padding: '14px' }}>{u.nombres}</td>
-                        <td style={{ padding: '14px' }}>{u.rol}</td>
-                        <td style={{ padding: '14px' }}>{u.estado}</td>
-                        <td style={{ padding: '14px', textAlign: 'right', display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
-                          <button onClick={() => abrirModalEditarUsuario(u)} style={{ background: '#e2e8f0', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Editar</button>
-                          <button onClick={() => toggleEstadoUsuario(u.id)} style={{ background: u.estado === 'activo' ? '#fee2e2' : '#dcfce7', color: u.estado === 'activo' ? '#991b1b' : '#166534', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>
-                            {u.estado === 'activo' ? 'Desactivar' : 'Activar'}
-                          </button>
-                          <button onClick={() => { setUserToReset(u); setModalResetPass(true); }} style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Clave</button>
-                        </td>
-                      </tr>
-                    ))}
+                    {listaUsuarios.map(u => {
+                      const cursosDelAlumno = matriculas
+                        .filter(m => m.usuario_alumno === u.usuario)
+                        .map(m => cursosCatalogo.find(c => Number(c.id) === Number(m.curso_id)))
+                        .filter(Boolean);
+
+                      return (
+                        <tr key={u.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '13px', color: '#1e293b' }}>
+                          <td style={{ padding: '14px', fontWeight: 'bold' }}>{u.usuario}</td>
+                          <td style={{ padding: '14px' }}>{u.nombres}</td>
+                          <td style={{ padding: '14px', textTransform: 'uppercase', fontSize: '11px', fontWeight: 'bold', color: '#2563eb' }}>{u.rol}</td>
+                          <td style={{ padding: '14px' }}>
+                            {u.rol !== 'alumno' ? (
+                              <span style={{ color: '#94a3b8', fontSize: '12px' }}>Gestión / Docencia</span>
+                            ) : cursosDelAlumno.length === 0 ? (
+                              <span style={{ color: '#94a3b8', fontSize: '12px' }}>Sin cursos asignados</span>
+                            ) : (
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {cursosDelAlumno.map(c => (
+                                  <span key={c.id} style={{ background: '#e0f2fe', color: '#0369a1', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                    {c.titulo}
+                                    <button onClick={() => handleQuitarCursoAlumno(u.usuario, c.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontWeight: 'bold', padding: 0 }}>✕</button>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </td>
+                          <td style={{ padding: '14px' }}>{u.estado}</td>
+                          <td style={{ padding: '14px', textAlign: 'right', display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                            <button onClick={() => abrirModalEditarUsuario(u)} style={{ background: '#e2e8f0', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Editar</button>
+                            <button onClick={() => toggleEstadoUsuario(u.id)} style={{ background: u.estado === 'activo' ? '#fee2e2' : '#dcfce7', color: u.estado === 'activo' ? '#991b1b' : '#166534', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>
+                              {u.estado === 'activo' ? 'Desactivar' : 'Activar'}
+                            </button>
+                            <button onClick={() => { setUserToReset(u); setModalResetPass(true); }} style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Clave</button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -1037,6 +1458,37 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {/* MODAL PARA QUE EL ADMIN AÑADA UN NUEVO CURSO A LA BASE DE DATOS */}
+      {modalNuevoCurso && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.65)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px' }}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto', padding: '25px', borderRadius: '14px' }}>
+            <h3 style={{ margin: '0 0 15px 0', color: '#0f172a' }}>Añadir Nuevo Curso a la Base de Datos</h3>
+            <form onSubmit={handleCrearCursoBD} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <input type="text" placeholder="Título del curso" value={nuevoCursoForm.titulo} onChange={e => setNuevoCursoForm({...nuevoCursoForm, titulo: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <input type="text" placeholder="Categoría (ej. Robótica)" value={nuevoCursoForm.categoria} onChange={e => setNuevoCursoForm({...nuevoCursoForm, categoria: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+                <input type="number" placeholder="Precio (S/)" value={nuevoCursoForm.precio} onChange={e => setNuevoCursoForm({...nuevoCursoForm, precio: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              </div>
+              <textarea rows="2" placeholder="Descripción breve del curso" value={nuevoCursoForm.descripcion} onChange={e => setNuevoCursoForm({...nuevoCursoForm, descripcion: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <select value={nuevoCursoForm.tipo} onChange={e => setNuevoCursoForm({...nuevoCursoForm, tipo: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
+                  <option value="Virtual">Virtual</option>
+                  <option value="Presencial">Presencial</option>
+                </select>
+                <input type="text" placeholder="Horario (ej. Sábados 4:00 PM)" value={nuevoCursoForm.horario} onChange={e => setNuevoCursoForm({...nuevoCursoForm, horario: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              </div>
+              <input type="text" placeholder="Docente a cargo" value={nuevoCursoForm.instructor} onChange={e => setNuevoCursoForm({...nuevoCursoForm, instructor: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              <input type="text" placeholder="URL de Imagen (opcional)" value={nuevoCursoForm.imagen_url} onChange={e => setNuevoCursoForm({...nuevoCursoForm, imagen_url: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              <textarea rows="3" placeholder="Temario (un módulo por línea)" value={nuevoCursoForm.temarioTexto} onChange={e => setNuevoCursoForm({...nuevoCursoForm, temarioTexto: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                <button type="submit" style={{ flex: 1, background: '#2563eb', color: '#fff', padding: '11px', borderRadius: '6px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>Guardar en BD</button>
+                <button type="button" onClick={() => setModalNuevoCurso(false)} style={{ flex: 1, background: '#e2e8f0', padding: '11px', borderRadius: '6px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* MODALES DEL AULA INTERNA */}
       {libroSeleccionado && <PdfFlipbook pdfUrl={libroSeleccionado} alCerrar={() => setLibroSeleccionado(null)} />}
@@ -1065,6 +1517,7 @@ export default function App() {
               <select value={usuarioForm.rol} onChange={e => setUsuarioForm({...usuarioForm, rol: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
                 <option value="alumno">Alumno</option>
                 <option value="docente">Docente</option>
+                <option value="admin">Administrador (admin)</option>
               </select>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button type="submit" style={{ flex: 1, background: '#2563eb', color: '#fff', padding: '10px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>Guardar</button>
