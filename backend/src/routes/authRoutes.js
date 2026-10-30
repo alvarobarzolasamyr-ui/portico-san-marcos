@@ -1,24 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const {
-  loginUser,
-  getUsers,
-  createUser,
-  updateUser,
-  toggleUserStatus,
-  resetPassword,
-  migrarAiven
-} = require('../controllers/authController');
+const authController = require('../controllers/authController');
 
-// Rutas
-router.post('/login', loginUser);
-router.get('/users', getUsers);
-router.post('/users', createUser);
-router.put('/users/:id', updateUser);
-router.patch('/users/:id/estado', toggleUserStatus);
-router.put('/users/:id/reset-password', resetPassword);
+// Rutas Generales de Usuarios
+router.post('/login', authController.loginUser);
+router.get('/users', authController.getUsers);
+router.post('/users', authController.createUser);
+router.put('/users/:id', authController.updateUser);
+router.put('/users/:id/estado', authController.toggleUserStatus);
+router.put('/users/:id/reset-password', authController.resetPassword);
 
-// Ruta para inicializar tabla y cargar usuarios en Aiven
-router.get('/migrar', migrarAiven);
+// Ruta Mágica para reparar contraseñas en Aiven
+router.get('/migrar-aiven', authController.migrarAiven);
 
 module.exports = router;
