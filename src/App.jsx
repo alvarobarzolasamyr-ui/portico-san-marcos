@@ -5,6 +5,7 @@ import PdfFlipbook from './components/PdfFlipbook';
 const API_BASE = 'https://portico-san-marcos.onrender.com/api';
 const WHATSAPP_NUMERO = '51967107035';
 
+// CATÁLOGO MAESTRO UNIFICADO
 const CATALOGO_INICIAL = [
   { id: 1, titulo: 'Fundamentos de Robótica y Cinemática', categoria: 'Robótica', descripcion: 'Domina el modelado espacial, matrices de transformación y parámetros Denavit-Hartenberg para brazos robóticos.', precio: 120.00, duracion: '5 Semanas (20 Horas)', imagen_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/fc_cA62Z1kQ', temario: ['Módulo 1: Morfología del robot', 'Módulo 2: Álgebra matricial'], tipo: 'Virtual', horario: 'Martes y Jueves - 7:00 PM', instructor: 'Ing. Fabrizio Barzola', enlaceSede: 'https://zoom.us/j/9876543210', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', estado: 'activo' },
   { id: 2, titulo: 'Electrónica Aplicada a la Ingeniería', categoria: 'Electrónica', descripcion: 'Análisis de circuitos DC/AC, semiconductores, amplificadores operacionales y etapas de potencia para motores.', precio: 95.00, duracion: '4 Semanas (16 Horas)', imagen_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/r9GC50r2Ge8', temario: ['Módulo 1: Leyes de Ohm y Kirchhoff'], tipo: 'Presencial', horario: 'Viernes - 7:00 PM', instructor: 'Ing. Carlos Mendoza', enlaceSede: 'Campus Central - Laboratorio de Electrónica', ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800', estado: 'activo' },
@@ -58,7 +59,9 @@ export default function App() {
   const [contenidoMsg, setContenidoMsg] = useState('');
   const [estadoEnvioMsg, setEstadoEnvioMsg] = useState('');
 
+  // AHORA ESTÁ 100% VACÍO AL INICIO, NO HABRÁ USUARIOS FALSOS. SÓLO MOSTRARÁ LOS DE LA BASE DE DATOS.
   const [listaUsuarios, setListaUsuarios] = useState([]);
+
   const [modalUsuario, setModalUsuario] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [usuarioForm, setUsuarioForm] = useState({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
@@ -111,9 +114,9 @@ export default function App() {
 
   const cargarUsuariosDesdeBD = async () => {
     try {
-      const res = await fetch(`${API_BASE}/auth/users`);
+      const res = await fetch(`${API_BASE}/usuarios`); // Apunta a la ruta real que envía la lista de usuarios
       const data = await res.json();
-      if (data.success && Array.isArray(data.users)) setListaUsuarios(data.users);
+      if (Array.isArray(data)) setListaUsuarios(data);
     } catch (e) {}
   };
 
@@ -241,7 +244,6 @@ export default function App() {
     const usuarioLimpio = usuarioForm.usuario.replace(/[^a-zA-Z0-9._-]/g, '').trim();
 
     if (!modoEdicion) {
-      // 1. CREAR NUEVO USUARIO EN LA BD
       if (!usuarioForm.password) return setMensajeUserMsg('Debes asignarle una contraseña al nuevo usuario.');
       try {
         const res = await fetch(`${API_BASE}/auth/users`, {
@@ -259,7 +261,6 @@ export default function App() {
         }
       } catch (err) { setMensajeUserMsg('Error al conectar con la BD.'); }
     } else {
-      // 2. ACTUALIZAR USUARIO EXISTENTE EN LA BD
       try {
         const res = await fetch(`${API_BASE}/auth/users/${usuarioForm.id}`, {
           method: 'PUT',
@@ -313,7 +314,7 @@ export default function App() {
     if (!aceptaDatosLogin) return setMensaje('Debes aceptar la Política de Privacidad.');
 
     const usuarioSanitizado = usuario.replace(/[^a-zA-Z0-9._-]/g, '').trim();
-    setMensaje('Verificando credenciales en Aiven...');
+    setMensaje('Verificando credenciales...');
 
     try {
       const response = await fetch(`${API_BASE}/auth/login`, {
@@ -417,6 +418,19 @@ export default function App() {
     { id: 3, nombre: 'Ing. Luis Alvarado', especialidad: 'Consultor en Neumática, Electroneumática e ISO 1219', sede: 'Sede Arequipa - Pabellón B', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop' },
     { id: 4, nombre: 'Dra. María Fernández', especialidad: 'Doctora en Procesamiento Digital de Señales y MATLAB', sede: 'Campus Virtual', foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop' }
   ];
+
+  const misCursosMatriculados = cursosCatalogo.filter(c => matriculas.some(m => m.usuario_alumno === usernameActual && Number(m.curso_id) === Number(c.id)));
+  
+  const clasesInternasFiltradas = cursosCatalogo.filter(item => {
+    // Si no es admin y el curso está inactivo, lo ocultamos.
+    if (!esAdmin && item.estado === 'inactivo') return false;
+    const tipoFiltro = item.tipo ? item.tipo.toLowerCase() : 'virtual';
+    const coincideModalidad = tipoFiltro === modalidadFiltro.toLowerCase();
+    const coincideCategoria = categoriaSeleccionada === 'todas' || item.categoria === categoriaSeleccionada;
+    const busqMin = busqueda.toLowerCase();
+    const coincideBusqueda = item.titulo.toLowerCase().includes(busqMin) || (item.instructor && item.instructor.toLowerCase().includes(busqMin));
+    return coincideModalidad && coincideCategoria && coincideBusqueda;
+  });
 
   // VISTA 1: TIENDA VIRTUAL
   if (!sesionIniciada) {
@@ -887,7 +901,6 @@ export default function App() {
             <form onSubmit={handleGuardarUsuario} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <input type="text" disabled={modoEdicion} placeholder="Nombre de Usuario (ej: mgarcia)" value={usuarioForm.usuario} onChange={e => setUsuarioForm({...usuarioForm, usuario: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: modoEdicion ? '#f1f5f9' : '#fff' }} />
               
-              {/* CAMPO DE CONTRASEÑA AÑADIDO PARA CREAR EL USUARIO CORRECTAMENTE */}
               {!modoEdicion && (
                 <input type="password" placeholder="Asigna una contraseña temporal" value={usuarioForm.password} onChange={e => setUsuarioForm({...usuarioForm, password: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
               )}
