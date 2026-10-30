@@ -58,6 +58,25 @@ export default function App() {
   const [contenidoMsg, setContenidoMsg] = useState('');
   const [estadoEnvioMsg, setEstadoEnvioMsg] = useState('');
 
+  const [listaUsuarios, setListaUsuarios] = useState([]);
+  const [modalUsuario, setModalUsuario] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [usuarioForm, setUsuarioForm] = useState({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
+  const [mensajeUserMsg, setMensajeUserMsg] = useState('');
+  const [modalResetPass, setModalResetPass] = useState(false);
+  const [userToReset, setUserToReset] = useState(null);
+  const [newPasswordInput, setNewPasswordInput] = useState('');
+
+  // =========================================================================
+  // PERMISOS DE ADMINISTRADOR Y DOCENTE (REGLAS DEL SUPERIOR)
+  // =========================================================================
+  const esAdmin = rolUsuario === 'admin';
+  const esDocente = rolUsuario === 'docente';
+  
+  // Regla 1: Profesores y Admin agregan cursos.
+  const puedeGestionarCursos = esAdmin || esDocente;
+  // Regla 2: Solo el Admin crea usuarios (se controla visualmente en el renderizado).
+
   useEffect(() => {
     if (tiempoBloqueo <= 0) return;
     const timer = setInterval(() => {
@@ -73,58 +92,47 @@ export default function App() {
     localStorage.setItem('carrito_portico', JSON.stringify(carrito));
   }, [carrito]);
 
-  const cargarCatalogoDesdeBD = () => {
-    fetch(`${API_BASE}/catalogo`)
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          const cursosUnificados = data.map(dbCurso => {
-            const cursoLocal = CATALOGO_INICIAL.find(c => c.id === dbCurso.id) || {};
-            return { ...cursoLocal, ...dbCurso, estado: dbCurso.estado || cursoLocal.estado || 'activo' };
-          });
-          setCursosCatalogo(cursosUnificados);
-        }
-      }).catch(() => {});
+  // =========================================================================
+  // CONEXIONES A LA BASE DE DATOS (FETCH)
+  // =========================================================================
+  const cargarCatalogoDesdeBD = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/catalogo`);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        const cursosUnificados = data.map(dbCurso => {
+          const cursoLocal = CATALOGO_INICIAL.find(c => c.id === dbCurso.id) || {};
+          return { ...cursoLocal, ...dbCurso, estado: dbCurso.estado || cursoLocal.estado || 'activo' };
+        });
+        setCursosCatalogo(cursosUnificados);
+      }
+    } catch (e) {}
   };
 
-  const cargarMatriculasDesdeBD = () => {
-    fetch(`${API_BASE}/matriculas`)
-      .then(res => res.json())
-      .then(data => { if (Array.isArray(data)) setMatriculas(data); }).catch(() => {});
+  const cargarUsuariosDesdeBD = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/users`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.users)) setListaUsuarios(data.users);
+    } catch (e) {}
   };
 
-  const cargarMensajesDesdeBD = (usr) => {
+  const cargarMatriculasDesdeBD = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/matriculas`);
+      const data = await res.json();
+      if (Array.isArray(data)) setMatriculas(data);
+    } catch (e) {}
+  };
+
+  const cargarMensajesDesdeBD = async (usr) => {
     if (!usr) return;
-    fetch(`${API_BASE}/mensajes/${usr}`)
-      .then(res => res.json())
-      .then(data => { if (Array.isArray(data)) setMensajesBD(data); }).catch(() => {});
+    try {
+      const res = await fetch(`${API_BASE}/mensajes/${usr}`);
+      const data = await res.json();
+      if (Array.isArray(data)) setMensajesBD(data);
+    } catch (e) {}
   };
-
-  const [listaUsuarios, setListaUsuarios] = useState([
-    { id: 1, usuario: 'jperez', nombres: 'Juan Pérez', rol: 'alumno', estado: 'activo' },
-    { id: 2, usuario: 'mgomez', nombres: 'María Gómez', rol: 'alumno', estado: 'activo' },
-    { id: 3, usuario: 'cmendoza', nombres: 'Carlos Mendoza', rol: 'docente', estado: 'activo' },
-    { id: 4, usuario: 'fbarzola', nombres: 'Fabrizio Barzola', rol: 'docente', estado: 'activo' },
-    { id: 5, usuario: 'lalvarado', nombres: 'Luis Alvarado', rol: 'docente', estado: 'activo' },
-    { id: 6, usuario: 'admin', nombres: 'Administrador General', rol: 'admin', estado: 'activo' },
-    { id: 7, usuario: 'dflores', nombres: 'Diego Flores', rol: 'alumno', estado: 'activo' },
-    { id: 8, usuario: 'jsalazar', nombres: 'Jorge Salazar', rol: 'docente', estado: 'activo' }
-  ]);
-
-  const cargarUsuariosDesdeBD = () => {
-    fetch(`${API_BASE}/usuarios`)
-      .then(res => res.json())
-      .then(data => { if (Array.isArray(data) && data.length > 0) setListaUsuarios(data); })
-      .catch(() => {});
-  };
-
-  const [modalUsuario, setModalUsuario] = useState(false);
-  const [modoEdicion, setModoEdicion] = useState(false);
-  const [usuarioForm, setUsuarioForm] = useState({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' });
-  const [mensajeUserMsg, setMensajeUserMsg] = useState('');
-  const [modalResetPass, setModalResetPass] = useState(false);
-  const [userToReset, setUserToReset] = useState(null);
-  const [newPasswordInput, setNewPasswordInput] = useState('');
 
   useEffect(() => { cargarCatalogoDesdeBD(); }, []);
 
@@ -154,6 +162,9 @@ export default function App() {
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
   };
 
+  // =========================================================================
+  // CREACIÓN DE CURSOS (DOCENTES Y ADMIN)
+  // =========================================================================
   const handleCrearCursoBD = async (e) => {
     e.preventDefault();
     const temarioArray = nuevoCursoForm.temarioTexto.split('\n').map(l => l.trim()).filter(Boolean);
@@ -163,35 +174,45 @@ export default function App() {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
       });
       const data = await res.json();
-      const nuevoCursoObj = { ...payload, id: data.id || Date.now(), imagen_url: payload.imagen_url || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80', video_demo_url: payload.video_demo_url || 'https://www.youtube.com/embed/fc_cA62Z1kQ', estado: 'activo' };
-      setCursosCatalogo([...cursosCatalogo, nuevoCursoObj]);
-      setModalNuevoCurso(false);
-      alert('Curso guardado exitosamente.');
+      if(data.success) {
+        const nuevoCursoObj = { ...payload, id: data.id || Date.now(), estado: 'activo' };
+        setCursosCatalogo([...cursosCatalogo, nuevoCursoObj]);
+        setModalNuevoCurso(false);
+        alert('Curso guardado exitosamente en la BD.');
+      }
     } catch (error) { alert('Error al conectar con el servidor.'); }
   };
 
   const handleToggleEstadoCurso = async (curso) => {
     const nuevoEstado = curso.estado === 'inactivo' ? 'activo' : 'inactivo';
     setCursosCatalogo(cursosCatalogo.map(c => c.id === curso.id ? { ...c, estado: nuevoEstado } : c));
-    try { await fetch(`${API_BASE}/catalogo/${curso.id}/estado`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado: nuevoEstado }) }); } catch (error) { console.error(error); }
+    try { await fetch(`${API_BASE}/catalogo/${curso.id}/estado`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado: nuevoEstado }) }); } catch (error) {}
   };
 
+  // =========================================================================
+  // MATRÍCULAS
+  // =========================================================================
   const handleAsignarCursoAlumno = async (e) => {
     e.preventDefault();
     if (!alumnoSeleccionadoMatricula) return alert("Selecciona un alumno.");
     const nuevaMat = { usuario_alumno: alumnoSeleccionadoMatricula, curso_id: Number(cursoSeleccionadoMatricula) };
-    if (!matriculas.some(m => m.usuario_alumno === nuevaMat.usuario_alumno && Number(m.curso_id) === nuevaMat.curso_id)) { setMatriculas([...matriculas, nuevaMat]); }
+    if (!matriculas.some(m => m.usuario_alumno === nuevaMat.usuario_alumno && Number(m.curso_id) === nuevaMat.curso_id)) {
+      setMatriculas([...matriculas, nuevaMat]);
+    }
     try {
       await fetch(`${API_BASE}/matriculas`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nuevaMat) });
       alert(`Curso asignado al estudiante @${alumnoSeleccionadoMatricula}`);
-    } catch (err) { console.error(err); }
+    } catch (err) {}
   };
 
   const handleQuitarCursoAlumno = async (usuario_alumno, curso_id) => {
     setMatriculas(matriculas.filter(m => !(m.usuario_alumno === usuario_alumno && Number(m.curso_id) === Number(curso_id))));
-    try { await fetch(`${API_BASE}/matriculas/${usuario_alumno}/${curso_id}`, { method: 'DELETE' }); } catch (err) { console.error(err); }
+    try { await fetch(`${API_BASE}/matriculas/${usuario_alumno}/${curso_id}`, { method: 'DELETE' }); } catch (err) {}
   };
 
+  // =========================================================================
+  // MENSAJERÍA DIRECTA CON BASE DE DATOS
+  // =========================================================================
   const handleEnviarMensajeBD = async (e) => {
     e.preventDefault();
     if (!contenidoMsg.trim() || !destinatarioMsg) return;
@@ -200,14 +221,154 @@ export default function App() {
     try {
       const res = await fetch(`${API_BASE}/mensajes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nuevoMensaje) });
       if (res.ok) {
-        setMensajesBD([nuevoMensaje, ...mensajesBD]);
-        setAsuntoMsg(''); setContenidoMsg(''); setEstadoEnvioMsg('✓ Mensaje enviado.');
+        setAsuntoMsg(''); setContenidoMsg(''); setEstadoEnvioMsg('✓ Mensaje enviado a la BD.');
+        cargarMensajesDesdeBD(usernameActual); // Actualiza la bandeja inmediatamente
         setTimeout(() => setEstadoEnvioMsg(''), 3500);
       }
     } catch (err) {
-      setMensajesBD([nuevoMensaje, ...mensajesBD]);
-      setAsuntoMsg(''); setContenidoMsg(''); setEstadoEnvioMsg('✓ Mensaje registrado localmente.');
+      setEstadoEnvioMsg('❌ Error de conexión al enviar el mensaje.');
     }
+  };
+
+  // =========================================================================
+  // GESTIÓN DE USUARIOS 100% CONECTADA A LA BASE DE DATOS AIVEN (SOLO ADMIN)
+  // =========================================================================
+  const abrirModalCrearUsuario = () => { setModoEdicion(false); setUsuarioForm({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' }); setMensajeUserMsg(''); setModalUsuario(true); };
+  const abrirModalEditarUsuario = (u) => { setModoEdicion(true); setUsuarioForm({ id: u.id, usuario: u.usuario, password: '', nombres: u.nombres, rol: u.rol }); setMensajeUserMsg(''); setModalUsuario(true); };
+  
+  const handleGuardarUsuario = async (e) => {
+    e.preventDefault();
+    const usuarioLimpio = usuarioForm.usuario.replace(/[^a-zA-Z0-9._-]/g, '').trim();
+
+    if (!modoEdicion) {
+      // 1. CREAR NUEVO USUARIO EN LA BD
+      if (!usuarioForm.password) return setMensajeUserMsg('Debes asignarle una contraseña al nuevo usuario.');
+      try {
+        const res = await fetch(`${API_BASE}/auth/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usuario: usuarioLimpio, password: usuarioForm.password, nombres: usuarioForm.nombres, rol: usuarioForm.rol })
+        });
+        const data = await res.json();
+        if (data.success) {
+          cargarUsuariosDesdeBD(); // Refresca la tabla automáticamente
+          setModalUsuario(false);
+          alert('¡Usuario creado en la Base de Datos con éxito!');
+        } else {
+          setMensajeUserMsg(data.message || 'El usuario ya existe.');
+        }
+      } catch (err) { setMensajeUserMsg('Error al conectar con la BD.'); }
+    } else {
+      // 2. ACTUALIZAR USUARIO EXISTENTE EN LA BD
+      try {
+        const res = await fetch(`${API_BASE}/auth/users/${usuarioForm.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombres: usuarioForm.nombres, rol: usuarioForm.rol })
+        });
+        if (res.ok) { cargarUsuariosDesdeBD(); setModalUsuario(false); }
+      } catch (err) { setMensajeUserMsg('Error al actualizar en la BD.'); }
+    }
+  };
+  
+  const toggleEstadoUsuario = async (id, estadoActual) => {
+    const nuevoEstado = estadoActual === 'activo' ? 'inactivo' : 'activo';
+    try {
+      await fetch(`${API_BASE}/auth/users/${id}/estado`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: nuevoEstado })
+      });
+      cargarUsuariosDesdeBD(); // Refresca la tabla
+    } catch (error) {}
+  };
+  
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (!newPasswordInput) return;
+    try {
+      const res = await fetch(`${API_BASE}/auth/users/${userToReset.id}/reset-password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPasswordInput })
+      });
+      if (res.ok) {
+        alert(`Contraseña del usuario '${userToReset.usuario}' actualizada en la BD.`);
+        setModalResetPass(false); setNewPasswordInput(''); setUserToReset(null);
+      }
+    } catch (error) { alert('Error al cambiar contraseña.'); }
+  };
+
+
+  // =========================================================================
+  // SISTEMA DE LOGIN Y VISTAS
+  // =========================================================================
+  const [usuario, setUsuario] = useState('');
+  const [password, setPassword] = useState('');
+  const [mensaje, setMensaje] = useState('');
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    if (tiempoBloqueo > 0) return;
+    if (!aceptaDatosLogin) return setMensaje('Debes aceptar la Política de Privacidad.');
+
+    const usuarioSanitizado = usuario.replace(/[^a-zA-Z0-9._-]/g, '').trim();
+    setMensaje('Verificando credenciales en Aiven...');
+
+    try {
+      const response = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario: usuarioSanitizado, password })
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        const nombreUsr = data.user.nombres || data.user.usuario;
+        const rolUsr = data.user.usuario === 'admin' ? 'admin' : (data.user.rol || 'alumno');
+        setUsuarioLogueado(nombreUsr);
+        setUsernameActual(data.user.usuario);
+        setRolUsuario(rolUsr);
+        setSesionIniciada(true);
+        setMostrarModalLogin(false);
+        setMensaje('');
+        setIntentosFallidos(0);
+        localStorage.setItem('sesionIniciada', 'true');
+        localStorage.setItem('usuarioLogueado', nombreUsr);
+        localStorage.setItem('usernameActual', data.user.usuario);
+        localStorage.setItem('rolUsuario', rolUsr);
+      } else {
+        const nuevosIntentos = intentosFallidos + 1;
+        setIntentosFallidos(nuevosIntentos);
+        if (nuevosIntentos >= 3) {
+          setTiempoBloqueo(30);
+          setMensaje('⚠️ Demasiados intentos fallidos. Bloqueado.');
+        } else {
+          setMensaje(`${data.message || 'Credenciales incorrectas'} (${nuevosIntentos}/3)`);
+        }
+      }
+    } catch (error) { setMensaje('Error de conexión con el servidor.'); }
+  };
+
+  const cerrarSesion = () => {
+    localStorage.removeItem('sesionIniciada'); localStorage.removeItem('usuarioLogueado');
+    localStorage.removeItem('usernameActual'); localStorage.removeItem('rolUsuario');
+    setSesionIniciada(false); setUsuario(''); setPassword('');
+    setRolUsuario(''); setUsernameActual(''); setVideoActivo(null);
+    setLaboratorioSeleccionado(null); setLibroSeleccionado(null);
+  };
+
+  const renderModalPrivacidad = () => {
+    if (!modalPrivacidadAbierto) return null;
+    return (
+      <div onClick={() => setModalPrivacidadAbierto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.88)', backdropFilter: 'blur(6px)', zIndex: 99999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+        <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', color: '#f8fafc', border: '1px solid #334155', borderRadius: '16px', maxWidth: '500px', width: '100%', padding: '24px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.6)' }}>
+          <button onClick={() => setModalPrivacidadAbierto(false)} style={{ position: 'absolute', top: '14px', right: '14px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '5px 10px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>Cerrar ✕</button>
+          <h3 style={{ margin: '0 0 12px 0', fontSize: '18px', color: '#fff' }}>Política de Privacidad</h3>
+          <p style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 20px 0' }}>Tus datos personales y credenciales son protegidos mediante cifrado seguro.</p>
+          <div style={{ textAlign: 'right' }}><button onClick={() => { setAceptaDatosLogin(true); setAceptaDatosCarrito(true); setModalPrivacidadAbierto(false); }} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Entendido</button></div>
+        </div>
+      </div>
+    );
   };
 
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
@@ -252,125 +413,10 @@ export default function App() {
 
   const docentesDestacados = [
     { id: 1, nombre: 'Ing. Fabrizio Barzola', especialidad: 'Especialista en Robótica', sede: 'Lab 4', foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop' },
-    { id: 2, nombre: 'Ing. Carlos Mendoza', especialidad: 'Experto en PLC Siemens', sede: 'Lab Electrónica', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop' }
+    { id: 2, nombre: 'Ing. Carlos Mendoza', especialidad: 'Experto en PLC Siemens', sede: 'Lab Electrónica', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop' },
+    { id: 3, nombre: 'Ing. Luis Alvarado', especialidad: 'Consultor en Neumática, Electroneumática e ISO 1219', sede: 'Sede Arequipa - Pabellón B', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop' },
+    { id: 4, nombre: 'Dra. María Fernández', especialidad: 'Doctora en Procesamiento Digital de Señales y MATLAB', sede: 'Campus Virtual', foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop' }
   ];
-
-  const [usuario, setUsuario] = useState('');
-  const [password, setPassword] = useState('');
-  const [mensaje, setMensaje] = useState('');
-
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    if (tiempoBloqueo > 0) return;
-    if (!aceptaDatosLogin) return setMensaje('Debes aceptar la Política de Privacidad.');
-
-    const usuarioSanitizado = usuario.replace(/[^a-zA-Z0-9._-]/g, '').trim();
-    setMensaje('Verificando credenciales...');
-
-    try {
-      const response = await fetch(`${API_BASE}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuario: usuarioSanitizado, password })
-      });
-      const data = await response.json();
-      if (response.ok && data.success) {
-        const nombreUsr = data.user.nombres || data.user.usuario;
-        const rolUsr = data.user.usuario === 'admin' ? 'admin' : (data.user.rol || 'alumno');
-        setUsuarioLogueado(nombreUsr);
-        setUsernameActual(data.user.usuario);
-        setRolUsuario(rolUsr);
-        setSesionIniciada(true);
-        setMostrarModalLogin(false);
-        setMensaje('');
-        setIntentosFallidos(0);
-        localStorage.setItem('sesionIniciada', 'true');
-        localStorage.setItem('usuarioLogueado', nombreUsr);
-        localStorage.setItem('usernameActual', data.user.usuario);
-        localStorage.setItem('rolUsuario', rolUsr);
-      } else {
-        const nuevosIntentos = intentosFallidos + 1;
-        setIntentosFallidos(nuevosIntentos);
-        if (nuevosIntentos >= 3) {
-          setTiempoBloqueo(30);
-          setMensaje('⚠️ Demasiados intentos fallidos. Bloqueado.');
-        } else {
-          setMensaje(`${data.message || 'Credenciales incorrectas'} (${nuevosIntentos}/3)`);
-        }
-      }
-    } catch (error) { setMensaje('Error de conexión con el servidor.'); }
-  };
-
-  const cerrarSesion = () => {
-    localStorage.removeItem('sesionIniciada'); localStorage.removeItem('usuarioLogueado');
-    localStorage.removeItem('usernameActual'); localStorage.removeItem('rolUsuario');
-    setSesionIniciada(false); setUsuario(''); setPassword('');
-    setRolUsuario(''); setUsernameActual(''); setVideoActivo(null);
-    setLaboratorioSeleccionado(null); setLibroSeleccionado(null);
-  };
-
-  const abrirModalCrearUsuario = () => { setModoEdicion(false); setUsuarioForm({ id: null, usuario: '', password: '', nombres: '', rol: 'alumno' }); setMensajeUserMsg(''); setModalUsuario(true); };
-  const abrirModalEditarUsuario = (u) => { setModoEdicion(true); setUsuarioForm({ id: u.id, usuario: u.usuario, password: '', nombres: u.nombres, rol: u.rol }); setMensajeUserMsg(''); setModalUsuario(true); };
-  
-  const handleGuardarUsuario = (e) => {
-    e.preventDefault();
-    if (!modoEdicion) {
-      if (listaUsuarios.some(u => u.usuario.toLowerCase() === usuarioForm.usuario.toLowerCase())) return setMensajeUserMsg('El usuario ya existe.');
-      const nuevoUsr = { id: Date.now(), usuario: usuarioForm.usuario.replace(/[^a-zA-Z0-9._-]/g, ''), nombres: usuarioForm.nombres, rol: usuarioForm.rol, estado: 'activo' };
-      setListaUsuarios([...listaUsuarios, nuevoUsr]); setModalUsuario(false);
-    } else {
-      setListaUsuarios(listaUsuarios.map(u => u.id === usuarioForm.id ? { ...u, nombres: usuarioForm.nombres, rol: usuarioForm.rol } : u));
-      setModalUsuario(false);
-    }
-  };
-  
-  const toggleEstadoUsuario = (id) => { setListaUsuarios(listaUsuarios.map(u => u.id === id ? { ...u, estado: u.estado === 'activo' ? 'inactivo' : 'activo' } : u)); };
-  
-  const handleResetPassword = (e) => {
-    e.preventDefault();
-    if (!newPasswordInput) return;
-    alert(`Contraseña del usuario '${userToReset.usuario}' actualizada.`);
-    setModalResetPass(false); setNewPasswordInput(''); setUserToReset(null);
-  };
-
-  const renderModalPrivacidad = () => {
-    if (!modalPrivacidadAbierto) return null;
-    return (
-      <div onClick={() => setModalPrivacidadAbierto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.88)', backdropFilter: 'blur(6px)', zIndex: 99999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-        <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', color: '#f8fafc', border: '1px solid #334155', borderRadius: '16px', maxWidth: '500px', width: '100%', padding: '24px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.6)' }}>
-          <button onClick={() => setModalPrivacidadAbierto(false)} style={{ position: 'absolute', top: '14px', right: '14px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '5px 10px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>Cerrar ✕</button>
-          <h3 style={{ margin: '0 0 12px 0', fontSize: '18px', color: '#fff' }}>Política de Privacidad</h3>
-          <p style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 20px 0' }}>Tus datos personales y credenciales son protegidos mediante cifrado seguro.</p>
-          <div style={{ textAlign: 'right' }}><button onClick={() => { setAceptaDatosLogin(true); setAceptaDatosCarrito(true); setModalPrivacidadAbierto(false); }} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Entendido</button></div>
-        </div>
-      </div>
-    );
-  };
-
-  // =========================================================================
-  // PERMISOS DE ADMINISTRADOR Y DOCENTE (REGLAS DEL SUPERIOR)
-  // =========================================================================
-  const esAdmin = rolUsuario === 'admin';
-  const esDocente = rolUsuario === 'docente';
-  
-  // Regla 1: Profesores y el admin pueden agregar cursos nuevos.
-  const puedeAgregarCursos = esAdmin || esDocente;
-
-  // Regla 2: SOLO el admin puede gestionar/agregar perfiles de usuarios.
-  // Esto se usa para ocultar la pestaña "Usuarios y Matrículas" a los docentes.
-
-  const misCursosMatriculados = cursosCatalogo.filter(c => matriculas.some(m => m.usuario_alumno === usernameActual && Number(m.curso_id) === Number(c.id)));
-  
-  const clasesInternasFiltradas = cursosCatalogo.filter(item => {
-    // Si no es admin y el curso está inactivo, lo ocultamos.
-    if (!esAdmin && item.estado === 'inactivo') return false;
-    const tipoFiltro = item.tipo ? item.tipo.toLowerCase() : 'virtual';
-    const coincideModalidad = tipoFiltro === modalidadFiltro.toLowerCase();
-    const coincideCategoria = categoriaSeleccionada === 'todas' || item.categoria === categoriaSeleccionada;
-    const busqMin = busqueda.toLowerCase();
-    const coincideBusqueda = item.titulo.toLowerCase().includes(busqMin) || (item.instructor && item.instructor.toLowerCase().includes(busqMin));
-    return coincideModalidad && coincideCategoria && coincideBusqueda;
-  });
 
   // VISTA 1: TIENDA VIRTUAL
   if (!sesionIniciada) {
@@ -422,7 +468,6 @@ export default function App() {
           ))}
         </main>
         
-        {/* Modales Tienda */}
         {cursoDemoModal && (
           <div onClick={() => setCursoDemoModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
             <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', maxWidth: '680px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '24px', position: 'relative' }}>
@@ -514,14 +559,14 @@ export default function App() {
           {rolUsuario === 'alumno' && <button onClick={() => irASeccion(seccionPerfilRef)} style={{ background: 'none', border: 'none', color: '#38bdf8', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Mi Perfil</button>}
           
           <button onClick={() => irASeccion(seccionCursosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>
-            {puedeAgregarCursos ? 'Administrar Cursos' : 'Catálogo'}
+            {puedeGestionarCursos ? 'Administrar Cursos' : 'Catálogo'}
           </button>
           
           {rolUsuario === 'alumno' && <button onClick={() => irASeccion(seccionDocentesRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Docentes</button>}
           <button onClick={() => irASeccion(seccionBibliotecaRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Biblioteca</button>
           <button onClick={() => irASeccion(seccionMensajesRef)} style={{ background: 'none', border: 'none', color: '#34d399', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>💬 Mensajería</button>
           
-          {/* REGLA ESTRICTA: SÓLO EL ADMIN VE LA PESTAÑA DE GESTIÓN DE USUARIOS Y MATRÍCULAS */}
+          {/* SÓLO EL ADMIN VE LA PESTAÑA DE GESTIÓN DE USUARIOS Y MATRÍCULAS */}
           {esAdmin && <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios y Matrículas</button>}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginLeft: '10px' }}>
@@ -548,6 +593,7 @@ export default function App() {
           </div>
         </div>
 
+        {/* PERFIL DEL ALUMNO: CURSOS MATRICULADOS */}
         {rolUsuario === 'alumno' && (
           <div ref={seccionPerfilRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
@@ -562,6 +608,8 @@ export default function App() {
                         <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold' }}>{curso.categoria}</span>
                         <h4 style={{ margin: '6px 0 8px 0', fontSize: '16px', color: '#0f172a' }}>{curso.titulo}</h4>
                         <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#334155' }}><strong>Docente:</strong> {curso.instructor}</p>
+                        
+                        {/* BOTONES DE GRABACIÓN Y ZOOM DENTRO DEL PERFIL DEL ALUMNO */}
                         <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
                           {(curso.tipo || 'Virtual') === 'Virtual' ? (
                             <>
@@ -584,9 +632,9 @@ export default function App() {
         <div ref={seccionCursosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>{puedeAgregarCursos ? 'ADMINISTRACIÓN DE CURSOS' : 'CATÁLOGO DE CLASES & LABORATORIOS'}</h2>
-              {/* REGLA DEL SUPERIOR: ADMIN Y DOCENTES AGREGAN CURSOS */}
-              {puedeAgregarCursos && <button onClick={() => setModalNuevoCurso(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>+ Añadir Nuevo Curso</button>}
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>{puedeGestionarCursos ? 'ADMINISTRACIÓN DE CURSOS' : 'CATÁLOGO DE CLASES & LABORATORIOS'}</h2>
+              {/* ADMIN Y DOCENTE PUEDEN AÑADIR CURSOS */}
+              {puedeGestionarCursos && <button onClick={() => setModalNuevoCurso(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>+ Añadir Nuevo Curso</button>}
             </div>
 
             {videoActivo && (
@@ -626,8 +674,8 @@ export default function App() {
                         )}
                       </div>
                       
-                      {/* SOLO ADMIN HABILITA/DESHABILITA (Seguridad extra) */}
-                      {esAdmin && (
+                      {/* ADMIN Y DOCENTE PUEDEN HABILITAR O DESHABILITAR CURSOS */}
+                      {puedeGestionarCursos && (
                         <button onClick={() => handleToggleEstadoCurso(item)} style={{ width: '100%', padding: '8px', marginTop: '10px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', background: estaInactivo ? '#dcfce7' : '#fee2e2', color: estaInactivo ? '#166534' : '#991b1b' }}>
                           {estaInactivo ? '✓ Habilitar Curso en Tienda' : '✕ Deshabilitar Curso'}
                         </button>
@@ -665,7 +713,7 @@ export default function App() {
 
         <div ref={seccionMensajesRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
-            <h2 style={{ fontSize: '24px', color: '#0f172a', margin: '0 0 25px 0', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>💬 MENSAJERÍA INTERNA (SINCRONIZADA CON BASE DE DATOS)</h2>
+            <h2 style={{ fontSize: '24px', color: '#0f172a', margin: '0 0 25px 0', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>💬 MENSAJERÍA INTERNA (CONECTADA A LA BASE DE DATOS)</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
               <form onSubmit={handleEnviarMensajeBD} style={{ background: '#ffffff', padding: '22px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <h3 style={{ margin: 0, fontSize: '17px', color: '#0f172a' }}>Redactar Nuevo Mensaje</h3>
@@ -687,7 +735,7 @@ export default function App() {
               <div style={{ background: '#ffffff', padding: '22px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', maxHeight: '420px', overflowY: 'auto' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                   <h3 style={{ margin: 0, fontSize: '17px', color: '#0f172a' }}>Bandeja de Mensajes (@{usernameActual || usuarioLogueado})</h3>
-                  <button onClick={() => cargarMensajesDesdeBD(usernameActual)} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '5px 10px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}>↻ Actualizar</button>
+                  <button onClick={() => cargarMensajesDesdeBD(usernameActual)} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '5px 10px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}>↻ Actualizar Bandeja</button>
                 </div>
                 {mensajesBD.length === 0 ? (
                   <p style={{ color: '#64748b', fontSize: '13px', textAlign: 'center', margin: 'auto 0' }}>No hay mensajes registrados para tu perfil todavía.</p>
@@ -709,13 +757,13 @@ export default function App() {
           </div>
         </div>
 
-        {/* REGLA ESTRICTA: SOLO ADMIN PUEDE CREAR/EDITAR USUARIOS Y MATRICULAR */}
+        {/* GESTIÓN DE USUARIOS Y MATRÍCULAS (EXCLUSIVO DEL ADMIN) */}
         {esAdmin && (
           <div ref={seccionUsuariosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
               <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE PERFILES Y MATRÍCULAS</h2>
-                <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>+ Nuevo Usuario</button>
+                <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>+ Nuevo Usuario en BD</button>
               </div>
 
               <form onSubmit={handleAsignarCursoAlumno} style={{ background: '#fff', padding: '18px', borderRadius: '12px', border: '1px solid #cbd5e1', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
@@ -772,7 +820,7 @@ export default function App() {
                           <td style={{ padding: '14px' }}>{u.estado}</td>
                           <td style={{ padding: '14px', textAlign: 'right', display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
                             <button onClick={() => abrirModalEditarUsuario(u)} style={{ background: '#e2e8f0', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Editar</button>
-                            <button onClick={() => toggleEstadoUsuario(u.id)} style={{ background: u.estado === 'activo' ? '#fee2e2' : '#dcfce7', color: u.estado === 'activo' ? '#991b1b' : '#166534', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>{u.estado === 'activo' ? 'Desactivar' : 'Activar'}</button>
+                            <button onClick={() => toggleEstadoUsuario(u.id, u.estado)} style={{ background: u.estado === 'activo' ? '#fee2e2' : '#dcfce7', color: u.estado === 'activo' ? '#991b1b' : '#166534', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>{u.estado === 'activo' ? 'Desactivar' : 'Activar'}</button>
                             <button onClick={() => { setUserToReset(u); setModalResetPass(true); }} style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>Clave</button>
                           </td>
                         </tr>
@@ -814,7 +862,6 @@ export default function App() {
         </div>
       )}
       
-      {/* MODALES RECURRENTES: PDF Y SEDE */}
       {libroSeleccionado && <PdfFlipbook pdfUrl={libroSeleccionado} alCerrar={() => setLibroSeleccionado(null)} />}
       
       {laboratorioSeleccionado && (
@@ -830,14 +877,21 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL USUARIO (SOLO ADMIN) */}
+      {/* MODAL USUARIO (CON CONTRASEÑA OBLIGATORIA AHORA SÍ) */}
       {modalUsuario && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px', boxSizing: 'border-box' }}>
           <div style={{ background: '#fff', width: '100%', maxWidth: '440px', padding: '25px', borderRadius: '12px' }}>
-            <h3 style={{ margin: '0 0 15px 0' }}>{modoEdicion ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}</h3>
-            {mensajeUserMsg && <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '12px' }}>{mensajeUserMsg}</p>}
+            <h3 style={{ margin: '0 0 15px 0' }}>{modoEdicion ? 'Editar Usuario' : 'Registrar Nuevo Usuario en BD'}</h3>
+            {mensajeUserMsg && <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '12px', fontWeight: 'bold' }}>{mensajeUserMsg}</p>}
+            
             <form onSubmit={handleGuardarUsuario} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <input type="text" disabled={modoEdicion} placeholder="Usuario" value={usuarioForm.usuario} onChange={e => setUsuarioForm({...usuarioForm, usuario: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: modoEdicion ? '#f1f5f9' : '#fff' }} />
+              <input type="text" disabled={modoEdicion} placeholder="Nombre de Usuario (ej: mgarcia)" value={usuarioForm.usuario} onChange={e => setUsuarioForm({...usuarioForm, usuario: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: modoEdicion ? '#f1f5f9' : '#fff' }} />
+              
+              {/* CAMPO DE CONTRASEÑA AÑADIDO PARA CREAR EL USUARIO CORRECTAMENTE */}
+              {!modoEdicion && (
+                <input type="password" placeholder="Asigna una contraseña temporal" value={usuarioForm.password} onChange={e => setUsuarioForm({...usuarioForm, password: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              )}
+              
               <input type="text" placeholder="Nombres completos" value={usuarioForm.nombres} onChange={e => setUsuarioForm({...usuarioForm, nombres: e.target.value})} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
               <select value={usuarioForm.rol} onChange={e => setUsuarioForm({...usuarioForm, rol: e.target.value})} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
                 <option value="alumno">Alumno</option>
@@ -845,15 +899,14 @@ export default function App() {
                 <option value="admin">Administrador (admin)</option>
               </select>
               <div style={{ display: 'flex', gap: '10px' }}>
-                <button type="submit" style={{ flex: 1, background: '#2563eb', color: '#fff', padding: '10px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>Guardar</button>
-                <button type="button" onClick={() => setModalUsuario(false)} style={{ flex: 1, background: '#e2e8f0', padding: '10px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>Cancelar</button>
+                <button type="submit" style={{ flex: 1, background: '#2563eb', color: '#fff', padding: '10px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>Guardar</button>
+                <button type="button" onClick={() => setModalUsuario(false)} style={{ flex: 1, background: '#e2e8f0', padding: '10px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>Cancelar</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* MODAL RESET CLAVE (SOLO ADMIN) */}
       {modalResetPass && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px' }}>
           <div style={{ background: '#fff', width: '100%', maxWidth: '390px', padding: '25px', borderRadius: '12px' }}>
@@ -862,8 +915,8 @@ export default function App() {
             <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <input type="password" value={newPasswordInput} onChange={e => setNewPasswordInput(e.target.value)} required style={{ padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
               <div style={{ display: 'flex', gap: '10px' }}>
-                <button type="submit" style={{ flex: 1, background: '#d97706', color: '#fff', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer' }}>Actualizar</button>
-                <button type="button" onClick={() => setModalResetPass(false)} style={{ flex: 1, background: '#e2e8f0', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer' }}>Cancelar</button>
+                <button type="submit" style={{ flex: 1, background: '#d97706', color: '#fff', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Actualizar</button>
+                <button type="button" onClick={() => setModalResetPass(false)} style={{ flex: 1, background: '#e2e8f0', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Cancelar</button>
               </div>
             </form>
           </div>
