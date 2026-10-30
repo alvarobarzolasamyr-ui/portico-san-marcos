@@ -5,185 +5,17 @@ import PdfFlipbook from './components/PdfFlipbook';
 const API_BASE = 'https://portico-san-marcos.onrender.com/api';
 const WHATSAPP_NUMERO = '51967107035';
 
-// CATÁLOGO MAESTRO UNIFICADO
 const CATALOGO_INICIAL = [
-  {
-    id: 1,
-    titulo: 'Fundamentos de Robótica y Cinemática',
-    categoria: 'Robótica',
-    descripcion: 'Domina el modelado espacial, matrices de transformación y parámetros Denavit-Hartenberg para brazos robóticos.',
-    precio: 120.00,
-    duracion: '5 Semanas (20 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80',
-    video_demo_url: 'https://www.youtube.com/embed/fc_cA62Z1kQ',
-    temario: [
-      'Módulo 1: Morfología del robot (grados de libertad, articulaciones y actuadores)',
-      'Módulo 2: Álgebra matricial y transformaciones espaciales 3D',
-      'Módulo 3: Cinemática Directa y parámetros Denavit-Hartenberg (D-H)'
-    ],
-    tipo: 'Virtual',
-    horario: 'Martes y Jueves - 7:00 PM',
-    instructor: 'Ing. Fabrizio Barzola',
-    enlaceSede: 'https://zoom.us/j/9876543210',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
-    estado: 'activo'
-  },
-  {
-    id: 2,
-    titulo: 'Electrónica Aplicada a la Ingeniería',
-    categoria: 'Electrónica',
-    descripcion: 'Análisis de circuitos DC/AC, semiconductores, amplificadores operacionales y etapas de potencia para motores.',
-    precio: 95.00,
-    duracion: '4 Semanas (16 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80',
-    video_demo_url: 'https://www.youtube.com/embed/r9GC50r2Ge8',
-    temario: [
-      'Módulo 1: Leyes de Ohm, Kirchhoff y análisis de mallas/nodos DC',
-      'Módulo 2: Componentes pasivos e impedancia en corriente alterna'
-    ],
-    tipo: 'Presencial',
-    horario: 'Viernes - 7:00 PM',
-    instructor: 'Ing. Carlos Mendoza',
-    enlaceSede: 'Campus Central - Laboratorio de Electrónica',
-    ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800',
-    estado: 'activo'
-  },
-  {
-    id: 3,
-    titulo: 'Arquitectura y Programación de Microcontroladores',
-    categoria: 'Sistemas Embebidos',
-    descripcion: 'Programación de registros, conversores ADC, señales PWM y protocolos industriales con Arduino Mega y ESP32.',
-    precio: 110.00,
-    duracion: '5 Semanas (20 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1553406830-ef2513450d76?w=600&q=80',
-    video_demo_url: 'https://www.youtube.com/embed/fJWR7dBuc18',
-    temario: ['Módulo 1: Arquitectura interna (CPU, memoria Flash/RAM y registros)'],
-    tipo: 'Virtual',
-    horario: 'Sábados - 3:00 PM',
-    instructor: 'Ing. Fabrizio Barzola',
-    enlaceSede: 'https://zoom.us/j/1234567890',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
-    estado: 'activo'
-  },
-  {
-    id: 4,
-    titulo: 'Lógica de Programación para Mecatrónica (C++ y Python)',
-    categoria: 'Programación',
-    descripcion: 'Desarrollo de algoritmos de control de hardware en C++ orientado a objetos y procesamiento matemático en Python.',
-    precio: 100.00,
-    duracion: '5 Semanas (20 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80',
-    video_demo_url: 'https://www.youtube.com/embed/ZzaPdXTrSb8',
-    temario: ['Módulo 1: Algoritmos, diagramas de flujo y estructuras de control'],
-    tipo: 'Virtual',
-    horario: 'Lunes y Miércoles - 8:00 PM',
-    instructor: 'Dra. María Fernández',
-    enlaceSede: 'https://meet.google.com/abc-defg-hij',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
-    estado: 'activo'
-  },
-  {
-    id: 5,
-    titulo: 'Automatización Industrial y PLCs Multimarca',
-    categoria: 'Automatización',
-    descripcion: 'Programación industrial en entornos Siemens TIA Portal, Allen-Bradley y Delta bajo la norma IEC 61131-3.',
-    precio: 150.00,
-    duracion: '6 Semanas (24 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80',
-    video_demo_url: 'https://www.youtube.com/embed/PbAGl_mv5XI',
-    temario: ['Módulo 1: Hardware de PLCs: Siemens, Allen-Bradley y Delta'],
-    tipo: 'Virtual',
-    horario: 'Martes y Jueves - 8:00 PM',
-    instructor: 'Ing. Carlos Mendoza',
-    enlaceSede: 'https://zoom.us/j/9876543210',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
-    estado: 'activo'
-  },
-  {
-    id: 6,
-    titulo: 'Visión Artificial y Procesamiento de Imágenes',
-    categoria: 'Inteligencia Artificial',
-    descripcion: 'Clasificación de piezas industriales, detección de bordes y seguimiento de objetos en tiempo real con Python y OpenCV.',
-    precio: 140.00,
-    duracion: '5 Semanas (20 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?w=600&q=80',
-    video_demo_url: 'https://www.youtube.com/embed/oXlwWbU8l2o',
-    temario: ['Módulo 1: Espacios de color y matrices de píxeles'],
-    tipo: 'Virtual',
-    horario: 'Viernes - 6:00 PM',
-    instructor: 'Dra. María Fernández',
-    enlaceSede: 'https://zoom.us/j/5556667770',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
-    estado: 'activo'
-  },
-  {
-    id: 7,
-    titulo: 'Diseño y Ruteo de Placas Electrónicas (PCBs)',
-    categoria: 'Electrónica',
-    descripcion: 'Creación de esquemáticos profesionales, ruteo multicapa, aislamiento óptico y archivos Gerber listos para manufactura.',
-    precio: 115.00,
-    duracion: '4 Semanas (16 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=600&q=80',
-    video_demo_url: 'https://www.youtube.com/embed/35YuILUlfGs',
-    temario: ['Módulo 1: Simbología esquemática y encapsulados SMD vs THT'],
-    tipo: 'Presencial',
-    horario: 'Miércoles - 4:00 PM',
-    instructor: 'Ing. Carlos Mendoza',
-    enlaceSede: 'Campus Central - Laboratorio de Electrónica',
-    ubicacionImg: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800',
-    estado: 'activo'
-  },
-  {
-    id: 8,
-    titulo: 'Simulación de Sistemas Neumáticos y Electroneumáticos',
-    categoria: 'Automatización',
-    descripcion: 'Diseño de circuitos secuenciales por método cascada, válvulas direccionales y control por relés en FluidSIM.',
-    precio: 105.00,
-    duracion: '4 Semanas (16 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&q=80',
-    video_demo_url: 'https://www.youtube.com/embed/2f_ca121kFQ',
-    temario: ['Módulo 1: Tratamiento del aire comprimido'],
-    tipo: 'Presencial',
-    horario: 'Martes - 4:00 PM',
-    instructor: 'Ing. Luis Alvarado',
-    enlaceSede: 'Sede Arequipa - Pabellón B - Lab 2',
-    ubicacionImg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800',
-    estado: 'activo'
-  },
-  {
-    id: 9,
-    titulo: 'Manufactura Aditiva e Impresión 3D',
-    categoria: 'Manufactura',
-    descripcion: 'Configuración avanzada de laminadores, selección de polímeros técnicos (PLA, PETG, ABS, TPU) y diseño de tolerancias.',
-    precio: 90.00,
-    duracion: '4 Semanas (16 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=600&q=80',
-    video_demo_url: 'https://www.youtube.com/embed/Vx0Z6LplaMU',
-    temario: ['Módulo 1: Tecnologías FDM, SLA y cinemática'],
-    tipo: 'Presencial',
-    horario: 'Jueves - 5:00 PM',
-    instructor: 'Ing. Fabrizio Barzola',
-    enlaceSede: 'Campus Central - Taller Mecánico',
-    ubicacionImg: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=800',
-    estado: 'activo'
-  },
-  {
-    id: 10,
-    titulo: 'Diseño Mecánico y Modelado CAD 3D',
-    categoria: 'Diseño Mecánico',
-    descripcion: 'Modelado paramétrico en Autodesk Inventor, cajas reductoras de engranajes, cálculo AGMA y análisis de esfuerzos FEA.',
-    precio: 135.00,
-    duracion: '5 Semanas (20 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80',
-    video_demo_url: 'https://www.youtube.com/embed/ddU98eb21wY',
-    temario: ['Módulo 1: Lectura de planos industriales'],
-    tipo: 'Virtual',
-    horario: 'Lunes - 7:00 PM',
-    instructor: 'Ing. Luis Alvarado',
-    enlaceSede: 'https://zoom.us/j/1234567890',
-    videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
-    estado: 'activo'
-  }
+  { id: 1, titulo: 'Fundamentos de Robótica y Cinemática', categoria: 'Robótica', descripcion: 'Domina el modelado espacial, matrices de transformación y parámetros Denavit-Hartenberg para brazos robóticos.', precio: 120.00, duracion: '5 Semanas (20 Horas)', imagen_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/fc_cA62Z1kQ', temario: ['Módulo 1: Morfología del robot', 'Módulo 2: Álgebra matricial'], tipo: 'Virtual', horario: 'Martes y Jueves - 7:00 PM', instructor: 'Ing. Fabrizio Barzola', enlaceSede: 'https://zoom.us/j/9876543210', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', estado: 'activo' },
+  { id: 2, titulo: 'Electrónica Aplicada a la Ingeniería', categoria: 'Electrónica', descripcion: 'Análisis de circuitos DC/AC, semiconductores, amplificadores operacionales y etapas de potencia para motores.', precio: 95.00, duracion: '4 Semanas (16 Horas)', imagen_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/r9GC50r2Ge8', temario: ['Módulo 1: Leyes de Ohm y Kirchhoff'], tipo: 'Presencial', horario: 'Viernes - 7:00 PM', instructor: 'Ing. Carlos Mendoza', enlaceSede: 'Campus Central - Laboratorio de Electrónica', ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800', estado: 'activo' },
+  { id: 3, titulo: 'Arquitectura y Programación de Microcontroladores', categoria: 'Sistemas Embebidos', descripcion: 'Programación de registros, conversores ADC, señales PWM y protocolos industriales con Arduino Mega y ESP32.', precio: 110.00, duracion: '5 Semanas (20 Horas)', imagen_url: 'https://images.unsplash.com/photo-1553406830-ef2513450d76?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/fJWR7dBuc18', temario: ['Módulo 1: Arquitectura interna (CPU, Flash/RAM)'], tipo: 'Virtual', horario: 'Sábados - 3:00 PM', instructor: 'Ing. Fabrizio Barzola', enlaceSede: 'https://zoom.us/j/1234567890', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', estado: 'activo' },
+  { id: 4, titulo: 'Lógica de Programación para Mecatrónica (C++ y Python)', categoria: 'Programación', descripcion: 'Desarrollo de algoritmos de control de hardware en C++ orientado a objetos y procesamiento matemático en Python.', precio: 100.00, duracion: '5 Semanas (20 Horas)', imagen_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/ZzaPdXTrSb8', temario: ['Módulo 1: Algoritmos y diagramas de flujo'], tipo: 'Virtual', horario: 'Lunes y Miércoles - 8:00 PM', instructor: 'Dra. María Fernández', enlaceSede: 'https://meet.google.com/abc-defg-hij', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', estado: 'activo' },
+  { id: 5, titulo: 'Automatización Industrial y PLCs Multimarca', categoria: 'Automatización', descripcion: 'Programación industrial en entornos Siemens TIA Portal, Allen-Bradley y Delta bajo la norma IEC 61131-3.', precio: 150.00, duracion: '6 Semanas (24 Horas)', imagen_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/PbAGl_mv5XI', temario: ['Módulo 1: Hardware de PLCs Siemens'], tipo: 'Virtual', horario: 'Martes y Jueves - 8:00 PM', instructor: 'Ing. Carlos Mendoza', enlaceSede: 'https://zoom.us/j/9876543210', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', estado: 'activo' },
+  { id: 6, titulo: 'Visión Artificial y Procesamiento de Imágenes', categoria: 'Inteligencia Artificial', descripcion: 'Clasificación de piezas industriales, detección de bordes y seguimiento de objetos en tiempo real con Python y OpenCV.', precio: 140.00, duracion: '5 Semanas (20 Horas)', imagen_url: 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/oXlwWbU8l2o', temario: ['Módulo 1: Espacios de color'], tipo: 'Virtual', horario: 'Viernes - 6:00 PM', instructor: 'Dra. María Fernández', enlaceSede: 'https://zoom.us/j/5556667770', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', estado: 'activo' },
+  { id: 7, titulo: 'Diseño y Ruteo de Placas Electrónicas (PCBs)', categoria: 'Electrónica', descripcion: 'Creación de esquemáticos profesionales, ruteo multicapa, aislamiento óptico y archivos Gerber listos para manufactura.', precio: 115.00, duracion: '4 Semanas (16 Horas)', imagen_url: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/35YuILUlfGs', temario: ['Módulo 1: Simbología esquemática'], tipo: 'Presencial', horario: 'Miércoles - 4:00 PM', instructor: 'Ing. Carlos Mendoza', enlaceSede: 'Campus Central - Laboratorio de Electrónica', ubicacionImg: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800', estado: 'activo' },
+  { id: 8, titulo: 'Simulación de Sistemas Neumáticos y Electroneumáticos', categoria: 'Automatización', descripcion: 'Diseño de circuitos secuenciales por método cascada, válvulas direccionales y control por relés en FluidSIM.', precio: 105.00, duracion: '4 Semanas (16 Horas)', imagen_url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/2f_ca121kFQ', temario: ['Módulo 1: Tratamiento del aire'], tipo: 'Presencial', horario: 'Martes - 4:00 PM', instructor: 'Ing. Luis Alvarado', enlaceSede: 'Sede Arequipa - Pabellón B', ubicacionImg: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800', estado: 'activo' },
+  { id: 9, titulo: 'Manufactura Aditiva e Impresión 3D', categoria: 'Manufactura', descripcion: 'Configuración avanzada de laminadores, selección de polímeros técnicos (PLA, PETG, ABS, TPU) y diseño de tolerancias.', precio: 90.00, duracion: '4 Semanas (16 Horas)', imagen_url: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/Vx0Z6LplaMU', temario: ['Módulo 1: Tecnologías FDM'], tipo: 'Presencial', horario: 'Jueves - 5:00 PM', instructor: 'Ing. Fabrizio Barzola', enlaceSede: 'Campus Central - Taller Mecánico', ubicacionImg: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=800', estado: 'activo' },
+  { id: 10, titulo: 'Diseño Mecánico y Modelado CAD 3D', categoria: 'Diseño Mecánico', descripcion: 'Modelado paramétrico en Autodesk Inventor, cajas reductoras de engranajes, cálculo AGMA y análisis de esfuerzos FEA.', precio: 135.00, duracion: '5 Semanas (20 Horas)', imagen_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/ddU98eb21wY', temario: ['Módulo 1: Lectura de planos'], tipo: 'Virtual', horario: 'Lunes - 7:00 PM', instructor: 'Ing. Luis Alvarado', enlaceSede: 'https://zoom.us/j/1234567890', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', estado: 'activo' }
 ];
 
 export default function App() {
@@ -213,10 +45,7 @@ export default function App() {
 
   const [modalNuevoCurso, setModalNuevoCurso] = useState(false);
   const [nuevoCursoForm, setNuevoCursoForm] = useState({
-    titulo: '', categoria: 'Robótica', descripcion: '', precio: '120',
-    duracion: '5 Semanas (20 Horas)', imagen_url: '', video_demo_url: '',
-    temarioTexto: 'Módulo 1: Fundamentos', tipo: 'Virtual', horario: 'Martes y Jueves - 7:00 PM',
-    instructor: 'Ing. Fabrizio Barzola', enlaceSede: 'https://zoom.us/j/9876543210'
+    titulo: '', categoria: 'Robótica', descripcion: '', precio: '120', duracion: '5 Semanas (20 Horas)', imagen_url: '', video_demo_url: '', temarioTexto: 'Módulo 1: Fundamentos', tipo: 'Virtual', horario: 'Martes y Jueves - 7:00 PM', instructor: 'Ing. Fabrizio Barzola', enlaceSede: 'https://zoom.us/j/9876543210'
   });
 
   const [matriculas, setMatriculas] = useState([]);
@@ -233,11 +62,7 @@ export default function App() {
     if (tiempoBloqueo <= 0) return;
     const timer = setInterval(() => {
       setTiempoBloqueo(prev => {
-        if (prev <= 1) {
-          setIntentosFallidos(0);
-          setMensaje('');
-          return 0;
-        }
+        if (prev <= 1) { setIntentosFallidos(0); setMensaje(''); return 0; }
         return prev - 1;
       });
     }, 1000);
@@ -275,7 +100,6 @@ export default function App() {
       .then(data => { if (Array.isArray(data)) setMensajesBD(data); }).catch(() => {});
   };
 
-  // ESTADO LOCAL DE USUARIOS PRECARGADOS (Garantiza que la lista NUNCA esté vacía)
   const [listaUsuarios, setListaUsuarios] = useState([
     { id: 1, usuario: 'jperez', nombres: 'Juan Pérez', rol: 'alumno', estado: 'activo' },
     { id: 2, usuario: 'mgomez', nombres: 'María Gómez', rol: 'alumno', estado: 'activo' },
@@ -330,47 +154,33 @@ export default function App() {
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
   };
 
-  // =========================================================================
-  // FUNCIONES DE CURSOS
-  // =========================================================================
   const handleCrearCursoBD = async (e) => {
     e.preventDefault();
     const temarioArray = nuevoCursoForm.temarioTexto.split('\n').map(l => l.trim()).filter(Boolean);
     const payload = { ...nuevoCursoForm, precio: Number(nuevoCursoForm.precio), temario: temarioArray };
     try {
       const res = await fetch(`${API_BASE}/catalogo`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
       });
       const data = await res.json();
       const nuevoCursoObj = { ...payload, id: data.id || Date.now(), imagen_url: payload.imagen_url || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80', video_demo_url: payload.video_demo_url || 'https://www.youtube.com/embed/fc_cA62Z1kQ', estado: 'activo' };
       setCursosCatalogo([...cursosCatalogo, nuevoCursoObj]);
       setModalNuevoCurso(false);
       alert('Curso guardado exitosamente.');
-    } catch (error) {
-      alert('Error al conectar con el servidor.');
-    }
+    } catch (error) { alert('Error al conectar con el servidor.'); }
   };
 
   const handleToggleEstadoCurso = async (curso) => {
     const nuevoEstado = curso.estado === 'inactivo' ? 'activo' : 'inactivo';
     setCursosCatalogo(cursosCatalogo.map(c => c.id === curso.id ? { ...c, estado: nuevoEstado } : c));
-    try {
-      await fetch(`${API_BASE}/catalogo/${curso.id}/estado`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado: nuevoEstado }) });
-    } catch (error) { console.error(error); }
+    try { await fetch(`${API_BASE}/catalogo/${curso.id}/estado`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado: nuevoEstado }) }); } catch (error) { console.error(error); }
   };
 
-  // =========================================================================
-  // FUNCIONES DE MATRÍCULA
-  // =========================================================================
   const handleAsignarCursoAlumno = async (e) => {
     e.preventDefault();
     if (!alumnoSeleccionadoMatricula) return alert("Selecciona un alumno.");
     const nuevaMat = { usuario_alumno: alumnoSeleccionadoMatricula, curso_id: Number(cursoSeleccionadoMatricula) };
-    if (!matriculas.some(m => m.usuario_alumno === nuevaMat.usuario_alumno && Number(m.curso_id) === nuevaMat.curso_id)) {
-      setMatriculas([...matriculas, nuevaMat]);
-    }
+    if (!matriculas.some(m => m.usuario_alumno === nuevaMat.usuario_alumno && Number(m.curso_id) === nuevaMat.curso_id)) { setMatriculas([...matriculas, nuevaMat]); }
     try {
       await fetch(`${API_BASE}/matriculas`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nuevaMat) });
       alert(`Curso asignado al estudiante @${alumnoSeleccionadoMatricula}`);
@@ -382,17 +192,11 @@ export default function App() {
     try { await fetch(`${API_BASE}/matriculas/${usuario_alumno}/${curso_id}`, { method: 'DELETE' }); } catch (err) { console.error(err); }
   };
 
-  // =========================================================================
-  // FUNCIONES DE MENSAJERÍA
-  // =========================================================================
   const handleEnviarMensajeBD = async (e) => {
     e.preventDefault();
     if (!contenidoMsg.trim() || !destinatarioMsg) return;
     setEstadoEnvioMsg('Enviando mensaje...');
-    const nuevoMensaje = {
-      remitente: usernameActual || usuarioLogueado, rol_remitente: rolUsuario, destinatario: destinatarioMsg,
-      asunto: asuntoMsg.trim() || 'Consulta', contenido: contenidoMsg.trim(), fecha_envio: new Date().toISOString()
-    };
+    const nuevoMensaje = { remitente: usernameActual || usuarioLogueado, rol_remitente: rolUsuario, destinatario: destinatarioMsg, asunto: asuntoMsg.trim() || 'Consulta', contenido: contenidoMsg.trim(), fecha_envio: new Date().toISOString() };
     try {
       const res = await fetch(`${API_BASE}/mensajes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nuevoMensaje) });
       if (res.ok) {
@@ -544,17 +348,22 @@ export default function App() {
   };
 
   // =========================================================================
-  // DEFINICIÓN EXACTA DE PERMISOS: ADMIN VS DOCENTE
+  // PERMISOS DE ADMINISTRADOR Y DOCENTE (REGLAS DEL SUPERIOR)
   // =========================================================================
   const esAdmin = rolUsuario === 'admin';
   const esDocente = rolUsuario === 'docente';
   
-  // Tanto Administradores como Docentes pueden agregar y gestionar cursos
-  const puedeGestionarCursos = esAdmin || esDocente;
+  // Regla 1: Profesores y el admin pueden agregar cursos nuevos.
+  const puedeAgregarCursos = esAdmin || esDocente;
+
+  // Regla 2: SOLO el admin puede gestionar/agregar perfiles de usuarios.
+  // Esto se usa para ocultar la pestaña "Usuarios y Matrículas" a los docentes.
 
   const misCursosMatriculados = cursosCatalogo.filter(c => matriculas.some(m => m.usuario_alumno === usernameActual && Number(m.curso_id) === Number(c.id)));
+  
   const clasesInternasFiltradas = cursosCatalogo.filter(item => {
-    if (!puedeGestionarCursos && item.estado === 'inactivo') return false;
+    // Si no es admin y el curso está inactivo, lo ocultamos.
+    if (!esAdmin && item.estado === 'inactivo') return false;
     const tipoFiltro = item.tipo ? item.tipo.toLowerCase() : 'virtual';
     const coincideModalidad = tipoFiltro === modalidadFiltro.toLowerCase();
     const coincideCategoria = categoriaSeleccionada === 'todas' || item.categoria === categoriaSeleccionada;
@@ -702,19 +511,17 @@ export default function App() {
         </div>
         <nav style={{ display: 'flex', gap: '18px', alignItems: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => irASeccion(seccionInicioRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Inicio</button>
-          
           {rolUsuario === 'alumno' && <button onClick={() => irASeccion(seccionPerfilRef)} style={{ background: 'none', border: 'none', color: '#38bdf8', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Mi Perfil</button>}
           
-          {/* DOCENTES Y ADMIN VEN "Administrar Cursos", ALUMNOS VEN "Catálogo" */}
           <button onClick={() => irASeccion(seccionCursosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>
-            {puedeGestionarCursos ? 'Administrar Cursos' : 'Catálogo'}
+            {puedeAgregarCursos ? 'Administrar Cursos' : 'Catálogo'}
           </button>
           
           {rolUsuario === 'alumno' && <button onClick={() => irASeccion(seccionDocentesRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Docentes</button>}
           <button onClick={() => irASeccion(seccionBibliotecaRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Biblioteca</button>
           <button onClick={() => irASeccion(seccionMensajesRef)} style={{ background: 'none', border: 'none', color: '#34d399', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>💬 Mensajería</button>
           
-          {/* SÓLO EL ADMIN VE LA PESTAÑA DE GESTIÓN DE USUARIOS Y MATRÍCULAS */}
+          {/* REGLA ESTRICTA: SÓLO EL ADMIN VE LA PESTAÑA DE GESTIÓN DE USUARIOS Y MATRÍCULAS */}
           {esAdmin && <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios y Matrículas</button>}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginLeft: '10px' }}>
@@ -741,7 +548,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* PERFIL DEL ALUMNO: CURSOS MATRICULADOS */}
         {rolUsuario === 'alumno' && (
           <div ref={seccionPerfilRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
@@ -756,8 +562,6 @@ export default function App() {
                         <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold' }}>{curso.categoria}</span>
                         <h4 style={{ margin: '6px 0 8px 0', fontSize: '16px', color: '#0f172a' }}>{curso.titulo}</h4>
                         <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#334155' }}><strong>Docente:</strong> {curso.instructor}</p>
-                        
-                        {/* BOTONES DE GRABACIÓN Y ZOOM DENTRO DEL PERFIL DEL ALUMNO */}
                         <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
                           {(curso.tipo || 'Virtual') === 'Virtual' ? (
                             <>
@@ -777,16 +581,14 @@ export default function App() {
           </div>
         )}
 
-        {/* CATÁLOGO DE CURSOS */}
         <div ref={seccionCursosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>{puedeGestionarCursos ? 'ADMINISTRACIÓN DE CURSOS' : 'CATÁLOGO DE CLASES & LABORATORIOS'}</h2>
-              {/* ADMIN Y DOCENTE PUEDEN AÑADIR CURSOS */}
-              {puedeGestionarCursos && <button onClick={() => setModalNuevoCurso(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>+ Añadir Nuevo Curso</button>}
+              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>{puedeAgregarCursos ? 'ADMINISTRACIÓN DE CURSOS' : 'CATÁLOGO DE CLASES & LABORATORIOS'}</h2>
+              {/* REGLA DEL SUPERIOR: ADMIN Y DOCENTES AGREGAN CURSOS */}
+              {puedeAgregarCursos && <button onClick={() => setModalNuevoCurso(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>+ Añadir Nuevo Curso</button>}
             </div>
 
-            {/* REPRODUCTOR DE VIDEO INCORPORADO */}
             {videoActivo && (
               <div style={{ background: '#0f172a', padding: '20px', borderRadius: '12px', color: '#fff', marginBottom: '30px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
@@ -813,7 +615,6 @@ export default function App() {
                       <h3>{item.titulo}</h3>
                       <p>{item.descripcion}</p>
                       
-                      {/* BOTONES DE ACCESO A CLASES PARA TODOS */}
                       <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
                         {esVirtual ? (
                           <>
@@ -825,8 +626,8 @@ export default function App() {
                         )}
                       </div>
                       
-                      {/* ADMIN Y DOCENTE PUEDEN HABILITAR O DESHABILITAR CURSOS */}
-                      {puedeGestionarCursos && (
+                      {/* SOLO ADMIN HABILITA/DESHABILITA (Seguridad extra) */}
+                      {esAdmin && (
                         <button onClick={() => handleToggleEstadoCurso(item)} style={{ width: '100%', padding: '8px', marginTop: '10px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', background: estaInactivo ? '#dcfce7' : '#fee2e2', color: estaInactivo ? '#166534' : '#991b1b' }}>
                           {estaInactivo ? '✓ Habilitar Curso en Tienda' : '✕ Deshabilitar Curso'}
                         </button>
@@ -839,7 +640,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* BIBLIOTECA VIRTUAL FLIPBOOK */}
         <div ref={seccionBibliotecaRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
@@ -863,7 +663,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* MENSAJERÍA */}
         <div ref={seccionMensajesRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <h2 style={{ fontSize: '24px', color: '#0f172a', margin: '0 0 25px 0', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>💬 MENSAJERÍA INTERNA (SINCRONIZADA CON BASE DE DATOS)</h2>
@@ -871,7 +670,6 @@ export default function App() {
               <form onSubmit={handleEnviarMensajeBD} style={{ background: '#ffffff', padding: '22px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <h3 style={{ margin: 0, fontSize: '17px', color: '#0f172a' }}>Redactar Nuevo Mensaje</h3>
                 
-                {/* LA LISTA ESTÁ PRECARGADA PARA NO DEPENDER SOLO DE LA BD AL INICIAR */}
                 <select value={destinatarioMsg} onChange={e => setDestinatarioMsg(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px' }}>
                   <option value="">-- Selecciona a quién enviar el mensaje --</option>
                   {listaUsuarios.filter(u => u.usuario !== usernameActual).map(u => (
@@ -911,7 +709,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* GESTIÓN DE USUARIOS Y MATRÍCULAS (EXCLUSIVO DEL ADMIN) */}
+        {/* REGLA ESTRICTA: SOLO ADMIN PUEDE CREAR/EDITAR USUARIOS Y MATRICULAR */}
         {esAdmin && (
           <div ref={seccionUsuariosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
