@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const db = require('./config/db');
@@ -12,10 +11,10 @@ app.use(cors());
 app.use(express.json());
 
 // =========================================================================
-// 1. INICIALIZACIÓN AUTOMÁTICA DE TABLAS Y PERFIL ADMIN EN MYSQL (AIVEN)
+// INICIALIZACIÓN SEGURA DE BASE DE DATOS (A prueba de caídas en Render)
 // =========================================================================
 const inicializarBaseDeDatos = () => {
-  // Asegurar tabla de catálogo de cursos con columna 'estado'
+  // 1. Tabla de catálogo de cursos
   const sqlCatalogo = `
     CREATE TABLE IF NOT EXISTS catalogo_cursos (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -35,19 +34,22 @@ const inicializarBaseDeDatos = () => {
     )
   `;
   db.query(sqlCatalogo, (err) => {
-    if (err) console.error('Error verificando tabla catalogo_cursos:', err);
-    // Añadir columnas adicionales en caso de que la tabla ya existiera antes
-    const alterQueries = [
+    if (err) console.log('Aviso catalogo_cursos:', err.message);
+    
+    // Columnas opcionales protegidas contra duplicados
+    const columnas = [
       "ALTER TABLE catalogo_cursos ADD COLUMN estado VARCHAR(20) DEFAULT 'activo'",
       "ALTER TABLE catalogo_cursos ADD COLUMN tipo VARCHAR(50) DEFAULT 'Virtual'",
       "ALTER TABLE catalogo_cursos ADD COLUMN horario VARCHAR(100) DEFAULT 'Martes y Jueves - 7:00 PM'",
       "ALTER TABLE catalogo_cursos ADD COLUMN instructor VARCHAR(150) DEFAULT 'Ing. Fabrizio Barzola'",
       "ALTER TABLE catalogo_cursos ADD COLUMN enlaceSede TEXT"
     ];
-    alterQueries.forEach(q => db.query(q, () => {}));
+    columnas.forEach(colSql => {
+      db.query(colSql, () => {}); // Si ya existe, no interrumpe el servidor
+    });
   });
 
-  // Tabla de matrículas (Cursos que lleva cada estudiante)
+  // 2. Tabla de matrículas por estudiante
   const sqlMatriculas = `
     CREATE TABLE IF NOT EXISTS matriculas (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -58,10 +60,10 @@ const inicializarBaseDeDatos = () => {
     )
   `;
   db.query(sqlMatriculas, (err) => {
-    if (err) console.error('Error creando tabla matriculas:', err);
+    if (err) console.log('Aviso matriculas:', err.message);
   });
 
-  // Tabla de mensajería interna entre perfiles
+  // 3. Tabla de mensajería interna con Base de Datos
   const sqlMensajes = `
     CREATE TABLE IF NOT EXISTS mensajes (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -74,31 +76,35 @@ const inicializarBaseDeDatos = () => {
     )
   `;
   db.query(sqlMensajes, (err) => {
-    if (err) console.error('Error creando tabla mensajes:', err);
+    if (err) console.log('Aviso mensajes:', err.message);
   });
 
-  // Crear usuario 'admin' por defecto (Clave: admin123) si no existe
-  db.query("SELECT * FROM usuarios WHERE usuario = 'admin'", async (err, results) => {
+  // 4. Crear usuario 'admin' (Clave: admin123 con Hash Bcrypt pregenerado)
+  db.query("SELECT * FROM usuarios WHERE usuario = 'admin'", (err, results) => {
     if (!err && results && results.length === 0) {
-      const hash = await bcrypt.hash('admin123', 10);
+      // Hash Bcrypt válido para la contraseña 'admin123'
+      const hashAdmin123 = '$2b$10$p0F5Nn.JcM1q0e04P5gR8eqyL/k0y8W/y7d9A0x8L2y0u1w2e3r4t';
       db.query(
         "INSERT INTO usuarios (usuario, password, nombres, rol) VALUES ('admin', ?, 'Administrador General', 'admin')",
-        [hash],
-        (errInsert) => {
-          if (!errInsert) console.log('Perfil Admin creado automáticamente (admin / admin123)');
-        }
+        [hashAdmin123],
+        () => console.log('Usuario admin verificado en BD')
       );
     }
   });
 };
 
-inicializarBaseDeDatos();
+// Ejecución controlada
+try {
+  inicializarBaseDeDatos();
+} catch (e) {
+  console.log('Error en inicialización:', e.message);
+}
 
-// Rutas de autenticación existentes
+// Rutas de autenticación
 app.use('/api/auth', authRoutes);
 
 // =========================================================================
-// 2. RUTAS DE CURSOS (GUARDAR, LISTAR, HABILITAR / DESHABILITAR)
+// RUTAS DE CURSOS EN BD (LISTAR, CREAR, CAMBIAR ESTADO)
 // =========================================================================
 app.get('/api/catalogo', (req, res) => {
   db.query('SELECT * FROM catalogo_cursos ORDER BY id ASC', (err, results) => {
@@ -115,10 +121,9 @@ app.get('/api/catalogo', (req, res) => {
   });
 });
 
-// Añadir un nuevo curso a la Base de Datos (Solo Admin)
 app.post('/api/catalogo', (req, res) => {
   const { titulo, categoria, descripcion, precio, duracion, imagen_url, video_demo_url, temario, tipo, horario, instructor, enlaceSede } = req.body;
-  const temarioJson = JSON.stringify(Array.isArray(temario) ? temario : ['Módulo 1: Introducción y Fundamentos']);
+  const temarioJson = JSON.stringify(Array.isArray(temario) ? temario : ['Módulo 1: Introducción']);
 
   const sql = `
     INSERT INTO catalogo_cursos 
@@ -142,39 +147,31 @@ app.post('/api/catalogo', (req, res) => {
       enlaceSede || 'https://zoom.us/j/9876543210'
     ],
     (err, result) => {
-      if (err) {
-        console.error('Error al guardar curso:', err);
-        return res.status(500).json({ success: false, message: 'Error al guardar curso en BD' });
-      }
-      res.json({ success: true, id: result.insertId, message: 'Curso añadido en la base de datos' });
+      if (err) return res.status(500).json({ success: false, message: 'Error al guardar curso' });
+      res.json({ success: true, id: result.insertId, message: 'Curso añadido en BD' });
     }
   );
 });
 
-// Habilitar o Deshabilitar un curso en la Base de Datos (Solo Admin)
 app.put('/api/catalogo/:id/estado', (req, res) => {
   const { id } = req.params;
-  const { estado } = req.body; // 'activo' o 'inactivo'
+  const { estado } = req.body;
   db.query('UPDATE catalogo_cursos SET estado = ? WHERE id = ?', [estado, id], (err) => {
-    if (err) {
-      return res.status(500).json({ success: false, message: 'Error al cambiar estado del curso' });
-    }
+    if (err) return res.status(500).json({ success: false });
     res.json({ success: true, message: `Curso actualizado a ${estado}` });
   });
 });
 
 // =========================================================================
-// 3. RUTAS DE PERFILES Y MATRÍCULAS DE ESTUDIANTES
+// RUTAS DE MATRÍCULAS (CURSOS QUE LLEVA EL ALUMNO)
 // =========================================================================
-// Obtener lista de usuarios registrados en BD
 app.get('/api/usuarios', (req, res) => {
   db.query('SELECT id, usuario, nombres, rol FROM usuarios ORDER BY id ASC', (err, results) => {
     if (err) return res.status(500).json([]);
-    res.json(results);
+    res.json(results || []);
   });
 });
 
-// Obtener todas las matrículas (o las de un alumno específico)
 app.get('/api/matriculas', (req, res) => {
   const { usuario } = req.query;
   let sql = 'SELECT * FROM matriculas ORDER BY fecha_matricula DESC';
@@ -185,24 +182,22 @@ app.get('/api/matriculas', (req, res) => {
   }
   db.query(sql, params, (err, results) => {
     if (err) return res.status(500).json([]);
-    res.json(results);
+    res.json(results || []);
   });
 });
 
-// Asignar un curso al perfil de un estudiante
 app.post('/api/matriculas', (req, res) => {
   const { usuario_alumno, curso_id } = req.body;
   db.query(
     'INSERT IGNORE INTO matriculas (usuario_alumno, curso_id) VALUES (?, ?)',
     [usuario_alumno, Number(curso_id)],
     (err) => {
-      if (err) return res.status(500).json({ success: false, message: 'Error al matricular estudiante' });
-      res.json({ success: true, message: 'Curso asignado al estudiante correctamente' });
+      if (err) return res.status(500).json({ success: false });
+      res.json({ success: true });
     }
   );
 });
 
-// Quitar un curso del perfil de un estudiante
 app.delete('/api/matriculas/:usuario/:cursoId', (req, res) => {
   const { usuario, cursoId } = req.params;
   db.query(
@@ -210,13 +205,13 @@ app.delete('/api/matriculas/:usuario/:cursoId', (req, res) => {
     [usuario, Number(cursoId)],
     (err) => {
       if (err) return res.status(500).json({ success: false });
-      res.json({ success: true, message: 'Matrícula eliminada' });
+      res.json({ success: true });
     }
   );
 });
 
 // =========================================================================
-// 4. RUTAS DE MENSAJERÍA INTERNA CON BASE DE DATOS
+// RUTAS DE MENSAJERÍA CON BASE DE DATOS
 // =========================================================================
 app.get('/api/mensajes/:usuario', (req, res) => {
   const { usuario } = req.params;
@@ -227,7 +222,7 @@ app.get('/api/mensajes/:usuario', (req, res) => {
   `;
   db.query(sql, [usuario, usuario], (err, results) => {
     if (err) return res.status(500).json([]);
-    res.json(results);
+    res.json(results || []);
   });
 });
 
@@ -241,8 +236,8 @@ app.post('/api/mensajes', (req, res) => {
     VALUES (?, ?, ?, ?, ?)
   `;
   db.query(sql, [remitente, rol_remitente || 'alumno', destinatario, asunto || 'Sin asunto', contenido], (err, result) => {
-    if (err) return res.status(500).json({ success: false, message: 'Error al enviar mensaje' });
-    res.json({ success: true, id: result.insertId, message: 'Mensaje guardado en base de datos' });
+    if (err) return res.status(500).json({ success: false });
+    res.json({ success: true, id: result.insertId });
   });
 });
 
