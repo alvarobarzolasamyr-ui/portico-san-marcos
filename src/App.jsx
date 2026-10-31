@@ -5,7 +5,7 @@ import PdfFlipbook from './components/PdfFlipbook';
 const API_BASE = 'https://portico-san-marcos.onrender.com/api';
 const WHATSAPP_NUMERO = '51967107035';
 
-// USUARIOS BASE DE RESPALDO (Se fusionan con los nuevos creados en la BD Aiven)
+// USUARIOS BASE DE RESPALDO (Se fusionan automáticamente con los de la BD Aiven)
 const USUARIOS_BASE_SISTEMA = [
   { id: 1, usuario: 'admin', nombres: 'Administrador General', rol: 'admin', estado: 'activo' },
   { id: 2, usuario: 'cendoza', nombres: 'Carlos Mendoza', rol: 'docente', estado: 'activo' },
@@ -190,7 +190,7 @@ const CATALOGO_INICIAL = [
     descripcion: 'Diseño de circuitos secuenciales por método cascada, válvulas direccionales y control por relés en FluidSIM.',
     precio: 105.00,
     duracion: '4 Semanas (16 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&q=80',
+    imagen_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/2f_ca121kFQ',
     temario: [
       'Módulo 1: Tratamiento del aire comprimido y unidad de mantenimiento FRL',
@@ -379,7 +379,6 @@ export default function App() {
       const res = await fetch(`${API_BASE}/usuarios`);
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
-        // Fusionar los usuarios de Aiven con los base para que nunca falte ninguno
         const mapa = new Map();
         USUARIOS_BASE_SISTEMA.forEach(u => mapa.set(u.usuario.toLowerCase(), u));
         data.forEach(u => {
@@ -788,6 +787,9 @@ export default function App() {
     if (ref && ref.current) ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  // =========================================================================
+  // BANNERS HERO PRINCIPALES (3 TÍTULOS CON IMÁGENES VERIFICADAS Y BOLITAS)
+  // =========================================================================
   const [bannerActual, setBannerActual] = useState(0);
   const bannersHero = [
     {
@@ -796,28 +798,28 @@ export default function App() {
       subtitulo: 'Formación de alto impacto para el futuro.',
       statsNum: '+ 35 MIL',
       statsTxt: 'Estudiantes Registrados',
-      img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop'
+      img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'
     },
     {
       tag: 'BIBLIOTECA VIRTUAL & LIBROS INTERACTIVOS',
       titulo: 'Accede a Textos y Manuales Técnicos,',
-      subtitulo: 'Visor estilo Flipbook digital para tus estudios.',
+      subtitulo: 'Visor estilo Flipbook 3D digital para tus estudios.',
       statsNum: '100%',
       statsTxt: 'Material Digital Gratuito',
-      img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=800&auto=format&fit=crop'
+      img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1000&auto=format&fit=crop'
     },
     {
-      tag: 'LABORATORIOS DE AUTOMATIZACIÓN Y ROBÓRTICA',
+      tag: 'LABORATORIOS DE AUTOMATIZACIÓN Y ROBÓTICA',
       titulo: 'Sesiones Prácticas en Banco de Pruebas,',
       subtitulo: 'Infraestructura acreditada de primer nivel.',
       statsNum: '+ 150',
       statsTxt: 'Prácticas Habilitadas',
-      img: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=800&auto=format&fit=crop'
+      img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop'
     }
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => setBannerActual((prev) => (prev + 1) % bannersHero.length), 5000);
+    const interval = setInterval(() => setBannerActual((prev) => (prev + 1) % bannersHero.length), 5500);
     return () => clearInterval(interval);
   }, [bannersHero.length]);
 
@@ -829,7 +831,7 @@ export default function App() {
     { id: 1, titulo: 'Manual de Automatización e Industria 4.0 con TIA Portal', autor: 'Ing. Carlos Mendoza', categoria: 'ingenieria', portada: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600&auto=format&fit=crop', pdfUrl: '/manual_plc.pdf' },
     { id: 2, titulo: 'Arquitectura Limpia y Microservicios con Node.js', autor: 'Dr. Roberto Gómez', categoria: 'programacion', portada: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop', pdfUrl: '/node_microservicios.pdf' },
     { id: 3, titulo: 'Guía Práctica de Robótica e IoT con ESP32', autor: 'Ing. Fabrizio Barzola', categoria: 'mecatronica', portada: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=600&auto=format&fit=crop', pdfUrl: '/guia_esp32.pdf' },
-    { id: 4, titulo: 'Fundamentos de Neumática e Hidráulica ISO 1219', autor: 'Ing. Luis Alvarado', categoria: 'mecatronica', portada: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=600&auto=format&fit=crop', pdfUrl: '/neumatica_iso1219.pdf' }
+    { id: 4, titulo: 'Fundamentos de Neumática e Hidráulica ISO 1219', autor: 'Ing. Luis Alvarado', categoria: 'mecatronica', portada: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=600&auto=format&fit=crop', pdfUrl: '/neumatica_iso1219.pdf' }
   ];
 
   const docentesDestacados = [
@@ -853,7 +855,7 @@ export default function App() {
     return coincideModalidad && coincideCategoria && coincideBusqueda;
   });
 
-  // Filtrado de contactos y mensajes para el Chat Moderno
+  // Filtrado de contactos y mensajes para el Chat Moderno Oscuro
   const contactosChat = listaUsuarios.filter(u =>
     u.usuario !== usernameActual &&
     (u.nombres.toLowerCase().includes(busquedaContactoChat.toLowerCase()) ||
@@ -868,17 +870,14 @@ export default function App() {
     const activo = (contactoActivoChat || '').toLowerCase();
 
     if (activo === 'todos') {
-      // Si el Admin tiene activada la Supervisión Global en el canal general, ve absolutamente todos los mensajes (incluyendo alumno <-> docente)
       if (esAdmin && modoSupervisionAdmin) return true;
       return dest === 'todos';
     }
 
-    // Si es Admin con Supervisión Global activa, al hacer clic en un docente o alumno ve todo lo que ese usuario envió o recibió
     if (esAdmin && modoSupervisionAdmin) {
       return rem === activo || dest === activo;
     }
 
-    // Conversación directa 1 a 1 entre el usuario actual y el contacto seleccionado
     return (rem === yo && dest === activo) || (rem === activo && dest === yo);
   });
 
@@ -900,33 +899,33 @@ export default function App() {
 
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#0f172a', color: '#f8fafc', fontFamily: 'system-ui, sans-serif' }}>
-        <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #1e293b', padding: '14px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <h1 style={{ margin: '0', fontSize: '22px', color: '#38bdf8', fontWeight: 'bold' }}>Aula Virtual Pórtico San Marcos</h1>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button onClick={() => setCarritoAbierto(true)} style={{ background: '#1e293b', color: '#fff', border: '1px solid #334155', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-              🛒 Mi Carrito {carrito.length > 0 && <span style={{ background: '#ef4444', marginLeft: '6px', padding: '2px 8px', borderRadius: '999px', fontSize: '12px' }}>{carrito.length}</span>}
+        <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #1e293b', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <h1 style={{ margin: '0', fontSize: '20px', color: '#38bdf8', fontWeight: 'bold' }}>Aula Virtual Pórtico San Marcos</h1>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <button onClick={() => setCarritoAbierto(true)} style={{ background: '#1e293b', color: '#fff', border: '1px solid #334155', padding: '9px 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
+              🛒 Mi Carrito {carrito.length > 0 && <span style={{ background: '#ef4444', marginLeft: '6px', padding: '2px 8px', borderRadius: '999px', fontSize: '11px' }}>{carrito.length}</span>}
             </button>
-            <button onClick={() => setMostrarModalLogin(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+            <button onClick={() => setMostrarModalLogin(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '9px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
               🔐 Ingresar al Aula
             </button>
           </div>
         </header>
 
-        <section style={{ textAlign: 'center', padding: '50px 20px 30px', maxWidth: '850px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '34px', color: '#fff', marginBottom: '12px', fontWeight: '800' }}>Catálogo de Cursos de Ingeniería Mecatrónica</h2>
-          <p style={{ color: '#94a3b8', fontSize: '16px', lineHeight: '1.6', margin: '0 0 25px 0' }}>
+        <section style={{ textAlign: 'center', padding: '44px 18px 26px', maxWidth: '850px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', color: '#fff', marginBottom: '12px', fontWeight: '800' }}>Catálogo de Cursos de Ingeniería Mecatrónica</h2>
+          <p style={{ color: '#94a3b8', fontSize: '15px', lineHeight: '1.6', margin: '0 0 22px 0' }}>
             Explora el temario oficial, visualiza una clase demostrativa de cada especialidad y agrega los cursos de tu interés al carrito para coordinar tu matrícula directamente por WhatsApp.
           </p>
-          <input type="text" placeholder="🔍 Buscar curso de Robótica, PLC, CAD, Python, PCB..." value={busquedaTienda} onChange={(e) => setBusquedaTienda(e.target.value)} style={{ width: '100%', maxWidth: '520px', padding: '12px 18px', borderRadius: '99px', background: '#1e293b', color: '#fff', border: '1px solid #334155', outline: 'none' }} />
+          <input type="text" placeholder="🔍 Buscar curso de Robótica, PLC, CAD, Python, PCB..." value={busquedaTienda} onChange={(e) => setBusquedaTienda(e.target.value)} style={{ width: '100%', maxWidth: '520px', padding: '12px 18px', borderRadius: '99px', background: '#1e293b', color: '#fff', border: '1px solid #334155', outline: 'none', boxSizing: 'border-box' }} />
         </section>
 
-        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', padding: '0 20px 30px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', padding: '0 16px 28px' }}>
           {categoriasTienda.map(cat => (
-            <button key={cat} onClick={() => setCatTiendaActiva(cat)} style={{ padding: '8px 16px', borderRadius: '99px', background: catTiendaActiva === cat ? '#2563eb' : '#1e293b', color: '#fff', border: '1px solid #334155', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>{cat}</button>
+            <button key={cat} onClick={() => setCatTiendaActiva(cat)} style={{ padding: '8px 15px', borderRadius: '99px', background: catTiendaActiva === cat ? '#2563eb' : '#1e293b', color: '#fff', border: '1px solid #334155', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>{cat}</button>
           ))}
         </div>
 
-        <main style={{ maxWidth: '1260px', margin: '0 auto', padding: '0 20px 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '24px' }}>
+        <main style={{ maxWidth: '1260px', margin: '0 auto', padding: '0 16px 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '22px' }}>
           {cursosTiendaFiltrados.map(curso => (
             <div key={curso.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 25px rgba(0,0,0,0.25)' }}>
               <div style={{ position: 'relative', height: '185px' }}>
@@ -953,19 +952,19 @@ export default function App() {
 
         {/* MODAL DEL VIDEO DEMO Y SÍLABO COMPLETO */}
         {cursoDemoModal && (
-          <div onClick={() => setCursoDemoModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', maxWidth: '680px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '24px', position: 'relative' }}>
+          <div onClick={() => setCursoDemoModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '16px' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', maxWidth: '680px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '22px', position: 'relative' }}>
               <button onClick={() => setCursoDemoModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar ✕</button>
               <span style={{ color: '#38bdf8', fontSize: '12px', fontWeight: 'bold' }}>{cursoDemoModal.categoria}</span>
-              <h2 style={{ color: '#fff', margin: '4px 0 14px 0', fontSize: '22px' }}>{cursoDemoModal.titulo}</h2>
-              <iframe src={cursoDemoModal.video_demo_url} title="demo" style={{ width: '100%', height: '350px', border: 'none', borderRadius: '8px', background: '#000', marginBottom: '15px' }} allowFullScreen />
+              <h2 style={{ color: '#fff', margin: '4px 0 14px 0', fontSize: '20px', paddingRight: '70px' }}>{cursoDemoModal.titulo}</h2>
+              <iframe src={cursoDemoModal.video_demo_url} title="demo" style={{ width: '100%', height: '310px', border: 'none', borderRadius: '8px', background: '#000', marginBottom: '15px' }} allowFullScreen />
               <h4 style={{ color: '#38bdf8', margin: '0 0 10px 0', fontSize: '15px' }}>📋 Sílabo y Temario del Curso:</h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {(Array.isArray(cursoDemoModal.temario) ? cursoDemoModal.temario : []).map((mod, i) => (
                   <li key={i} style={{ background: '#0f172a', padding: '10px 14px', borderRadius: '8px', borderLeft: '4px solid #2563eb', fontSize: '13px', color: '#e2e8f0' }}>{mod}</li>
                 ))}
               </ul>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #334155', paddingTop: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #334155', paddingTop: '16px', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
                   <span style={{ fontSize: '12px', color: '#94a3b8', display: 'block' }}>Inversión del curso:</span>
                   <strong style={{ fontSize: '24px', color: '#34d399' }}>S/ {Number(cursoDemoModal.precio).toFixed(2)}</strong>
@@ -1028,7 +1027,7 @@ export default function App() {
         {/* MODAL DE LOGIN */}
         {mostrarModalLogin && (
           <div onClick={() => setMostrarModalLogin(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)', zIndex: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', padding: '38px 30px', borderRadius: '16px', width: '100%', maxWidth: '420px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#1e293b', border: '1px solid #334155', padding: '34px 26px', borderRadius: '16px', width: '100%', maxWidth: '420px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
               <button onClick={() => setMostrarModalLogin(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
               <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <h2 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '24px', fontWeight: '800' }}>Pórtico San Marcos</h2>
@@ -1058,59 +1057,303 @@ export default function App() {
   }
 
   // =========================================================================
-  // VISTA 2: INTERIOR DEL AULA VIRTUAL
+  // VISTA 2: INTERIOR DEL AULA VIRTUAL (PC Y CELULAR OPTIMIZADOS)
   // =========================================================================
   return (
     <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
       
-      {/* NAVBAR INTERNO */}
-      <header style={{ width: '100%', background: '#091e42', color: '#fff', padding: '15px 25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 1000, flexWrap: 'wrap', boxSizing: 'border-box' }}>
-        <div>
-          <h2 style={{ margin: 0, fontSize: '18px', color: '#38bdf8', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
-          <span style={{ fontSize: '11px', color: '#94a3b8' }}>Aula Virtual & Biblioteca 3D</span>
+      {/* ESTILOS RESPONSIVOS INTEGRADOS PARA PC Y CELULAR */}
+      <style>{`
+        .psm-navbar {
+          width: 100%;
+          background: #091e42;
+          color: #fff;
+          padding: 14px 28px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+          box-sizing: border-box;
+        }
+        .psm-nav-links {
+          display: flex;
+          gap: 18px;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+        .psm-hamburger {
+          display: none;
+          background: #1e293b;
+          color: #38bdf8;
+          border: 1px solid #334155;
+          padding: 8px 12px;
+          border-radius: 8px;
+          font-size: 15px;
+          font-weight: bold;
+          cursor: pointer;
+        }
+        /* BANNER PRINCIPAL MÁS GRANDE EN PC CON BOLITAS INDICADORAS */
+        .psm-hero-wrapper {
+          position: relative;
+          background: linear-gradient(125deg, #061539 0%, #0d2b6b 52%, #1d4ed8 100%);
+          border-radius: 22px;
+          padding: 48px 54px 56px 54px;
+          min-height: 390px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 36px;
+          color: #ffffff;
+          box-shadow: 0 22px 45px rgba(9, 30, 66, 0.22);
+          overflow: hidden;
+          box-sizing: border-box;
+        }
+        .psm-hero-text {
+          flex: 1.15;
+          z-index: 2;
+        }
+        .psm-hero-title {
+          font-size: clamp(28px, 3.3vw, 44px);
+          line-height: 1.18;
+          margin: 16px 0 18px 0;
+          font-weight: 800;
+          color: #ffffff;
+        }
+        .psm-hero-image-box {
+          flex: 0.95;
+          display: flex;
+          justify-content: flex-end;
+          z-index: 2;
+        }
+        .psm-hero-image-box img {
+          width: 100%;
+          max-width: 490px;
+          height: 300px;
+          object-fit: cover;
+          border-radius: 16px;
+          box-shadow: 0 16px 35px rgba(0,0,0,0.45);
+          border: 2px solid rgba(255,255,255,0.18);
+        }
+        .psm-hero-dots {
+          position: absolute;
+          bottom: 18px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 12px;
+          z-index: 5;
+          background: rgba(15, 23, 42, 0.45);
+          padding: 7px 16px;
+          border-radius: 999px;
+          backdrop-filter: blur(6px);
+        }
+        .psm-hero-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 999px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          padding: 0;
+        }
+        /* CHAT OSCURO UNIFICADO PARA PC Y CELULAR */
+        .psm-chat-grid {
+          display: grid;
+          grid-template-columns: 330px 1fr;
+          background: #0b1120;
+          border-radius: 16px;
+          border: 1px solid #1e293b;
+          overflow: hidden;
+          box-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
+          min-height: 580px;
+        }
+        .psm-chat-sidebar {
+          background: #0f172a;
+          color: #f8fafc;
+          display: flex;
+          flex-direction: column;
+          border-right: 1px solid #1e293b;
+          height: 580px;
+        }
+        .psm-chat-main {
+          display: flex;
+          flex-direction: column;
+          background: #111827;
+          color: #f8fafc;
+          height: 580px;
+        }
+        /* OPTIMIZACIÓN PARA CELULARES */
+        @media (max-width: 900px) {
+          .psm-navbar {
+            padding: 12px 16px;
+          }
+          .psm-hamburger {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+          }
+          .psm-nav-links {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #1e293b;
+          }
+          .psm-nav-links.abierto {
+            display: flex;
+          }
+          .psm-nav-links button {
+            text-align: left;
+            padding: 10px 12px !important;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05) !important;
+          }
+          .psm-user-box {
+            margin-left: 0 !important;
+            justify-content: space-between;
+            background: #0f172a;
+            padding: 10px 14px;
+            border-radius: 8px;
+          }
+          .psm-hero-wrapper {
+            flex-direction: column;
+            padding: 24px 18px 54px 18px;
+            min-height: auto;
+            text-align: center;
+            gap: 20px;
+            border-radius: 16px;
+          }
+          .psm-hero-title {
+            font-size: 24px;
+            margin: 12px 0;
+          }
+          .psm-hero-stats {
+            margin: 12px auto 0 auto !important;
+          }
+          .psm-hero-image-box {
+            width: 100%;
+            justify-content: center;
+          }
+          .psm-hero-image-box img {
+            height: 200px;
+            max-width: 100%;
+          }
+          .psm-chat-grid {
+            grid-template-columns: 1fr;
+            min-height: auto;
+          }
+          .psm-chat-sidebar {
+            height: 250px;
+            border-right: none;
+            border-bottom: 1px solid #1e293b;
+          }
+          .psm-chat-main {
+            height: 460px;
+          }
+        }
+      `}</style>
+
+      {/* NAVBAR SUPERIOR INTERNO (ORDENADO EN PC Y CON MENÚ DESPLEGABLE EN CELULAR) */}
+      <header className="psm-navbar">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: '18px', color: '#38bdf8', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
+            <span style={{ fontSize: '11px', color: '#94a3b8' }}>Aula Virtual & Biblioteca 3D</span>
+          </div>
+
+          <button className="psm-hamburger" onClick={() => setMenuMovilAbierto(!menuMovilAbierto)}>
+            {menuMovilAbierto ? '✕ Cerrar' : '☰ Menú'}
+          </button>
         </div>
-        <nav style={{ display: 'flex', gap: '18px', alignItems: 'center', flexWrap: 'wrap' }}>
+
+        <nav className={`psm-nav-links ${menuMovilAbierto ? 'abierto' : ''}`}>
           <button onClick={() => irASeccion(seccionInicioRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Inicio</button>
-          {rolUsuario === 'alumno' && <button onClick={() => irASeccion(seccionPerfilRef)} style={{ background: 'none', border: 'none', color: '#38bdf8', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Mi Perfil y Cursos</button>}
+          {rolUsuario === 'alumno' && (
+            <button onClick={() => irASeccion(seccionPerfilRef)} style={{ background: 'none', border: 'none', color: '#38bdf8', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Mi Perfil y Cursos</button>
+          )}
           <button onClick={() => irASeccion(seccionCursosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>
             {puedeGestionarCursos ? 'Administrar Cursos' : 'Catálogo'}
           </button>
-          {rolUsuario === 'alumno' && <button onClick={() => irASeccion(seccionDocentesRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Docentes</button>}
+          {rolUsuario === 'alumno' && (
+            <button onClick={() => irASeccion(seccionDocentesRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Docentes</button>
+          )}
           <button onClick={() => irASeccion(seccionBibliotecaRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Biblioteca 3D</button>
-          <button onClick={() => irASeccion(seccionMensajesRef)} style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', padding: '6px 12px', borderRadius: '99px', color: '#34d399', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
+          <button onClick={() => irASeccion(seccionMensajesRef)} style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', padding: '6px 12px', borderRadius: '99px', color: '#34d399', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap' }}>
             💬 Chat en Vivo ({mensajesBD.length})
           </button>
-          {esAdmin && <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios y Matrículas</button>}
+          {esAdmin && (
+            <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios y Matrículas</button>
+          )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginLeft: '10px' }}>
+          <div className="psm-user-box" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginLeft: '10px' }}>
             <div style={{ textAlign: 'right' }}>
               <span style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#fff' }}>{usuarioLogueado}</span>
               <span style={{ fontSize: '11px', color: '#38bdf8', textTransform: 'uppercase', fontWeight: 'bold' }}>{rolUsuario}</span>
             </div>
-            <button onClick={cerrarSesion} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>Cerrar Sesión</button>
+            <button onClick={cerrarSesion} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', whiteSpace: 'nowrap' }}>
+              Cerrar Sesión
+            </button>
           </div>
         </nav>
       </header>
 
-      <main style={{ flex: 1, padding: '30px 0', display: 'flex', flexDirection: 'column', gap: '40px', width: '100%' }}>
+      <main style={{ flex: 1, padding: '26px 0', display: 'flex', flexDirection: 'column', gap: '38px', width: '100%' }}>
         
-        {/* SECCIÓN 1: HERO BANNER */}
+        {/* ========================================================================= */}
+        {/* SECCIÓN 1: BANNER PRINCIPAL AMPLIADO CON BOLITAS INTERACTIVAS             */}
+        {/* ========================================================================= */}
         <div ref={seccionInicioRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
-            <div className="focus-hero-banner-main">
-              <div className="hero-banner-content">
-                <span style={{ background: 'rgba(255,255,255,0.15)', color: '#38bdf8', padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>
+            <div className="psm-hero-wrapper">
+              <div className="psm-hero-text">
+                <span style={{ display: 'inline-block', background: 'rgba(255,255,255,0.14)', color: '#38bdf8', padding: '7px 16px', borderRadius: '99px', fontSize: '12px', fontWeight: 'bold', letterSpacing: '0.4px' }}>
                   {bannersHero[bannerActual].tag} ({rolUsuario.toUpperCase()})
                 </span>
-                <h1>{bannersHero[bannerActual].titulo}<br /><span style={{ color: '#38bdf8' }}>{bannersHero[bannerActual].subtitulo}</span></h1>
-                <div className="hero-stats-badge" style={{ marginTop: '20px', display: 'flex', gap: '20px', background: 'rgba(255,255,255,0.1)', padding: '12px 20px', borderRadius: '12px', backdropFilter: 'blur(10px)', width: 'fit-content' }}>
+                <h1 className="psm-hero-title">
+                  {bannersHero[bannerActual].titulo}<br />
+                  <span style={{ color: '#38bdf8' }}>{bannersHero[bannerActual].subtitulo}</span>
+                </h1>
+                <div className="psm-hero-stats" style={{ marginTop: '20px', display: 'flex', gap: '20px', background: 'rgba(15, 23, 42, 0.45)', border: '1px solid rgba(255,255,255,0.15)', padding: '12px 22px', borderRadius: '12px', backdropFilter: 'blur(10px)', width: 'fit-content' }}>
                   <div>
-                    <strong style={{ fontSize: '20px', color: '#fff', display: 'block' }}>{bannersHero[bannerActual].statsNum}</strong>
+                    <strong style={{ fontSize: '22px', color: '#fff', display: 'block' }}>{bannersHero[bannerActual].statsNum}</strong>
                     <span style={{ fontSize: '12px', color: '#cbd5e1' }}>{bannersHero[bannerActual].statsTxt}</span>
                   </div>
                 </div>
               </div>
-              <div className="hero-banner-image"><img src={bannersHero[bannerActual].img} alt="Hero Banner" /></div>
+
+              <div className="psm-hero-image-box">
+                <img
+                  src={bannersHero[bannerActual].img}
+                  alt={bannersHero[bannerActual].titulo}
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop';
+                  }}
+                />
+              </div>
+
+              {/* BOLITAS INDICADORAS PARA CAMBIAR ENTRE LOS DISTINTOS TÍTULOS DEL BANNER */}
+              <div className="psm-hero-dots">
+                {bannersHero.map((b, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    aria-label={`Ver banner ${idx + 1}`}
+                    onClick={() => setBannerActual(idx)}
+                    className="psm-hero-dot"
+                    style={{
+                      width: bannerActual === idx ? '30px' : '11px',
+                      background: bannerActual === idx ? '#38bdf8' : 'rgba(255,255,255,0.45)',
+                      boxShadow: bannerActual === idx ? '0 0 10px rgba(56, 189, 248, 0.8)' : 'none'
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -1119,12 +1362,12 @@ export default function App() {
         {rolUsuario === 'alumno' && (
           <div ref={seccionPerfilRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '14px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }}>
-                <h2 style={{ fontSize: '22px', color: '#0f172a', margin: '0 0 20px 0', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>🎓 MI PERFIL DE ESTUDIANTE: CURSOS MATRICULADOS</h2>
+              <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '14px', padding: '22px', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }}>
+                <h2 style={{ fontSize: '20px', color: '#0f172a', margin: '0 0 18px 0', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>🎓 MI PERFIL DE ESTUDIANTE: CURSOS MATRICULADOS</h2>
                 {misCursosMatriculados.length === 0 ? (
                   <p style={{ color: '#64748b', fontSize: '14px' }}>Aún no tienes cursos asignados en tu ficha de matrícula. Comunícate con el Administrador por el Chat en Vivo.</p>
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '16px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(275px, 1fr))', gap: '16px' }}>
                     {misCursosMatriculados.map(curso => (
                       <div key={curso.id} style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderLeft: '5px solid #2563eb', borderRadius: '10px', padding: '16px' }}>
                         <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold' }}>{curso.categoria} • {curso.tipo || 'Virtual'}</span>
@@ -1154,7 +1397,7 @@ export default function App() {
         <div ref={seccionCursosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>{puedeGestionarCursos ? 'ADMINISTRACIÓN DE CURSOS EN BASE DE DATOS' : 'MIS CLASES & LABORATORIOS'}</h2>
+              <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>{puedeGestionarCursos ? 'ADMINISTRACIÓN DE CURSOS EN BASE DE DATOS' : 'MIS CLASES & LABORATORIOS'}</h2>
               {puedeGestionarCursos && (
                 <button onClick={() => setModalNuevoCurso(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                   + Añadir Nuevo Curso a BD
@@ -1163,22 +1406,22 @@ export default function App() {
             </div>
 
             {/* BARRA DE FILTROS VIRTUAL / PRESENCIAL */}
-            <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '25px' }}>
-              <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <button onClick={() => { setModalidadFiltro('virtual'); setVideoActivo(null); setLaboratorioSeleccionado(null); }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'virtual' ? '#2563eb' : '#f1f5f9', color: modalidadFiltro === 'virtual' ? '#fff' : '#334155' }}>
+            <div style={{ background: '#fff', padding: '16px', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '25px' }}>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <button onClick={() => { setModalidadFiltro('virtual'); setVideoActivo(null); setLaboratorioSeleccionado(null); }} style={{ padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'virtual' ? '#2563eb' : '#f1f5f9', color: modalidadFiltro === 'virtual' ? '#fff' : '#334155', fontSize: '13px' }}>
                   Modalidad Virtual ({cursosCatalogo.filter(c => (c.tipo || 'Virtual') === 'Virtual' && (puedeGestionarCursos || c.estado !== 'inactivo')).length})
                 </button>
-                <button onClick={() => { setModalidadFiltro('presencial'); setVideoActivo(null); setLaboratorioSeleccionado(null); }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'presencial' ? '#059669' : '#f1f5f9', color: modalidadFiltro === 'presencial' ? '#fff' : '#334155' }}>
+                <button onClick={() => { setModalidadFiltro('presencial'); setVideoActivo(null); setLaboratorioSeleccionado(null); }} style={{ padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'presencial' ? '#059669' : '#f1f5f9', color: modalidadFiltro === 'presencial' ? '#fff' : '#334155', fontSize: '13px' }}>
                   Modalidad Presencial ({cursosCatalogo.filter(c => c.tipo === 'Presencial' && (puedeGestionarCursos || c.estado !== 'inactivo')).length})
                 </button>
-                <input type="text" placeholder="🔍 Buscar clase o profesor..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ marginLeft: 'auto', padding: '10px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', minWidth: '240px' }} />
+                <input type="text" placeholder="🔍 Buscar clase o profesor..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ flex: 1, minWidth: '220px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }} />
               </div>
             </div>
 
             {videoActivo && (
               <div style={{ background: '#0f172a', padding: '20px', borderRadius: '12px', color: '#fff', marginBottom: '30px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                  <h3 style={{ margin: 0, color: '#38bdf8' }}>Reproduciendo Sesión: {videoActivo.titulo}</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
+                  <h3 style={{ margin: 0, color: '#38bdf8', fontSize: '16px' }}>Reproduciendo Sesión: {videoActivo.titulo}</h3>
                   <button onClick={() => setVideoActivo(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar Video</button>
                 </div>
                 <video controls autoPlay style={{ width: '100%', maxHeight: '420px', borderRadius: '8px', background: '#000' }}>
@@ -1233,7 +1476,7 @@ export default function App() {
           <div ref={seccionDocentesRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
               <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
-                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>DOCENTES & INSTRUCTORES</h2>
+                <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>DOCENTES & INSTRUCTORES</h2>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                 {docentesDestacados.map(docente => (
@@ -1255,7 +1498,7 @@ export default function App() {
         <div ref={seccionBibliotecaRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
             <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
-              <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>BIBLIOTECA VIRTUAL (FLIPBOOK 3D)</h2>
+              <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>BIBLIOTECA VIRTUAL (FLIPBOOK 3D)</h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
               {listaLibros.map((libro) => (
@@ -1276,16 +1519,16 @@ export default function App() {
         </div>
 
         {/* ========================================================================= */}
-        {/* SECCIÓN 5: CHAT MODERNO EN TIEMPO REAL (ESTILO WHATSAPP WEB / SLACK)     */}
+        {/* SECCIÓN 5: CENTRO DE MENSAJERÍA EN TIEMPO REAL (TEMA OSCURO EN PC Y MÓVIL)*/}
         {/* ========================================================================= */}
         <div ref={seccionMensajesRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ background: '#0f172a', padding: '20px 24px', borderRadius: '16px 16px 0 0', border: '1px solid #1e293b', borderBottom: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>
+                <h2 style={{ fontSize: '20px', color: '#f8fafc', margin: 0, fontWeight: '800' }}>
                   💬 CENTRO DE MENSAJERÍA EN TIEMPO REAL
                 </h2>
-                <span style={{ fontSize: '12px', color: '#059669', fontWeight: 'bold' }}>
+                <span style={{ fontSize: '12px', color: '#34d399', fontWeight: 'bold' }}>
                   ● Sincronización automática activa cada 3 segundos con Base de Datos Aiven
                 </span>
               </div>
@@ -1295,9 +1538,9 @@ export default function App() {
                   type="button"
                   onClick={() => setModoSupervisionAdmin(!modoSupervisionAdmin)}
                   style={{
-                    background: modoSupervisionAdmin ? '#0f172a' : '#e2e8f0',
-                    color: modoSupervisionAdmin ? '#38bdf8' : '#334155',
-                    border: '1px solid #334155',
+                    background: modoSupervisionAdmin ? '#1e293b' : '#334155',
+                    color: modoSupervisionAdmin ? '#38bdf8' : '#cbd5e1',
+                    border: '1px solid #475569',
                     padding: '8px 14px',
                     borderRadius: '8px',
                     fontSize: '12px',
@@ -1305,18 +1548,18 @@ export default function App() {
                     cursor: 'pointer'
                   }}
                 >
-                  {modoSupervisionAdmin ? '👁️ Supervisión Global Admin: ACTIVA (Ves chats a Docentes)' : '👁️ Activar Supervisión Global Admin'}
+                  {modoSupervisionAdmin ? '👁️ Supervisión Global Admin: ACTIVA' : '👁️ Activar Supervisión Global Admin'}
                 </button>
               )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', background: '#ffffff', borderRadius: '16px', border: '1px solid #cbd5e1', overflow: 'hidden', boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08)', minHeight: '560px' }}>
+            <div className="psm-chat-grid" style={{ borderRadius: '0 0 16px 16px' }}>
               
               {/* COLUMNA IZQUIERDA: LISTA DE CONTACTOS */}
-              <div style={{ background: '#0f172a', color: '#f8fafc', display: 'flex', flexDirection: 'column', borderRight: '1px solid #1e293b' }}>
+              <div className="psm-chat-sidebar">
                 <div style={{ padding: '16px', borderBottom: '1px solid #1e293b' }}>
-                  <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '8px', fontWeight: 'bold' }}>
-                    CONECTADO COMO: <span style={{ color: '#38bdf8' }}>@{usernameActual} ({rolUsuario.toUpperCase()})</span>
+                  <div style={{ fontSize: '11px', color: '#38bdf8', marginBottom: '8px', fontWeight: 'bold', letterSpacing: '0.3px' }}>
+                    CONECTADO COMO: @{usernameActual} ({rolUsuario.toUpperCase()})
                   </div>
                   <input
                     type="text"
@@ -1327,7 +1570,7 @@ export default function App() {
                   />
                 </div>
 
-                <div style={{ flex: 1, overflowY: 'auto', maxHeight: '480px' }}>
+                <div style={{ flex: 1, overflowY: 'auto' }}>
                   {/* Canal General / Bandeja Global */}
                   <div
                     onClick={() => setContactoActivoChat('todos')}
@@ -1338,22 +1581,22 @@ export default function App() {
                       gap: '12px',
                       cursor: 'pointer',
                       borderBottom: '1px solid #1e293b',
-                      background: contactoActivoChat === 'todos' ? '#2563eb' : 'transparent',
+                      background: contactoActivoChat === 'todos' ? '#1e3a8a' : 'transparent',
                       transition: '0.15s'
                     }}
                   >
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px', flexShrink: 0 }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px', flexShrink: 0 }}>
                       📢
                     </div>
                     <div style={{ flex: 1, overflow: 'hidden' }}>
                       <div style={{ fontWeight: 'bold', fontSize: '14px', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {esAdmin && modoSupervisionAdmin ? 'Todos los Mensajes (Global)' : 'Canal General (@todos)'}
                       </div>
-                      <div style={{ fontSize: '11px', color: contactoActivoChat === 'todos' ? '#e0f2fe' : '#94a3b8' }}>
+                      <div style={{ fontSize: '11px', color: '#94a3b8' }}>
                         {esAdmin && modoSupervisionAdmin ? 'Incluye chats Alumno ↔ Docente' : 'Comunicados para toda el aula'}
                       </div>
                     </div>
-                    <span style={{ background: 'rgba(255,255,255,0.15)', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
+                    <span style={{ background: 'rgba(255,255,255,0.15)', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold', color: '#fff' }}>
                       {mensajesBD.length}
                     </span>
                   </div>
@@ -1362,7 +1605,7 @@ export default function App() {
                   {contactosChat.map(u => {
                     const seleccionado = contactoActivoChat.toLowerCase() === u.usuario.toLowerCase();
                     const iniciales = (u.nombres || u.usuario).slice(0, 2).toUpperCase();
-                    const colorAvatar = u.rol === 'admin' ? '#f59e0b' : u.rol === 'docente' ? '#38bdf8' : '#8b5cf6';
+                    const colorAvatar = u.rol === 'admin' ? '#991b1b' : u.rol === 'docente' ? '#0369a1' : '#6d28d9';
                     const cantMensajesConUsuario = mensajesBD.filter(m =>
                       (m.remitente || '').toLowerCase() === u.usuario.toLowerCase() ||
                       (m.destinatario || '').toLowerCase() === u.usuario.toLowerCase()
@@ -1379,21 +1622,21 @@ export default function App() {
                           gap: '12px',
                           cursor: 'pointer',
                           borderBottom: '1px solid #1e293b',
-                          background: seleccionado ? '#2563eb' : 'transparent',
+                          background: seleccionado ? '#1e3a8a' : 'transparent',
                           transition: '0.15s'
                         }}
                       >
-                        <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: colorAvatar, color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', fontSize: '13px', flexShrink: 0 }}>
+                        <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: colorAvatar, color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', fontSize: '13px', flexShrink: 0 }}>
                           {iniciales}
                         </div>
                         <div style={{ flex: 1, overflow: 'hidden' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <strong style={{ fontSize: '13px', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.nombres}</strong>
-                            <span style={{ fontSize: '10px', textTransform: 'uppercase', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.12)', color: '#cbd5e1', fontWeight: 'bold' }}>
+                            <span style={{ fontSize: '10px', textTransform: 'uppercase', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.1)', color: '#94a3b8', fontWeight: 'bold' }}>
                               {u.rol}
                             </span>
                           </div>
-                          <div style={{ fontSize: '11px', color: seleccionado ? '#e0f2fe' : '#94a3b8' }}>
+                          <div style={{ fontSize: '11px', color: '#94a3b8' }}>
                             @{u.usuario} {cantMensajesConUsuario > 0 ? `• ${cantMensajesConUsuario} msj` : ''}
                           </div>
                         </div>
@@ -1403,15 +1646,15 @@ export default function App() {
                 </div>
               </div>
 
-              {/* COLUMNA DERECHA: VENTANA DE CONVERSACIÓN E INPUT */}
-              <div style={{ display: 'flex', flexDirection: 'column', background: '#f8fafc', height: '560px' }}>
+              {/* COLUMNA DERECHA: VENTANA DE CONVERSACIÓN OSCURA IGUAL QUE EN CELULAR */}
+              <div className="psm-chat-main">
                 {/* Cabecera del Chat */}
-                <div style={{ padding: '14px 20px', background: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ padding: '14px 20px', background: '#161f33', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '16px', color: '#0f172a', fontWeight: 'bold' }}>
-                      {infoContactoSeleccionado.nombres} <span style={{ color: '#2563eb', fontSize: '13px' }}>(@{infoContactoSeleccionado.usuario})</span>
+                    <h3 style={{ margin: 0, fontSize: '16px', color: '#ffffff', fontWeight: 'bold' }}>
+                      {infoContactoSeleccionado.nombres} <span style={{ color: '#38bdf8', fontSize: '14px' }}>(@{infoContactoSeleccionado.usuario})</span>
                     </h3>
-                    <span style={{ fontSize: '12px', color: '#64748b' }}>
+                    <span style={{ fontSize: '12px', color: '#94a3b8' }}>
                       {esAdmin && modoSupervisionAdmin
                         ? 'Modo Supervisión Admin: Viendo mensajes directos y mensajes dirigidos a docentes'
                         : `Conversación directa con @${infoContactoSeleccionado.usuario}`}
@@ -1420,19 +1663,19 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => cargarMensajesDesdeBD(usernameActual)}
-                    style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold', color: '#0f172a' }}
+                    style={{ background: '#334155', border: '1px solid #475569', padding: '7px 14px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold', color: '#f8fafc' }}
                   >
                     ↻ Sincronizar Ahora
                   </button>
                 </div>
 
-                {/* Historial de Burbujas de Mensajes */}
-                <div ref={chatScrollRef} style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', background: '#f1f5f9' }}>
+                {/* Historial de Burbujas de Mensajes en Tema Oscuro */}
+                <div ref={chatScrollRef} style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', background: '#111827' }}>
                   {mensajesConversacionActiva.length === 0 ? (
-                    <div style={{ margin: 'auto', textAlign: 'center', color: '#64748b', maxWidth: '340px' }}>
+                    <div style={{ margin: 'auto', textAlign: 'center', color: '#94a3b8', maxWidth: '340px' }}>
                       <div style={{ fontSize: '36px', marginBottom: '8px' }}>💬</div>
-                      <strong style={{ display: 'block', color: '#334155', marginBottom: '4px' }}>Sin mensajes en esta vista todavía</strong>
-                      <span style={{ fontSize: '12px' }}>Escribe un mensaje abajo para iniciar la conversación en tiempo real con @{infoContactoSeleccionado.usuario}.</span>
+                      <strong style={{ display: 'block', color: '#e2e8f0', marginBottom: '4px' }}>Sin mensajes en esta conversación</strong>
+                      <span style={{ fontSize: '12px' }}>Escribe un mensaje abajo para conversar en tiempo real con @{infoContactoSeleccionado.usuario}.</span>
                     </div>
                   ) : (
                     mensajesConversacionActiva.map((m, idx) => {
@@ -1446,60 +1689,60 @@ export default function App() {
                           key={m.id || idx}
                           style={{
                             alignSelf: esMio ? 'flex-end' : 'flex-start',
-                            maxWidth: '75%',
-                            background: esMio ? '#2563eb' : '#ffffff',
-                            color: esMio ? '#ffffff' : '#0f172a',
+                            maxWidth: '78%',
+                            background: esMio ? '#1d4ed8' : '#1e293b',
+                            color: '#ffffff',
                             padding: '12px 16px',
                             borderRadius: esMio ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                            border: esMio ? 'none' : '1px solid #e2e8f0'
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                            border: esMio ? '1px solid #2563eb' : '1px solid #334155'
                           }}
                         >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '4px', fontSize: '11px', opacity: 0.9 }}>
-                            <strong style={{ color: esMio ? '#bae6fd' : '#2563eb' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '4px', fontSize: '11px' }}>
+                            <strong style={{ color: esMio ? '#93c5fd' : '#38bdf8' }}>
                               @{m.remitente} ({m.rol_remitente || 'usuario'}) ➔ @{m.destinatario}
                             </strong>
-                            <span>{horaFormateada}</span>
+                            <span style={{ color: '#cbd5e1' }}>{horaFormateada}</span>
                           </div>
                           {m.asunto && m.asunto !== 'Chat Académico' && (
-                            <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '4px', padding: '2px 6px', borderRadius: '4px', background: esMio ? 'rgba(255,255,255,0.15)' : '#f1f5f9', width: 'fit-content' }}>
+                            <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '4px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.12)', width: 'fit-content' }}>
                               📌 {m.asunto}
                             </div>
                           )}
-                          <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.45', wordBreak: 'break-word' }}>{m.contenido}</p>
+                          <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.45', wordBreak: 'break-word', color: '#f8fafc' }}>{m.contenido}</p>
                         </div>
                       );
                     })
                   )}
                 </div>
 
-                {/* Barra Inferior para Escribir y Enviar Mensaje */}
-                <form onSubmit={handleEnviarMensajeBD} style={{ padding: '14px 18px', background: '#ffffff', borderTop: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <span style={{ fontSize: '12px', color: '#475569', fontWeight: 'bold' }}>
-                      Enviando a: <strong style={{ color: '#2563eb' }}>@{contactoActivoChat}</strong>
+                {/* Barra Inferior Oscura para Escribir y Enviar Mensaje */}
+                <form onSubmit={handleEnviarMensajeBD} style={{ padding: '14px 18px', background: '#161f33', borderTop: '1px solid #1e293b', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '12px', color: '#cbd5e1', fontWeight: 'bold' }}>
+                      Para: <strong style={{ color: '#38bdf8' }}>@{contactoActivoChat}</strong>
                     </span>
                     <input
                       type="text"
-                      placeholder="Asunto opcional (ej. Consulta de laboratorio)..."
+                      placeholder="Asunto opcional..."
                       value={asuntoMsg}
                       onChange={e => setAsuntoMsg(e.target.value)}
-                      style={{ flex: 1, padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '12px', outline: 'none' }}
+                      style={{ flex: 1, minWidth: '150px', padding: '6px 10px', borderRadius: '6px', border: '1px solid #334155', background: '#0f172a', color: '#fff', fontSize: '12px', outline: 'none' }}
                     />
-                    {estadoEnvioMsg && <span style={{ fontSize: '12px', color: '#059669', fontWeight: 'bold' }}>{estadoEnvioMsg}</span>}
+                    {estadoEnvioMsg && <span style={{ fontSize: '12px', color: '#34d399', fontWeight: 'bold' }}>{estadoEnvioMsg}</span>}
                   </div>
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <input
                       type="text"
-                      placeholder={`Escribe un mensaje para @${contactoActivoChat} y presiona Enter...`}
+                      placeholder={`Escribe un mensaje para @${contactoActivoChat}...`}
                       value={contenidoMsg}
                       onChange={e => setContenidoMsg(e.target.value)}
                       required
-                      style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', outline: 'none' }}
+                      style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid #334155', background: '#0f172a', color: '#fff', fontSize: '14px', outline: 'none' }}
                     />
                     <button
                       type="submit"
-                      style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '0 22px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}
+                      style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '0 20px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px', whiteSpace: 'nowrap' }}
                     >
                       Enviar ➤
                     </button>
@@ -1516,8 +1759,8 @@ export default function App() {
         {esAdmin && (
           <div ref={seccionUsuariosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontSize: '24px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE PERFILES Y MATRÍCULAS (SOLO ADMIN)</h2>
+              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE PERFILES Y MATRÍCULAS (SOLO ADMIN)</h2>
                 <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>+ Nuevo Usuario en BD</button>
               </div>
 
