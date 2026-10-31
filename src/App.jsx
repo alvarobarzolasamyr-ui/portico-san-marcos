@@ -1077,12 +1077,23 @@ export default function App() {
           top: 0;
           z-index: 1000;
           box-sizing: border-box;
+          gap: 20px;
+        }
+        .psm-brand-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-shrink: 0;
         }
         .psm-nav-links {
           display: flex;
           gap: 18px;
           align-items: center;
-          flex-wrap: wrap;
+          justify-content: flex-end;
+          flex-wrap: nowrap;
+        }
+        .psm-nav-links button {
+          white-space: nowrap;
         }
         .psm-hamburger {
           display: none;
@@ -1189,6 +1200,12 @@ export default function App() {
         @media (max-width: 900px) {
           .psm-navbar {
             padding: 12px 16px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+          }
+          .psm-brand-row {
+            width: 100%;
           }
           .psm-hamburger {
             display: inline-flex;
@@ -1216,9 +1233,11 @@ export default function App() {
           }
           .psm-user-box {
             margin-left: 0 !important;
+            padding-left: 0 !important;
+            border-left: none !important;
             justify-content: space-between;
             background: #0f172a;
-            padding: 10px 14px;
+            padding: 10px 14px !important;
             border-radius: 8px;
           }
           .psm-hero-wrapper {
@@ -1259,12 +1278,12 @@ export default function App() {
         }
       `}</style>
 
-      {/* NAVBAR SUPERIOR INTERNO (ORDENADO EN PC Y CON MENÚ DESPLEGABLE EN CELULAR) */}
+      {/* NAVBAR SUPERIOR INTERNO (ALINEADO EN 1 SOLA FILA EN PC Y DESPLEGABLE EN CELULAR) */}
       <header className="psm-navbar">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+        <div className="psm-brand-row">
           <div>
-            <h2 style={{ margin: 0, fontSize: '18px', color: '#38bdf8', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
-            <span style={{ fontSize: '11px', color: '#94a3b8' }}>Aula Virtual & Biblioteca 3D</span>
+            <h2 style={{ margin: 0, fontSize: '18px', color: '#38bdf8', fontWeight: 'bold', whiteSpace: 'nowrap' }}>Pórtico San Marcos</h2>
+            <span style={{ fontSize: '11px', color: '#94a3b8', whiteSpace: 'nowrap', display: 'block' }}>Aula Virtual & Biblioteca 3D</span>
           </div>
 
           <button className="psm-hamburger" onClick={() => setMenuMovilAbierto(!menuMovilAbierto)}>
@@ -1291,10 +1310,10 @@ export default function App() {
             <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios y Matrículas</button>
           )}
 
-          <div className="psm-user-box" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginLeft: '10px' }}>
-            <div style={{ textAlign: 'right' }}>
-              <span style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#fff' }}>{usuarioLogueado}</span>
-              <span style={{ fontSize: '11px', color: '#38bdf8', textTransform: 'uppercase', fontWeight: 'bold' }}>{rolUsuario}</span>
+          <div className="psm-user-box" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginLeft: '6px', paddingLeft: '14px', borderLeft: '1px solid #1e293b', flexShrink: 0 }}>
+            <div style={{ textAlign: 'right', lineHeight: '1.2' }}>
+              <span style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#fff', whiteSpace: 'nowrap' }}>{usuarioLogueado}</span>
+              <span style={{ fontSize: '10px', color: '#38bdf8', textTransform: 'uppercase', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{rolUsuario}</span>
             </div>
             <button onClick={cerrarSesion} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', whiteSpace: 'nowrap' }}>
               Cerrar Sesión
