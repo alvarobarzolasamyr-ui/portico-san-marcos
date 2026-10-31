@@ -5,7 +5,6 @@ import PdfFlipbook from './components/PdfFlipbook';
 const API_BASE = 'https://portico-san-marcos.onrender.com/api';
 const WHATSAPP_NUMERO = '51967107035';
 
-// CATÁLOGO MAESTRO UNIFICADO
 const CATALOGO_INICIAL = [
   { id: 1, titulo: 'Fundamentos de Robótica y Cinemática', categoria: 'Robótica', descripcion: 'Domina el modelado espacial, matrices de transformación y parámetros Denavit-Hartenberg para brazos robóticos.', precio: 120.00, duracion: '5 Semanas (20 Horas)', imagen_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/fc_cA62Z1kQ', temario: ['Módulo 1: Morfología del robot', 'Módulo 2: Álgebra matricial'], tipo: 'Virtual', horario: 'Martes y Jueves - 7:00 PM', instructor: 'Ing. Fabrizio Barzola', enlaceSede: 'https://zoom.us/j/9876543210', videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4', estado: 'activo' },
   { id: 2, titulo: 'Electrónica Aplicada a la Ingeniería', categoria: 'Electrónica', descripcion: 'Análisis de circuitos DC/AC, semiconductores, amplificadores operacionales y etapas de potencia para motores.', precio: 95.00, duracion: '4 Semanas (16 Horas)', imagen_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80', video_demo_url: 'https://www.youtube.com/embed/r9GC50r2Ge8', temario: ['Módulo 1: Leyes de Ohm y Kirchhoff'], tipo: 'Presencial', horario: 'Viernes - 7:00 PM', instructor: 'Ing. Carlos Mendoza', enlaceSede: 'Campus Central - Laboratorio de Electrónica', ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800', estado: 'activo' },
@@ -59,7 +58,7 @@ export default function App() {
   const [contenidoMsg, setContenidoMsg] = useState('');
   const [estadoEnvioMsg, setEstadoEnvioMsg] = useState('');
 
-  // AHORA ESTÁ 100% VACÍO AL INICIO, NO HABRÁ USUARIOS FALSOS. SÓLO MOSTRARÁ LOS DE LA BASE DE DATOS.
+  // LISTA DE USUARIOS 100% VACÍA, SÓLO SE LLENARÁ DE TU BASE DE DATOS
   const [listaUsuarios, setListaUsuarios] = useState([]);
 
   const [modalUsuario, setModalUsuario] = useState(false);
@@ -71,14 +70,15 @@ export default function App() {
   const [newPasswordInput, setNewPasswordInput] = useState('');
 
   // =========================================================================
-  // PERMISOS DE ADMINISTRADOR Y DOCENTE (REGLAS DEL SUPERIOR)
+  // PERMISOS DE ADMINISTRADOR Y DOCENTE (REGLAS ESTRICTAS DEL SUPERIOR)
   // =========================================================================
   const esAdmin = rolUsuario === 'admin';
   const esDocente = rolUsuario === 'docente';
   
   // Regla 1: Profesores y Admin agregan cursos.
   const puedeGestionarCursos = esAdmin || esDocente;
-  // Regla 2: Solo el Admin crea usuarios (se controla visualmente en el renderizado).
+  
+  // Regla 2: Solo el Admin crea usuarios (se controla visualmente ocultando el panel a los docentes).
 
   useEffect(() => {
     if (tiempoBloqueo <= 0) return;
@@ -114,7 +114,7 @@ export default function App() {
 
   const cargarUsuariosDesdeBD = async () => {
     try {
-      const res = await fetch(`${API_BASE}/usuarios`); // Apunta a la ruta real que envía la lista de usuarios
+      const res = await fetch(`${API_BASE}/usuarios`);
       const data = await res.json();
       if (Array.isArray(data)) setListaUsuarios(data);
     } catch (e) {}
@@ -147,6 +147,9 @@ export default function App() {
     }
   }, [sesionIniciada, usernameActual]);
 
+  // =========================================================================
+  // FUNCIONES DE CARRITO
+  // =========================================================================
   const agregarAlCarrito = (curso) => {
     if (!carrito.some(item => item.id === curso.id)) setCarrito([...carrito, curso]);
     setCarritoAbierto(true);
@@ -214,19 +217,41 @@ export default function App() {
   };
 
   // =========================================================================
-  // MENSAJERÍA DIRECTA CON BASE DE DATOS
+  // MENSAJERÍA DIRECTA CON BASE DE DATOS (REPARADA: ACTUALIZACIÓN INSTANTÁNEA)
   // =========================================================================
   const handleEnviarMensajeBD = async (e) => {
     e.preventDefault();
     if (!contenidoMsg.trim() || !destinatarioMsg) return;
     setEstadoEnvioMsg('Enviando mensaje...');
-    const nuevoMensaje = { remitente: usernameActual || usuarioLogueado, rol_remitente: rolUsuario, destinatario: destinatarioMsg, asunto: asuntoMsg.trim() || 'Consulta', contenido: contenidoMsg.trim(), fecha_envio: new Date().toISOString() };
+    
+    const nuevoMensaje = { 
+      remitente: usernameActual || usuarioLogueado, 
+      rol_remitente: rolUsuario, 
+      destinatario: destinatarioMsg, 
+      asunto: asuntoMsg.trim() || 'Consulta Académica', 
+      contenido: contenidoMsg.trim(), 
+      fecha_envio: new Date().toISOString() 
+    };
+
     try {
-      const res = await fetch(`${API_BASE}/mensajes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nuevoMensaje) });
+      const res = await fetch(`${API_BASE}/mensajes`, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(nuevoMensaje) 
+      });
+      const data = await res.json();
+      
       if (res.ok) {
-        setAsuntoMsg(''); setContenidoMsg(''); setEstadoEnvioMsg('✓ Mensaje enviado a la BD.');
-        cargarMensajesDesdeBD(usernameActual); // Actualiza la bandeja inmediatamente
+        // ACTUALIZACIÓN OPTIMISTA: Agrega el mensaje al instante en la pantalla
+        const mensajeConId = { ...nuevoMensaje, id: data.id || Date.now() };
+        setMensajesBD(prevMensajes => [mensajeConId, ...prevMensajes]);
+        
+        setAsuntoMsg(''); 
+        setContenidoMsg(''); 
+        setEstadoEnvioMsg('✓ Mensaje enviado y guardado exitosamente.');
         setTimeout(() => setEstadoEnvioMsg(''), 3500);
+      } else {
+        setEstadoEnvioMsg('❌ Hubo un problema al enviar.');
       }
     } catch (err) {
       setEstadoEnvioMsg('❌ Error de conexión al enviar el mensaje.');
@@ -246,6 +271,7 @@ export default function App() {
     if (!modoEdicion) {
       if (!usuarioForm.password) return setMensajeUserMsg('Debes asignarle una contraseña al nuevo usuario.');
       try {
+        // Usa la ruta correcta configurada en authRoutes.js (/api/auth/users)
         const res = await fetch(`${API_BASE}/auth/users`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -253,7 +279,7 @@ export default function App() {
         });
         const data = await res.json();
         if (data.success) {
-          cargarUsuariosDesdeBD(); // Refresca la tabla automáticamente
+          cargarUsuariosDesdeBD(); 
           setModalUsuario(false);
           alert('¡Usuario creado en la Base de Datos con éxito!');
         } else {
@@ -276,11 +302,11 @@ export default function App() {
     const nuevoEstado = estadoActual === 'activo' ? 'inactivo' : 'activo';
     try {
       await fetch(`${API_BASE}/auth/users/${id}/estado`, {
-        method: 'PATCH',
+        method: 'PUT', // Usa PUT para coincidir con tu backend
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: nuevoEstado })
       });
-      cargarUsuariosDesdeBD(); // Refresca la tabla
+      cargarUsuariosDesdeBD(); 
     } catch (error) {}
   };
   
