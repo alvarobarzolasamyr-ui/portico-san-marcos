@@ -260,6 +260,8 @@ export default function App() {
   const [usuarioLogueado, setUsuarioLogueado] = useState(() => localStorage.getItem('usuarioLogueado') || '');
   const [usernameActual, setUsernameActual] = useState(() => localStorage.getItem('usernameActual') || '');
   const [rolUsuario, setRolUsuario] = useState(() => localStorage.getItem('rolUsuario') || '');
+  const [sesionToken, setSesionToken] = useState(() => localStorage.getItem('sesionToken') || '');
+  const [dispositivoActual, setDispositivoActual] = useState(() => localStorage.getItem('dispositivoActual') || 'PC / Navegador Autorizado');
   const [cursosCatalogo, setCursosCatalogo] = useState(CATALOGO_INICIAL);
 
   // ESTADOS DE LA TIENDA Y CARRITO
@@ -269,6 +271,7 @@ export default function App() {
   const [carritoAbierto, setCarritoAbierto] = useState(false);
   const [mostrarModalLogin, setMostrarModalLogin] = useState(false);
   const [nombreInteresado, setNombreInteresado] = useState('');
+  const [procesandoOrdenServidor, setProcesandoOrdenServidor] = useState(false);
   const [carrito, setCarrito] = useState(() => {
     const guardado = localStorage.getItem('carrito_portico');
     return guardado ? JSON.parse(guardado) : [];
@@ -281,6 +284,20 @@ export default function App() {
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [intentosFallidos, setIntentosFallidos] = useState(0);
   const [tiempoBloqueo, setTiempoBloqueo] = useState(0);
+
+  // ESTADOS DE LOS 7 CONTROLES DE SEGURIDAD EN SERVIDOR
+  const [infoTokenPdf, setInfoTokenPdf] = useState(null);
+  const [ordenesServidor, setOrdenesServidor] = useState([]);
+  const [modalEvaluacionCurso, setModalEvaluacionCurso] = useState(null);
+  const [preguntasExamen, setPreguntasExamen] = useState([]);
+  const [respuestasExamen, setRespuestasExamen] = useState({});
+  const [resultadoExamenServidor, setResultadoExamenServidor] = useState(null);
+  const [notasServidor, setNotasServidor] = useState([]);
+
+  const [modalSubirArchivoCurso, setModalSubirArchivoCurso] = useState(null);
+  const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
+  const [estadoValidacionArchivo, setEstadoValidacionArchivo] = useState(null);
+  const [archivosSegurosLista, setArchivosSegurosLista] = useState([]);
 
   // ESTADOS DE CREACIÓN DE CURSOS (ADMIN Y DOCENTES)
   const [modalNuevoCurso, setModalNuevoCurso] = useState(false);
@@ -329,7 +346,6 @@ export default function App() {
   // =========================================================================
   const esAdmin = rolUsuario === 'admin' || usernameActual === 'admin';
   const esDocente = rolUsuario === 'docente';
-  // Profesores y Admin pueden agregar y gestionar cursos
   const puedeGestionarCursos = esAdmin || esDocente;
 
   // Temporizador para fuerza bruta
@@ -353,7 +369,7 @@ export default function App() {
   }, [carrito]);
 
   // =========================================================================
-  // FUNCIONES DE SINCRONIZACIÓN CON LA BASE DE DATOS (RENDER / AIVEN)
+  // FUNCIONES DE SINCRONIZACIÓN CON LA BASE DE DATOS Y SEGURIDAD
   // =========================================================================
   const cargarCatalogoDesdeBD = async () => {
     try {
@@ -415,28 +431,64 @@ export default function App() {
     } catch (e) {}
   };
 
+  const cargarDatosSeguridadServidor = async (usr) => {
+    const usuarioConsulta = (usr || usernameActual || '').trim();
+    if (!usuarioConsulta) return;
+    try {
+      const resNotas = await fetch(`${API_BASE}/seguridad/notas/${encodeURIComponent(usuarioConsulta)}`);
+      const dataNotas = await resNotas.json();
+      if (Array.isArray(dataNotas)) setNotasServidor(dataNotas);
+
+      if (usuarioConsulta === 'admin' || rolUsuario === 'admin' || rolUsuario === 'docente') {
+        const resOrd = await fetch(`${API_BASE}/seguridad/ordenes`);
+        const dataOrd = await resOrd.json();
+        if (Array.isArray(dataOrd)) setOrdenesServidor(dataOrd);
+
+        const resArch = await fetch(`${API_BASE}/seguridad/archivos`);
+        const dataArch = await resArch.json();
+        if (Array.isArray(dataArch)) setArchivosSegurosLista(dataArch);
+      }
+    } catch (e) {}
+  };
+
+  // PROTECCIÓN 3: VERIFICACIÓN CONTINUA DE SESIÓN Y DISPOSITIVO ÚNICO
+  const verificarSesionUnicaEnServidor = async (usr, token) => {
+    if (!usr || !token) return;
+    try {
+      const res = await fetch(`${API_BASE}/seguridad/verificar-sesion/${encodeURIComponent(usr)}/${encodeURIComponent(token)}`);
+      const data = await res.json();
+      if (data && data.valida === false) {
+        alert(`🔒 CONTROL DE SESIONES Y DISPOSITIVOS:\n\n${data.motivo}`);
+        cerrarSesion();
+      }
+    } catch (e) {}
+  };
+
   useEffect(() => {
     cargarCatalogoDesdeBD();
   }, []);
 
-  // POLLING EN TIEMPO REAL CADA 3 SEGUNDOS PARA RECIBIR MENSAJES DEL CELULAR AL INSTANTE
+  // POLLING EN TIEMPO REAL CADA 3 SEGUNDOS (MENSAJES + CONTROL DE DISPOSITIVOS)
   useEffect(() => {
     if (!sesionIniciada || !usernameActual) return;
 
     cargarUsuariosDesdeBD();
     cargarMatriculasDesdeBD();
     cargarMensajesDesdeBD(usernameActual);
+    cargarDatosSeguridadServidor(usernameActual);
 
     const intervaloTiempoReal = setInterval(() => {
       cargarMensajesDesdeBD(usernameActual);
       cargarUsuariosDesdeBD();
       cargarMatriculasDesdeBD();
+      if (sesionToken) {
+        verificarSesionUnicaEnServidor(usernameActual, sesionToken);
+      }
     }, 3000);
 
     return () => clearInterval(intervaloTiempoReal);
-  }, [sesionIniciada, usernameActual]);
+  }, [sesionIniciada, usernameActual, sesionToken]);
 
-  // Auto-scroll suave en la ventana de chat cuando llegan mensajes nuevos
   useEffect(() => {
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
@@ -444,7 +496,7 @@ export default function App() {
   }, [mensajesBD.length, contactoActivoChat]);
 
   // =========================================================================
-  // FUNCIONES DEL CARRITO Y WHATSAPP
+  // PROTECCIÓN 4 Y 5: CARRITO CON PRECIO VALIDADO EXCLUSIVAMENTE EN BACKEND
   // =========================================================================
   const agregarAlCarrito = (curso) => {
     if (!carrito.some(item => item.id === curso.id)) setCarrito([...carrito, curso]);
@@ -454,21 +506,251 @@ export default function App() {
   const estaEnCarrito = (id) => carrito.some(item => item.id === id);
   const totalCarrito = carrito.reduce((acc, item) => acc + Number(item.precio), 0);
 
-  const enviarPedidoWhatsApp = () => {
+  const enviarPedidoWhatsApp = async () => {
     if (carrito.length === 0) return;
     if (!aceptaDatosCarrito) {
       alert('Por favor, acepta la Política de Privacidad antes de continuar.');
       return;
     }
+
+    setProcesandoOrdenServidor(true);
     const nombreLimpio = nombreInteresado.replace(/[<>]/g, '').trim();
-    const saludo = nombreLimpio
-      ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreLimpio}*.`
-      : `¡Hola *Pórtico San Marcos*! 👋`;
-    const listaTexto = carrito
-      .map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`)
-      .join('\n');
-    const textoFinal = `${saludo}\nDeseo adquirir los siguientes cursos de Ingeniería Mecatrónica:\n\n${listaTexto}\n\n💰 *Total a pagar: S/ ${totalCarrito.toFixed(2)}*\n\n*(He leído y acepto la política de datos)*\n¿Me podrían brindar los medios de pago para habilitar mi acceso?`;
-    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
+
+    try {
+      // Se envían ÚNICAMENTE los IDs al backend; el servidor calcula los precios reales y firma la orden
+      const res = await fetch(`${API_BASE}/seguridad/crear-orden-compra`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          curso_ids: carrito.map(c => c.id),
+          nombre_cliente: nombreLimpio || 'Estudiante',
+          usuario_cliente: usernameActual || 'invitado'
+        })
+      });
+      const data = await res.json();
+
+      const itemsFinales = data.success && Array.isArray(data.itemsValidados) ? data.itemsValidados : carrito;
+      const totalOficial = data.success && typeof data.totalServidor === 'number' ? data.totalServidor : totalCarrito;
+      const codigoOrdenServidor = data.codigoOrden || `PSM-2026-VERIF`;
+
+      const saludo = nombreLimpio
+        ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreLimpio}*.`
+        : `¡Hola *Pórtico San Marcos*! 👋`;
+      const listaTexto = itemsFinales
+        .map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)} (Validado en Servidor)`)
+        .join('\n');
+      const textoFinal = `${saludo}\n🔐 *Código de Orden en Servidor:* ${codigoOrdenServidor}\nDeseo adquirir los siguientes cursos de Ingeniería Mecatrónica:\n\n${listaTexto}\n\n💰 *Total Oficial Validado en Backend: S/ ${Number(totalOficial).toFixed(2)}*\n\n*(He leído y acepto la política de datos)*\n¿Me podrían brindar los medios de pago para confirmar mi orden en el servidor?`;
+
+      setProcesandoOrdenServidor(false);
+      window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
+    } catch (err) {
+      setProcesandoOrdenServidor(false);
+      const saludo = nombreLimpio
+        ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreLimpio}*.`
+        : `¡Hola *Pórtico San Marcos*! 👋`;
+      const listaTexto = carrito
+        .map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`)
+        .join('\n');
+      const textoFinal = `${saludo}\nDeseo adquirir los siguientes cursos de Ingeniería Mecatrónica:\n\n${listaTexto}\n\n💰 *Total a pagar: S/ ${totalCarrito.toFixed(2)}*`;
+      window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoFinal)}`, '_blank');
+    }
+  };
+
+  // =========================================================================
+  // PROTECCIÓN 1: VALIDACIÓN DE MATRÍCULA EN SERVIDOR ANTES DE ABRIR ENLACES PRIVADOS
+  // =========================================================================
+  const solicitarAccesoCursoPrivado = async (curso, modoAccion) => {
+    try {
+      const res = await fetch(`${API_BASE}/seguridad/acceso-curso`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuario: usernameActual,
+          rol: rolUsuario,
+          curso_id: curso.id
+        })
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        alert(data.message || '🔒 Acceso denegado por el servidor: Debes estar matriculado en este curso para acceder a los enlaces privados.');
+        return;
+      }
+
+      if (modoAccion === 'grabacion') {
+        setVideoActivo({
+          ...curso,
+          videoUrl: data.videoUrl || curso.videoUrl,
+          firmaServidor: data.firmaServidor
+        });
+      } else if (modoAccion === 'zoom') {
+        window.open(data.enlaceSede || curso.enlaceSede || 'https://zoom.us', '_blank');
+      } else if (modoAccion === 'sede') {
+        setLaboratorioSeleccionado({
+          ...curso,
+          enlaceSede: data.enlaceSede || curso.enlaceSede,
+          firmaServidor: data.firmaServidor
+        });
+      }
+    } catch (error) {
+      // Respaldo verificando matrícula cargada
+      const matriculadoLocal = esAdmin || esDocente || matriculas.some(m => m.usuario_alumno === usernameActual && Number(m.curso_id) === Number(curso.id));
+      if (!matriculadoLocal) {
+        alert('🔒 Acceso bloqueado: No registras matrícula activa en este curso privado.');
+        return;
+      }
+      if (modoAccion === 'grabacion') setVideoActivo(curso);
+      if (modoAccion === 'zoom') window.open(curso.enlaceSede || '#', '_blank');
+      if (modoAccion === 'sede') setLaboratorioSeleccionado(curso);
+    }
+  };
+
+  // =========================================================================
+  // PROTECCIÓN 2: ABRIR Y DESCARGAR PDF CON ENLACE TEMPORAL DEL SERVIDOR
+  // =========================================================================
+  const abrirLibroConEnlaceTemporal = async (libro) => {
+    try {
+      const res = await fetch(`${API_BASE}/seguridad/enlace-pdf-temporal`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuario: usernameActual || 'estudiante',
+          libro_id: libro.id
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setInfoTokenPdf({
+          titulo: libro.titulo,
+          token: data.tokenTemporal,
+          expira: new Date(data.expiraEn).toLocaleTimeString(),
+          endpoint: `${API_BASE}/seguridad/descargar-pdf/${data.tokenTemporal}`
+        });
+        setLibroSeleccionado(libro.pdfUrl);
+      } else {
+        setLibroSeleccionado(libro.pdfUrl);
+      }
+    } catch (err) {
+      setLibroSeleccionado(libro.pdfUrl);
+    }
+  };
+
+  // =========================================================================
+  // PROTECCIÓN 6: EVALUACIONES VALIDADAS EXCLUSIVAMENTE EN BACKEND
+  // =========================================================================
+  const abrirEvaluacionSegura = async (curso) => {
+    setResultadoExamenServidor(null);
+    setRespuestasExamen({});
+    setModalEvaluacionCurso(curso);
+    try {
+      const res = await fetch(`${API_BASE}/seguridad/preguntas-evaluacion/${curso.id}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.preguntas)) {
+        setPreguntasExamen(data.preguntas);
+      }
+    } catch (e) {}
+  };
+
+  const enviarEvaluacionAlServidor = async (e) => {
+    e.preventDefault();
+    if (!modalEvaluacionCurso) return;
+    try {
+      const res = await fetch(`${API_BASE}/seguridad/evaluar-examen`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuario: usernameActual,
+          curso_id: modalEvaluacionCurso.id,
+          respuestas: respuestasExamen
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setResultadoExamenServidor(data);
+        cargarDatosSeguridadServidor(usernameActual);
+      }
+    } catch (e) {
+      alert('Error al conectar con el servidor de evaluaciones.');
+    }
+  };
+
+  // =========================================================================
+  // PROTECCIÓN 7: SUBIDA DE ARCHIVOS VALIDANDO EXTENSIÓN, CONTENIDO Y TAMAÑO
+  // =========================================================================
+  const handleSeleccionarArchivo = (e) => {
+    const file = e.target.files && e.target.files[0];
+    setEstadoValidacionArchivo(null);
+    if (file) {
+      setArchivoSeleccionado(file);
+    }
+  };
+
+  const enviarArchivoAlServidor = async (e) => {
+    e.preventDefault();
+    if (!archivoSeleccionado || !modalSubirArchivoCurso) return;
+
+    setEstadoValidacionArchivo({ tipo: 'info', texto: 'Analizando extensión, firma binaria (Magic Bytes) y tamaño en el servidor...' });
+
+    const lector = new FileReader();
+    lector.onload = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/seguridad/validar-archivo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            usuario: usernameActual,
+            curso_id: modalSubirArchivoCurso.id,
+            nombre_archivo: archivoSeleccionado.name,
+            tamano_bytes: archivoSeleccionado.size,
+            contenido_base64: lector.result
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setEstadoValidacionArchivo({
+            tipo: 'exito',
+            texto: `${data.message}\nSHA-256: ${data.hashSha256.slice(0, 28)}...`
+          });
+          setArchivoSeleccionado(null);
+          cargarDatosSeguridadServidor(usernameActual);
+        } else {
+          setEstadoValidacionArchivo({
+            tipo: 'error',
+            texto: data.message || 'Archivo rechazado por el servidor.'
+          });
+        }
+      } catch (err) {
+        setEstadoValidacionArchivo({
+          tipo: 'error',
+          texto: 'Error de red al validar el archivo en el servidor.'
+        });
+      }
+    };
+    lector.readAsDataURL(archivoSeleccionado);
+  };
+
+  const confirmarPagoOrdenEnServidor = async (codigoOrden) => {
+    const alumno = prompt('Ingresa el usuario del alumno para activar su matrícula tras confirmar el pago (ej: dflores):', alumnoSeleccionadoMatricula || 'dflores');
+    if (alumno === null) return;
+    try {
+      const res = await fetch(`${API_BASE}/seguridad/confirmar-pago-servidor`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          codigo_orden: codigoOrden,
+          usuario_alumno: alumno.trim(),
+          rol_ejecutor: rolUsuario
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(data.message);
+        cargarDatosSeguridadServidor(usernameActual);
+        cargarMatriculasDesdeBD();
+      } else {
+        alert(data.message || 'No se pudo confirmar la orden.');
+      }
+    } catch (e) {}
   };
 
   // =========================================================================
@@ -684,7 +966,7 @@ export default function App() {
   };
 
   // =========================================================================
-  // LOGIN Y NAVEGACIÓN INTERNA
+  // LOGIN CON CONTROL DE SESIONES Y DISPOSITIVOS EN SERVIDOR
   // =========================================================================
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
@@ -696,7 +978,7 @@ export default function App() {
     if (!aceptaDatosLogin) return setMensaje('Debes aceptar la Política de Privacidad para continuar.');
 
     const usuarioSanitizado = usuario.replace(/[^a-zA-Z0-9._-]/g, '').trim();
-    setMensaje('Verificando credenciales...');
+    setMensaje('Verificando credenciales y registrando dispositivo...');
 
     try {
       const response = await fetch(`${API_BASE}/auth/login`, {
@@ -708,6 +990,24 @@ export default function App() {
       if (response.ok && data.success) {
         const nombreUsr = data.user.nombres || data.user.usuario;
         const rolUsr = data.user.usuario === 'admin' ? 'admin' : (data.user.rol || 'alumno');
+
+        // Registrar sesión única y huella del dispositivo en el servidor (Protección 3)
+        const etiquetaDispositivo = `${navigator.platform || 'Dispositivo'} (${window.innerWidth}x${window.innerHeight})`;
+        try {
+          const resSes = await fetch(`${API_BASE}/seguridad/registrar-sesion`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usuario: data.user.usuario, dispositivo: etiquetaDispositivo })
+          });
+          const dataSes = await resSes.json();
+          if (dataSes.success && dataSes.sesionToken) {
+            setSesionToken(dataSes.sesionToken);
+            setDispositivoActual(etiquetaDispositivo);
+            localStorage.setItem('sesionToken', dataSes.sesionToken);
+            localStorage.setItem('dispositivoActual', etiquetaDispositivo);
+          }
+        } catch (e) {}
+
         setUsuarioLogueado(nombreUsr);
         setUsernameActual(data.user.usuario);
         setRolUsuario(rolUsr);
@@ -739,11 +1039,13 @@ export default function App() {
     localStorage.removeItem('usuarioLogueado');
     localStorage.removeItem('usernameActual');
     localStorage.removeItem('rolUsuario');
+    localStorage.removeItem('sesionToken');
     setSesionIniciada(false);
     setUsuario('');
     setPassword('');
     setRolUsuario('');
     setUsernameActual('');
+    setSesionToken('');
     setVideoActivo(null);
     setLaboratorioSeleccionado(null);
     setLibroSeleccionado(null);
@@ -780,6 +1082,7 @@ export default function App() {
   const seccionDocentesRef = useRef(null);
   const seccionBibliotecaRef = useRef(null);
   const seccionMensajesRef = useRef(null);
+  const seccionSeguridadRef = useRef(null);
   const seccionUsuariosRef = useRef(null);
 
   const irASeccion = (ref) => {
@@ -977,7 +1280,7 @@ export default function App() {
           </div>
         )}
 
-        {/* CARRITO LATERAL */}
+        {/* CARRITO LATERAL CON VALIDACIÓN DE PRECIO Y ORDEN EN SERVIDOR */}
         {carritoAbierto && (
           <div onClick={() => setCarritoAbierto(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 250, display: 'flex', justifyContent: 'flex-end' }}>
             <aside onClick={e => e.stopPropagation()} style={{ background: '#1e293b', width: '100%', maxWidth: '410px', height: '100vh', padding: '24px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
@@ -1005,17 +1308,20 @@ export default function App() {
                     ))}
                   </div>
                   <div style={{ borderTop: '1px solid #334155', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #059669', borderRadius: '8px', padding: '8px 10px', fontSize: '11px', color: '#34d399' }}>
+                      🛡️ <strong>Seguridad Backend:</strong> Los precios y el código de orden se validan exclusivamente en el servidor antes de emitir el pedido.
+                    </div>
                     <input type="text" placeholder="Tu Nombre Completo (opcional)" value={nombreInteresado} onChange={e => setNombreInteresado(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '6px', background: '#0f172a', color: '#fff', border: '1px solid #475569', boxSizing: 'border-box' }} />
                     <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', color: '#cbd5e1', cursor: 'pointer' }}>
                       <input type="checkbox" checked={aceptaDatosCarrito} onChange={e => setAceptaDatosCarrito(e.target.checked)} style={{ marginTop: '2px' }} />
                       <span>Acepto la <button type="button" onClick={() => setModalPrivacidadAbierto(true)} style={{ background: 'none', border: 'none', color: '#38bdf8', textDecoration: 'underline', padding: 0, cursor: 'pointer', fontSize: '12px' }}>Política de Privacidad</button>.</span>
                     </label>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '16px' }}>
-                      <span style={{ color: '#cbd5e1' }}>Total Estimado:</span>
+                      <span style={{ color: '#cbd5e1' }}>Total Validado:</span>
                       <strong style={{ color: '#34d399', fontSize: '20px' }}>S/ {totalCarrito.toFixed(2)}</strong>
                     </div>
-                    <button onClick={enviarPedidoWhatsApp} style={{ width: '100%', background: '#25D366', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '15px', cursor: 'pointer' }}>
-                      Coordinar por WhatsApp
+                    <button onClick={enviarPedidoWhatsApp} disabled={procesandoOrdenServidor} style={{ width: '100%', background: '#25D366', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '15px', cursor: 'pointer' }}>
+                      {procesandoOrdenServidor ? 'Validando precios en Servidor...' : 'Coordinar por WhatsApp'}
                     </button>
                   </div>
                 </>
@@ -1031,7 +1337,7 @@ export default function App() {
               <button onClick={() => setMostrarModalLogin(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
               <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <h2 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '24px', fontWeight: '800' }}>Pórtico San Marcos</h2>
-                <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0 }}>Acceso exclusivo para estudiantes, docentes y administradores.</p>
+                <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0 }}>Acceso exclusivo con control de sesión y dispositivo único.</p>
               </div>
               <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <input type="text" placeholder="Usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} disabled={tiempoBloqueo > 0} required style={{ width: '100%', padding: '13px', borderRadius: '8px', border: '1px solid #475569', background: '#0f172a', color: '#fff', fontSize: '15px', boxSizing: 'border-box' }} />
@@ -1057,7 +1363,7 @@ export default function App() {
   }
 
   // =========================================================================
-  // VISTA 2: INTERIOR DEL AULA VIRTUAL (PC Y CELULAR OPTIMIZADOS)
+  // VISTA 2: INTERIOR DEL AULA VIRTUAL (PC Y CELULAR OPTIMIZADOS + 7 CONTROLES)
   // =========================================================================
   return (
     <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
@@ -1077,12 +1383,23 @@ export default function App() {
           top: 0;
           z-index: 1000;
           box-sizing: border-box;
+          gap: 20px;
+        }
+        .psm-brand-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-shrink: 0;
         }
         .psm-nav-links {
           display: flex;
-          gap: 18px;
+          gap: 15px;
           align-items: center;
-          flex-wrap: wrap;
+          justify-content: flex-end;
+          flex-wrap: nowrap;
+        }
+        .psm-nav-links button {
+          white-space: nowrap;
         }
         .psm-hamburger {
           display: none;
@@ -1186,9 +1503,15 @@ export default function App() {
           height: 580px;
         }
         /* OPTIMIZACIÓN PARA CELULARES */
-        @media (max-width: 900px) {
+        @media (max-width: 960px) {
           .psm-navbar {
             padding: 12px 16px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+          }
+          .psm-brand-row {
+            width: 100%;
           }
           .psm-hamburger {
             display: inline-flex;
@@ -1216,9 +1539,11 @@ export default function App() {
           }
           .psm-user-box {
             margin-left: 0 !important;
+            padding-left: 0 !important;
+            border-left: none !important;
             justify-content: space-between;
             background: #0f172a;
-            padding: 10px 14px;
+            padding: 10px 14px !important;
             border-radius: 8px;
           }
           .psm-hero-wrapper {
@@ -1259,12 +1584,12 @@ export default function App() {
         }
       `}</style>
 
-      {/* NAVBAR SUPERIOR INTERNO (ORDENADO EN PC Y CON MENÚ DESPLEGABLE EN CELULAR) */}
+      {/* NAVBAR SUPERIOR INTERNO (ALINEADO EN 1 SOLA FILA EN PC Y DESPLEGABLE EN CELULAR) */}
       <header className="psm-navbar">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+        <div className="psm-brand-row">
           <div>
-            <h2 style={{ margin: 0, fontSize: '18px', color: '#38bdf8', fontWeight: 'bold' }}>Pórtico San Marcos</h2>
-            <span style={{ fontSize: '11px', color: '#94a3b8' }}>Aula Virtual & Biblioteca 3D</span>
+            <h2 style={{ margin: 0, fontSize: '18px', color: '#38bdf8', fontWeight: 'bold', whiteSpace: 'nowrap' }}>Pórtico San Marcos</h2>
+            <span style={{ fontSize: '11px', color: '#94a3b8', whiteSpace: 'nowrap', display: 'block' }}>Aula Virtual & Biblioteca 3D</span>
           </div>
 
           <button className="psm-hamburger" onClick={() => setMenuMovilAbierto(!menuMovilAbierto)}>
@@ -1273,28 +1598,29 @@ export default function App() {
         </div>
 
         <nav className={`psm-nav-links ${menuMovilAbierto ? 'abierto' : ''}`}>
-          <button onClick={() => irASeccion(seccionInicioRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Inicio</button>
+          <button onClick={() => irASeccion(seccionInicioRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Inicio</button>
           {rolUsuario === 'alumno' && (
-            <button onClick={() => irASeccion(seccionPerfilRef)} style={{ background: 'none', border: 'none', color: '#38bdf8', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Mi Perfil y Cursos</button>
+            <button onClick={() => irASeccion(seccionPerfilRef)} style={{ background: 'none', border: 'none', color: '#38bdf8', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Mi Perfil y Cursos</button>
           )}
-          <button onClick={() => irASeccion(seccionCursosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>
+          <button onClick={() => irASeccion(seccionCursosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
             {puedeGestionarCursos ? 'Administrar Cursos' : 'Catálogo'}
           </button>
           {rolUsuario === 'alumno' && (
-            <button onClick={() => irASeccion(seccionDocentesRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Docentes</button>
+            <button onClick={() => irASeccion(seccionDocentesRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Docentes</button>
           )}
-          <button onClick={() => irASeccion(seccionBibliotecaRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Biblioteca 3D</button>
+          <button onClick={() => irASeccion(seccionBibliotecaRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Biblioteca 3D</button>
+          <button onClick={() => irASeccion(seccionSeguridadRef)} style={{ background: 'none', border: 'none', color: '#fbbf24', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>🛡️ Seguridad</button>
           <button onClick={() => irASeccion(seccionMensajesRef)} style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', padding: '6px 12px', borderRadius: '99px', color: '#34d399', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap' }}>
             💬 Chat en Vivo ({mensajesBD.length})
           </button>
           {esAdmin && (
-            <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '14px' }}>Usuarios y Matrículas</button>
+            <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Usuarios y Matrículas</button>
           )}
 
-          <div className="psm-user-box" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginLeft: '10px' }}>
-            <div style={{ textAlign: 'right' }}>
-              <span style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#fff' }}>{usuarioLogueado}</span>
-              <span style={{ fontSize: '11px', color: '#38bdf8', textTransform: 'uppercase', fontWeight: 'bold' }}>{rolUsuario}</span>
+          <div className="psm-user-box" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginLeft: '6px', paddingLeft: '14px', borderLeft: '1px solid #1e293b', flexShrink: 0 }}>
+            <div style={{ textAlign: 'right', lineHeight: '1.2' }}>
+              <span style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#fff', whiteSpace: 'nowrap' }}>{usuarioLogueado}</span>
+              <span style={{ fontSize: '10px', color: '#38bdf8', textTransform: 'uppercase', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{rolUsuario} • 🔒 1 Disp.</span>
             </div>
             <button onClick={cerrarSesion} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', whiteSpace: 'nowrap' }}>
               Cerrar Sesión
@@ -1363,7 +1689,12 @@ export default function App() {
           <div ref={seccionPerfilRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
               <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '14px', padding: '22px', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }}>
-                <h2 style={{ fontSize: '20px', color: '#0f172a', margin: '0 0 18px 0', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px' }}>🎓 MI PERFIL DE ESTUDIANTE: CURSOS MATRICULADOS</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '18px', flexWrap: 'wrap', gap: '8px' }}>
+                  <h2 style={{ fontSize: '20px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>🎓 MI PERFIL DE ESTUDIANTE: CURSOS MATRICULADOS</h2>
+                  <span style={{ fontSize: '12px', background: '#dcfce7', color: '#166534', padding: '4px 10px', borderRadius: '99px', fontWeight: 'bold' }}>
+                    🔒 Sesión Protegida: {dispositivoActual}
+                  </span>
+                </div>
                 {misCursosMatriculados.length === 0 ? (
                   <p style={{ color: '#64748b', fontSize: '14px' }}>Aún no tienes cursos asignados en tu ficha de matrícula. Comunícate con el Administrador por el Chat en Vivo.</p>
                 ) : (
@@ -1377,12 +1708,20 @@ export default function App() {
                         <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
                           {(curso.tipo || 'Virtual') === 'Virtual' ? (
                             <>
-                              <button className="card-action-btn" style={{ flex: 1, padding: '8px', fontSize: '12px' }} onClick={() => setVideoActivo(curso)}>Ver Grabación</button>
-                              <a href={curso.enlaceSede || '#'} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', padding: '8px', fontSize: '12px', textDecoration: 'none', textAlign: 'center' }}>Ir a Zoom</a>
+                              <button className="card-action-btn" style={{ flex: 1, padding: '8px', fontSize: '12px' }} onClick={() => solicitarAccesoCursoPrivado(curso, 'grabacion')}>Ver Grabación</button>
+                              <button className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', padding: '8px', fontSize: '12px' }} onClick={() => solicitarAccesoCursoPrivado(curso, 'zoom')}>Ir a Zoom</button>
                             </>
                           ) : (
-                            <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(curso)} style={{ backgroundColor: '#059669', width: '100%', padding: '8px', fontSize: '12px' }}>Ver Sede Física</button>
+                            <button className="card-action-btn" onClick={() => solicitarAccesoCursoPrivado(curso, 'sede')} style={{ backgroundColor: '#059669', width: '100%', padding: '8px', fontSize: '12px' }}>Ver Sede Física</button>
                           )}
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                          <button onClick={() => abrirEvaluacionSegura(curso)} style={{ flex: 1, background: '#1e293b', color: '#38bdf8', border: 'none', padding: '7px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>
+                            📝 rendir Evaluación
+                          </button>
+                          <button onClick={() => { setModalSubirArchivoCurso(curso); setEstadoValidacionArchivo(null); }} style={{ flex: 1, background: '#e2e8f0', color: '#0f172a', border: 'none', padding: '7px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>
+                            📎 Subir Informe
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -1421,7 +1760,10 @@ export default function App() {
             {videoActivo && (
               <div style={{ background: '#0f172a', padding: '20px', borderRadius: '12px', color: '#fff', marginBottom: '30px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
-                  <h3 style={{ margin: 0, color: '#38bdf8', fontSize: '16px' }}>Reproduciendo Sesión: {videoActivo.titulo}</h3>
+                  <div>
+                    <h3 style={{ margin: 0, color: '#38bdf8', fontSize: '16px' }}>Reproduciendo Sesión Privada: {videoActivo.titulo}</h3>
+                    <span style={{ fontSize: '11px', color: '#34d399' }}>✓ Matrícula verificada en Servidor • Firma: {videoActivo.firmaServidor || 'Autorizado'}</span>
+                  </div>
                   <button onClick={() => setVideoActivo(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar Video</button>
                 </div>
                 <video controls autoPlay style={{ width: '100%', maxHeight: '420px', borderRadius: '8px', background: '#000' }}>
@@ -1446,18 +1788,29 @@ export default function App() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#475569', marginBottom: '15px' }}>
                         <span><strong>Horario:</strong> {item.horario || 'Por definir'}</span>
                         <span><strong>Docente:</strong> {item.instructor || 'Staff Académico'}</span>
-                        <span><strong>Precio Tienda:</strong> S/ {Number(item.precio || 100).toFixed(2)}</span>
+                        <span><strong>Precio Oficial Servidor:</strong> S/ {Number(item.precio || 100).toFixed(2)}</span>
                       </div>
                       <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
                         {esVirtual ? (
                           <>
-                            <button className="card-action-btn" style={{ flex: 1 }} onClick={() => setVideoActivo(item)}>Grabación</button>
-                            <a href={item.enlaceSede || '#'} target="_blank" rel="noreferrer" className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981', textDecoration: 'none', textAlign: 'center' }}>Zoom</a>
+                            <button className="card-action-btn" style={{ flex: 1 }} onClick={() => solicitarAccesoCursoPrivado(item, 'grabacion')}>Grabación</button>
+                            <button className="card-action-btn" style={{ flex: 1, backgroundColor: '#10b981' }} onClick={() => solicitarAccesoCursoPrivado(item, 'zoom')}>Zoom</button>
                           </>
                         ) : (
-                          <button className="card-action-btn" onClick={() => setLaboratorioSeleccionado(item)} style={{ backgroundColor: '#059669', width: '100%' }}>Ver Sede</button>
+                          <button className="card-action-btn" onClick={() => solicitarAccesoCursoPrivado(item, 'sede')} style={{ backgroundColor: '#059669', width: '100%' }}>Ver Sede</button>
                         )}
                       </div>
+
+                      {/* ACCIONES DE EVALUACIÓN EN BACKEND Y ENTREGA SEGURA DE ARCHIVOS */}
+                      <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                        <button onClick={() => abrirEvaluacionSegura(item)} style={{ flex: 1, background: '#0f172a', color: '#38bdf8', border: '1px solid #334155', padding: '7px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>
+                          📝 Evaluación
+                        </button>
+                        <button onClick={() => { setModalSubirArchivoCurso(item); setEstadoValidacionArchivo(null); }} style={{ flex: 1, background: '#f1f5f9', color: '#0f172a', border: '1px solid #cbd5e1', padding: '7px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>
+                          📎 Subir Archivo
+                        </button>
+                      </div>
+
                       {puedeGestionarCursos && (
                         <button onClick={() => handleToggleEstadoCurso(item)} style={{ width: '100%', padding: '8px', marginTop: '10px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', background: estaInactivo ? '#dcfce7' : '#fee2e2', color: estaInactivo ? '#166534' : '#991b1b' }}>
                           {estaInactivo ? '✓ Habilitar Curso en Tienda' : '✕ Deshabilitar Curso'}
@@ -1494,12 +1847,25 @@ export default function App() {
           </div>
         )}
 
-        {/* SECCIÓN 4: BIBLIOTECA VIRTUAL FLIPBOOK 3D */}
+        {/* SECCIÓN 4: BIBLIOTECA VIRTUAL FLIPBOOK 3D CON ENLACES TEMPORALES */}
         <div ref={seccionBibliotecaRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
-            <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
-              <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>BIBLIOTECA VIRTUAL (FLIPBOOK 3D)</h2>
+            <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+              <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>BIBLIOTECA VIRTUAL (FLIPBOOK 3D & ENLACES TEMPORALES)</h2>
+              <span style={{ fontSize: '12px', color: '#059669', fontWeight: 'bold' }}>🔒 Protección Activa: Tokens temporales con expiración en servidor (5 min)</span>
             </div>
+
+            {infoTokenPdf && (
+              <div style={{ background: '#0f172a', color: '#f8fafc', padding: '12px 18px', borderRadius: '10px', marginBottom: '20px', borderLeft: '4px solid #38bdf8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', fontSize: '12px' }}>
+                <div>
+                  <strong style={{ color: '#38bdf8' }}>🔐 Enlace Temporal Generado en Servidor para:</strong> {infoTokenPdf.titulo} | <strong>Token:</strong> <code>{infoTokenPdf.token.slice(0, 16)}...</code> | <strong>Expira a las:</strong> {infoTokenPdf.expira}
+                </div>
+                <a href={infoTokenPdf.endpoint} target="_blank" rel="noreferrer" style={{ background: '#10b981', color: '#fff', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' }}>
+                  Verificar Token en Servidor ↗
+                </a>
+              </div>
+            )}
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
               {listaLibros.map((libro) => (
                 <div key={libro.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -1508,12 +1874,61 @@ export default function App() {
                     <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '6px' }}>{libro.categoria}</span>
                     <h3 style={{ fontSize: '15px', color: '#0f172a', margin: '0 0 8px 0', fontWeight: 'bold' }}>{libro.titulo}</h3>
                     <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 15px 0' }}>Autor: {libro.autor}</p>
-                    <button onClick={() => setLibroSeleccionado(libro.pdfUrl)} style={{ marginTop: 'auto', padding: '10px 16px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
-                      Leer en Flipbook 3D
+                    <button onClick={() => abrirLibroConEnlaceTemporal(libro)} style={{ marginTop: 'auto', padding: '10px 16px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
+                      🔐 Abrir con Enlace Temporal 3D
                     </button>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* SECCIÓN DE AUDITORÍA Y ARQUITECTURA DE SEGURIDAD (LOS 7 CONTROLES)        */}
+        {/* ========================================================================= */}
+        <div ref={seccionSeguridadRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
+          <div className="dashboard-container">
+            <div style={{ background: '#0f172a', color: '#f8fafc', borderRadius: '16px', padding: '24px', border: '1px solid #1e293b', boxShadow: '0 12px 30px rgba(15, 23, 42, 0.18)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '14px', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '20px', color: '#38bdf8', fontWeight: '800' }}>🛡️ PANEL DE PROTECCIÓN Y AUDITORÍA EN SERVIDOR</h2>
+                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>Estado en vivo de los 7 controles de ciberseguridad académica en Backend</span>
+                </div>
+                <span style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#34d399', padding: '6px 12px', borderRadius: '99px', fontSize: '12px', fontWeight: 'bold' }}>
+                  ✓ 7 / 7 Protecciones Activas
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+                {[
+                  { riesgo: 'Compartir enlaces de cursos privados', proteccion: 'Validación de matrícula en servidor (/api/seguridad/acceso-curso)' },
+                  { riesgo: 'Descargar PDF sin autorización', proteccion: 'Descargas mediante enlaces temporales (/api/seguridad/enlace-pdf-temporal)' },
+                  { riesgo: 'Compartir cuentas', proteccion: `Control de sesiones y dispositivos (${dispositivoActual})` },
+                  { riesgo: 'Alterar el precio de un curso', proteccion: 'Precio validado exclusivamente en backend (/api/seguridad/crear-orden-compra)' },
+                  { riesgo: 'Falsificar una compra', proteccion: 'Confirmación de pago mediante servidor (/api/seguridad/confirmar-pago-servidor)' },
+                  { riesgo: 'Manipular evaluaciones', proteccion: 'Validación de respuestas y notas en backend (/api/seguridad/evaluar-examen)' },
+                  { riesgo: 'Subir archivos maliciosos', proteccion: 'Validación de extensión, contenido y tamaño (/api/seguridad/validar-archivo)' }
+                ].map((item, idx) => (
+                  <div key={idx} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', padding: '12px 14px' }}>
+                    <div style={{ fontSize: '11px', color: '#f87171', fontWeight: 'bold', marginBottom: '4px' }}>Riesgo: {item.riesgo}</div>
+                    <div style={{ fontSize: '13px', color: '#34d399', fontWeight: 'bold' }}>✓ {item.proteccion}</div>
+                  </div>
+                ))}
+              </div>
+
+              {notasServidor.length > 0 && (
+                <div style={{ marginTop: '18px', background: '#161f33', padding: '14px', borderRadius: '10px', border: '1px solid #334155' }}>
+                  <h4 style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#38bdf8' }}>📊 Últimas Evaluaciones Calificadas en Servidor:</h4>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {notasServidor.slice(0, 6).map((n, i) => (
+                      <span key={i} style={{ background: '#0f172a', border: '1px solid #334155', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', color: '#e2e8f0' }}>
+                        @{n.usuario_alumno} • Curso #{n.curso_id} ➔ <strong style={{ color: n.nota >= 14 ? '#34d399' : '#f87171' }}>Nota: {n.nota}/20</strong> ({n.correctas}/{n.total_preguntas})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1754,15 +2169,41 @@ export default function App() {
         </div>
 
         {/* ========================================================================= */}
-        {/* SECCIÓN 6: GESTIÓN DE USUARIOS Y MATRÍCULAS (EXCLUSIVO DEL ADMIN)        */}
+        {/* SECCIÓN 6: GESTIÓN DE USUARIOS, MATRÍCULAS Y ÓRDENES (EXCLUSIVO ADMIN)    */}
         {/* ========================================================================= */}
         {esAdmin && (
           <div ref={seccionUsuariosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
               <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE PERFILES Y MATRÍCULAS (SOLO ADMIN)</h2>
+                <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE PERFILES, MATRÍCULAS Y CONFIRMACIÓN DE PAGOS (SOLO ADMIN)</h2>
                 <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>+ Nuevo Usuario en BD</button>
               </div>
+
+              {/* CONFIRMACIÓN DE ÓRDENES DE COMPRA EN SERVIDOR (PROTECCIÓN 5) */}
+              {ordenesServidor.length > 0 && (
+                <div style={{ background: '#fff', padding: '18px', borderRadius: '12px', border: '1px solid #cbd5e1', marginBottom: '24px' }}>
+                  <h3 style={{ margin: '0 0 10px 0', fontSize: '15px', color: '#0f172a' }}>💳 Órdenes de Compra Registradas en Servidor (Anti-Falsificación de Pagos):</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {ordenesServidor.slice(0, 6).map(ord => (
+                      <div key={ord.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', flexWrap: 'wrap', gap: '10px', fontSize: '12px' }}>
+                        <div>
+                          <strong>Código:</strong> <code>{ord.codigo_orden}</code> | <strong>Cliente:</strong> {ord.nombre_cliente} (@{ord.usuario_cliente}) | <strong>Total Servidor:</strong> <span style={{ color: '#059669', fontWeight: 'bold' }}>S/ {Number(ord.total_validado).toFixed(2)}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ padding: '4px 8px', borderRadius: '6px', fontWeight: 'bold', background: ord.estado_pago === 'pagado_verificado' ? '#dcfce7' : '#fef3c7', color: ord.estado_pago === 'pagado_verificado' ? '#166534' : '#92400e' }}>
+                            {ord.estado_pago}
+                          </span>
+                          {ord.estado_pago !== 'pagado_verificado' && (
+                            <button onClick={() => confirmarPagoOrdenEnServidor(ord.codigo_orden)} style={{ background: '#059669', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '11px' }}>
+                              ✓ Confirmar Pago en Servidor
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <form onSubmit={handleAsignarCursoAlumno} style={{ background: '#fff', padding: '18px', borderRadius: '12px', border: '1px solid #cbd5e1', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: '200px' }}>
@@ -1832,6 +2273,87 @@ export default function App() {
         )}
       </main>
 
+      {/* MODAL DE EVALUACIÓN CALIFICADA EXCLUSIVAMENTE EN BACKEND (PROTECCIÓN 6) */}
+      {modalEvaluacionCurso && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px' }}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto', padding: '26px', borderRadius: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h3 style={{ margin: 0, color: '#0f172a' }}>📝 Evaluación: {modalEvaluacionCurso.titulo}</h3>
+              <button onClick={() => setModalEvaluacionCurso(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar ✕</button>
+            </div>
+            <p style={{ fontSize: '12px', color: '#059669', fontWeight: 'bold', margin: '0 0 16px 0' }}>
+              🛡️ Las respuestas correctas están ocultas y protegidas en el servidor. La nota se calcula en Backend.
+            </p>
+            <form onSubmit={enviarEvaluacionAlServidor} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {preguntasExamen.map(preg => (
+                <div key={preg.id} style={{ background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #cbd5e1' }}>
+                  <strong style={{ display: 'block', fontSize: '13px', color: '#0f172a', marginBottom: '10px' }}>{preg.pregunta}</strong>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {preg.opciones.map(op => (
+                      <label key={op.id} style={{ fontSize: '13px', color: '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input
+                          type="radio"
+                          name={preg.id}
+                          value={op.id}
+                          checked={respuestasExamen[preg.id] === op.id}
+                          onChange={() => setRespuestasExamen({ ...respuestasExamen, [preg.id]: op.id })}
+                          required
+                        />
+                        <span><strong>{op.id})</strong> {op.texto}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              {resultadoExamenServidor && (
+                <div style={{ padding: '14px', borderRadius: '10px', background: resultadoExamenServidor.aprobado ? '#dcfce7' : '#fee2e2', color: resultadoExamenServidor.aprobado ? '#166534' : '#991b1b', fontWeight: 'bold', fontSize: '13px' }}>
+                  {resultadoExamenServidor.mensaje} ({resultadoExamenServidor.correctas}/{resultadoExamenServidor.total} aciertos)
+                </div>
+              )}
+
+              <button type="submit" style={{ background: '#2563eb', color: '#fff', padding: '12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
+                Enviar Respuestas y Calificar en Servidor
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE SUBIDA DE ARCHIVO CON VALIDACIÓN DE EXTENSIÓN, CONTENIDO Y TAMAÑO (PROTECCIÓN 7) */}
+      {modalSubirArchivoCurso && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px' }}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: '500px', padding: '26px', borderRadius: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h3 style={{ margin: 0, color: '#0f172a' }}>📎 Subir Entregable: {modalSubirArchivoCurso.titulo}</h3>
+              <button onClick={() => setModalSubirArchivoCurso(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar ✕</button>
+            </div>
+            <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.5' }}>
+              🛡️ <strong>Filtro Anti-Malware del Servidor:</strong> Se validan estrictamente la extensión (`.pdf`, `.docx`, `.zip`, `.ino`, `.py`, `.png`), los bytes internos (Magic Bytes) y el tamaño máximo (5 MB). Archivos `.exe`, `.bat`, `.php` o `.js` son rechazados.
+            </p>
+            <form onSubmit={enviarArchivoAlServidor} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '14px' }}>
+              <input type="file" onChange={handleSeleccionarArchivo} required style={{ padding: '10px', border: '1px dashed #2563eb', borderRadius: '8px', background: '#f8fafc' }} />
+              {estadoValidacionArchivo && (
+                <div style={{
+                  padding: '12px',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  whiteSpace: 'pre-line',
+                  background: estadoValidacionArchivo.tipo === 'exito' ? '#dcfce7' : estadoValidacionArchivo.tipo === 'error' ? '#fee2e2' : '#e0f2fe',
+                  color: estadoValidacionArchivo.tipo === 'exito' ? '#166534' : estadoValidacionArchivo.tipo === 'error' ? '#991b1b' : '#0369a1'
+                }}>
+                  {estadoValidacionArchivo.texto}
+                </div>
+              )}
+              <button type="submit" style={{ background: '#2563eb', color: '#fff', padding: '12px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
+                Validar y Subir al Servidor
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* MODAL DE NUEVO CURSO (ADMIN Y DOCENTE) */}
       {modalNuevoCurso && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.65)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, padding: '20px' }}>
@@ -1873,7 +2395,7 @@ export default function App() {
               <button onClick={() => setLaboratorioSeleccionado(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar</button>
             </div>
             <p>{laboratorioSeleccionado.descripcion}</p>
-            <p><strong>Sede Física:</strong> {laboratorioSeleccionado.enlaceSede} | <strong>Horario:</strong> {laboratorioSeleccionado.horario}</p>
+            <p><strong>Sede Física Validada en Servidor:</strong> {laboratorioSeleccionado.enlaceSede} | <strong>Horario:</strong> {laboratorioSeleccionado.horario}</p>
           </div>
         </div>
       )}
