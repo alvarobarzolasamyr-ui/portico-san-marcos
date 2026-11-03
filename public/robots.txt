@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap oficial registrado para Google Search Console
+Sitemap: https://portico-san-marcos.vercel.app/sitemap.xml
