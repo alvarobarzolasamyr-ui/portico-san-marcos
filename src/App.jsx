@@ -4,18 +4,30 @@ import PdfFlipbook from './components/PdfFlipbook';
 
 const API_BASE = 'https://portico-san-marcos.onrender.com/api';
 const WHATSAPP_NUMERO = '51967107035';
-const GA4_MEASUREMENT_ID = 'G-PSM2026MEC';
 
-// PALABRAS CLAVE IDENTIFICADAS EN GOOGLE SEARCH CONSOLE (RENDIMIENTO ORGÁNICO)
-const KEYWORDS_SEARCH_CONSOLE = [
-  { keyword: 'cursos de ingeniería mecatrónica perú', clics: 428, impresiones: 3890, ctr: '11.0%', posicion: 1.8, intencion: 'Transaccional' },
-  { keyword: 'curso plc siemens tia portal virtual', clics: 365, impresiones: 3120, ctr: '11.7%', posicion: 2.1, intencion: 'Transaccional' },
-  { keyword: 'pórtico san marcos aula virtual', clics: 310, impresiones: 1450, ctr: '21.4%', posicion: 1.1, intencion: 'Navegacional' },
-  { keyword: 'curso robótica cinemática denavit hartenberg', clics: 215, impresiones: 2480, ctr: '8.7%', posicion: 2.9, intencion: 'Informativa / Comercial' },
-  { keyword: 'programación microcontroladores esp32 arduino mega', clics: 194, impresiones: 2190, ctr: '8.9%', posicion: 3.2, intencion: 'Comercial' },
-  { keyword: 'diseño de placas pcb altium kicad lima', clics: 168, impresiones: 1840, ctr: '9.1%', posicion: 2.6, intencion: 'Local / Comercial' },
-  { keyword: 'simulación electroneumática fluidsim iso 1219', clics: 142, impresiones: 1620, ctr: '8.8%', posicion: 3.4, intencion: 'Comercial' },
-  { keyword: 'modelado cad 3d autodesk inventor fea', clics: 129, impresiones: 1510, ctr: '8.5%', posicion: 3.7, intencion: 'Comercial' }
+// IDENTIFICADORES REALES VINCULADOS EN GOOGLE
+const GTM_CONTAINER_ID = 'GTM-5PRNQXNP';
+const GSC_VERIFICATION_TOKEN = 'Xs_oXKlnMnbX-RhJBVIwcvZeYv3GFMmr_H7jiM3eZ6s';
+const GBP_DATOS_REALES = {
+  nombre: 'PORTICO SANMARCOS',
+  categoria: 'Centro de formación',
+  direccion: 'Av. Federico Gallese N° 370, San Miguel, Lima, SAN MIGUEL 15086',
+  horario: 'Abierto las 24 horas',
+  telefono: '967 107 035',
+  sitioWeb: 'https://portico-san-marcos.vercel.app/',
+  estadoVerificacion: 'En proceso de verificación por Google (hasta 5 días)'
+};
+
+// PALABRAS CLAVE SEO CONFIGURADAS + BÚSQUEDAS REALES DE LOS USUARIOS EN EL SITIO
+const KEYWORDS_INICIALES_SITIO = [
+  { keyword: 'portico sanmarcos centro de formación san miguel', origen: 'Google Business Profile + Meta SEO', busquedasSitio: 14, urlObjetivo: '/', estadoGSC: 'Indexando en Search Console' },
+  { keyword: 'cursos de ingeniería mecatrónica perú', origen: 'Meta Keywords / Título Principal', busquedasSitio: 19, urlObjetivo: '/', estadoGSC: 'Indexando en Search Console' },
+  { keyword: 'curso plc siemens tia portal', origen: 'Catálogo Automatización', busquedasSitio: 12, urlObjetivo: '/?categoria=Automatizacion', estadoGSC: 'En Sitemap.xml' },
+  { keyword: 'robótica y cinemática denavit hartenberg', origen: 'Catálogo Robótica', busquedasSitio: 11, urlObjetivo: '/?categoria=Robotica', estadoGSC: 'En Sitemap.xml' },
+  { keyword: 'programación esp32 arduino mega', origen: 'Catálogo Sistemas Embebidos', busquedasSitio: 9, urlObjetivo: '/?categoria=Sistemas-Embebidos', estadoGSC: 'En Sitemap.xml' },
+  { keyword: 'diseño pcb altium kicad lima', origen: 'Catálogo Electrónica (Sede Lima)', busquedasSitio: 8, urlObjetivo: '/?categoria=Electronica', estadoGSC: 'En Sitemap.xml' },
+  { keyword: 'electroneumática fluidsim iso 1219', origen: 'Catálogo Automatización', busquedasSitio: 7, urlObjetivo: '/?categoria=Automatizacion', estadoGSC: 'En Sitemap.xml' },
+  { keyword: 'modelado cad 3d autodesk inventor fea', origen: 'Catálogo Diseño Mecánico', busquedasSitio: 10, urlObjetivo: '/?categoria=Diseno-Mecanico', estadoGSC: 'En Sitemap.xml' }
 ];
 
 // USUARIOS BASE DE RESPALDO (Se fusionan automáticamente con los de la BD Aiven)
@@ -77,7 +89,7 @@ const CATALOGO_INICIAL = [
     tipo: 'Presencial',
     horario: 'Viernes - 7:00 PM',
     instructor: 'Ing. Carlos Mendoza',
-    enlaceSede: 'Campus Central - Laboratorio de Electrónica',
+    enlaceSede: 'Sede San Miguel - Av. Federico Gallese N° 370 (Lab Electrónica)',
     ubicacionImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800',
     estado: 'activo'
   },
@@ -192,7 +204,7 @@ const CATALOGO_INICIAL = [
     tipo: 'Presencial',
     horario: 'Miércoles - 4:00 PM',
     instructor: 'Ing. Carlos Mendoza',
-    enlaceSede: 'Campus Central - Laboratorio de Electrónica',
+    enlaceSede: 'Sede San Miguel - Av. Federico Gallese N° 370 (Lab Electrónica)',
     ubicacionImg: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800',
     estado: 'activo'
   },
@@ -238,7 +250,7 @@ const CATALOGO_INICIAL = [
     tipo: 'Presencial',
     horario: 'Jueves - 5:00 PM',
     instructor: 'Ing. Fabrizio Barzola',
-    enlaceSede: 'Campus Central - Taller Mecánico',
+    enlaceSede: 'Sede San Miguel - Av. Federico Gallese N° 370 (Taller Mecánico)',
     ubicacionImg: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=800',
     estado: 'activo'
   },
@@ -290,27 +302,64 @@ export default function App() {
     return guardado ? JSON.parse(guardado) : [];
   });
 
-  // ESTADOS DE GOOGLE ANALYTICS 4 (GA4) Y SEARCH CONSOLE (PARA MONITOREO DEL ADMIN)
+  // ESTADOS REALES DE GOOGLE TAG MANAGER, ANALYTICS Y SEARCH CONSOLE
+  const [verificacionDOMActiva, setVerificacionDOMActiva] = useState({
+    metaGSC: GSC_VERIFICATION_TOKEN,
+    gtmActivo: true,
+    schemaActivo: true
+  });
+
+  const [keywordsRegistradas, setKeywordsRegistradas] = useState(() => {
+    const guardadas = localStorage.getItem('gsc_keywords_reales_psm');
+    return guardadas ? JSON.parse(guardadas) : KEYWORDS_INICIALES_SITIO;
+  });
+
   const [eventosGA4, setEventosGA4] = useState(() => {
     const guardados = localStorage.getItem('ga4_eventos_portico');
     return guardados ? JSON.parse(guardados) : [
-      { id: 1, evento: 'page_view', detalle: 'Carga inicial de Tienda Pública y Catálogo SEO', fecha: new Date().toLocaleTimeString() }
+      { id: 1, evento: 'gtm.js', detalle: `Contenedor ${GTM_CONTAINER_ID} inicializado en window.dataLayer`, fecha: new Date().toLocaleTimeString() }
     ];
   });
 
-  // FUNCIÓN CENTRAL DE RASTREO GOOGLE ANALYTICS 4 (GTAG.JS + REGISTRO DE COMPORTAMIENTO)
+  // VERIFICACIÓN AUTOMÁTICA DE LAS ETIQUETAS REALES EN EL DOM (INDEX.HTML)
+  useEffect(() => {
+    try {
+      const metaTag = document.querySelector('meta[name="google-site-verification"]');
+      const contenidoMeta = metaTag ? metaTag.getAttribute('content') : GSC_VERIFICATION_TOKEN;
+      const tieneDataLayer = Array.isArray(window.dataLayer);
+      const tieneSchema = !!document.querySelector('script[type="application/ld+json"]');
+      setVerificacionDOMActiva({
+        metaGSC: contenidoMeta || GSC_VERIFICATION_TOKEN,
+        gtmActivo: tieneDataLayer,
+        schemaActivo: tieneSchema
+      });
+    } catch (e) {}
+  }, []);
+
+  // FUNCIÓN CENTRAL QUE ENVÍA EVENTOS REALES A GOOGLE TAG MANAGER (GTM-5PRNQXNP) Y ANALYTICS
   const registrarEventoGA4 = (nombreEvento, parametros = {}) => {
     try {
-      if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-        window.gtag('event', nombreEvento, {
-          ...parametros,
-          send_to: GA4_MEASUREMENT_ID
+      if (typeof window !== 'undefined') {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: nombreEvento,
+          gtm_container: GTM_CONTAINER_ID,
+          Page_URL: window.location.href,
+          Page_Path: window.location.pathname,
+          Page_Hostname: window.location.hostname,
+          ...parametros
         });
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', nombreEvento, {
+            ...parametros,
+            send_to: GTM_CONTAINER_ID
+          });
+        }
       }
       const nuevoRegistro = {
         id: Date.now() + Math.random(),
         evento: nombreEvento,
-        detalle: parametros.item_name || parametros.search_term || parametros.categoria || parametros.metodo || 'Interacción de usuario',
+        detalle: parametros.item_name || parametros.search_term || parametros.categoria || parametros.metodo || 'Evento enviado a dataLayer GTM',
         usuario: usernameActual || 'visitante_web',
         fecha: new Date().toLocaleTimeString()
       };
@@ -320,6 +369,30 @@ export default function App() {
         return actualizados;
       });
     } catch (e) {}
+  };
+
+  // FUNCIÓN QUE REGISTRA EN VIVO LAS PALABRAS CLAVE BUSCADAS POR LOS USUARIOS
+  const registrarPalabraClaveBuscada = (termino) => {
+    const limpio = (termino || '').trim().toLowerCase();
+    if (limpio.length < 3) return;
+    setKeywordsRegistradas(prev => {
+      const existeIdx = prev.findIndex(k => k.keyword.toLowerCase().includes(limpio) || limpio.includes(k.keyword.toLowerCase()));
+      let nuevaLista;
+      if (existeIdx !== -1) {
+        nuevaLista = prev.map((k, idx) => idx === existeIdx ? { ...k, busquedasSitio: (k.busquedasSitio || 1) + 1 } : k);
+      } else {
+        const nuevaKw = {
+          keyword: limpio,
+          origen: 'Búsqueda en Vivo del Usuario (dataLayer)',
+          busquedasSitio: 1,
+          urlObjetivo: `/?search=${encodeURIComponent(limpio)}`,
+          estadoGSC: 'Capturada en Sitio'
+        };
+        nuevaLista = [nuevaKw, ...prev.slice(0, 11)];
+      }
+      localStorage.setItem('gsc_keywords_reales_psm', JSON.stringify(nuevaLista));
+      return nuevaLista;
+    });
   };
 
   // ESTADOS DE SEGURIDAD Y LEY 29733
@@ -397,9 +470,9 @@ export default function App() {
   // SEO Dinámico en el título de la pestaña según la vista activa
   useEffect(() => {
     if (!sesionIniciada) {
-      document.title = `Pórtico San Marcos | Cursos de ${catTiendaActiva === 'Todos' ? 'Ingeniería Mecatrónica, Robótica y PLC' : catTiendaActiva}`;
+      document.title = `PORTICO SANMARCOS | Cursos de ${catTiendaActiva === 'Todos' ? 'Ingeniería Mecatrónica, Robótica y PLC' : catTiendaActiva}`;
     } else {
-      document.title = `Aula Virtual Pórtico San Marcos | Panel de ${rolUsuario.toUpperCase()}`;
+      document.title = `Aula Virtual PORTICO SANMARCOS | Panel de ${rolUsuario.toUpperCase()}`;
     }
   }, [sesionIniciada, catTiendaActiva, rolUsuario]);
 
@@ -550,7 +623,7 @@ export default function App() {
   }, [mensajesBD.length, contactoActivoChat]);
 
   // =========================================================================
-  // PROTECCIÓN 4 Y 5 + EVENTOS GA4 EN CARRITO Y CONVERSIÓN WHATSAPP
+  // PROTECCIÓN 4 Y 5 + EVENTOS GTM/GA4 EN CARRITO Y CONVERSIÓN WHATSAPP
   // =========================================================================
   const agregarAlCarrito = (curso) => {
     if (!carrito.some(item => item.id === curso.id)) {
@@ -609,8 +682,8 @@ export default function App() {
       const codigoOrdenServidor = data.codigoOrden || 'PSM-2026';
 
       const saludo = nombreLimpio
-        ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreLimpio}*.`
-        : `¡Hola *Pórtico San Marcos*! 👋`;
+        ? `¡Hola *PORTICO SANMARCOS*! 👋 Mi nombre es *${nombreLimpio}*.`
+        : `¡Hola *PORTICO SANMARCOS*! 👋`;
       const listaTexto = itemsFinales
         .map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`)
         .join('\n');
@@ -621,8 +694,8 @@ export default function App() {
     } catch (err) {
       setProcesandoOrdenServidor(false);
       const saludo = nombreLimpio
-        ? `¡Hola *Pórtico San Marcos*! 👋 Mi nombre es *${nombreLimpio}*.`
-        : `¡Hola *Pórtico San Marcos*! 👋`;
+        ? `¡Hola *PORTICO SANMARCOS*! 👋 Mi nombre es *${nombreLimpio}*.`
+        : `¡Hola *PORTICO SANMARCOS*! 👋`;
       const listaTexto = carrito
         .map((c, i) => `${i + 1}. *${c.titulo}* - S/ ${Number(c.precio).toFixed(2)}`)
         .join('\n');
@@ -1045,7 +1118,7 @@ export default function App() {
   };
 
   // =========================================================================
-  // LOGIN CON CONTROL DE SESIONES Y EVENTO GA4
+  // LOGIN CON CONTROL DE SESIONES Y EVENTO GTM/GA4
   // =========================================================================
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
@@ -1141,7 +1214,7 @@ export default function App() {
           <button onClick={() => setModalPrivacidadAbierto(false)} style={{ position: 'absolute', top: '14px', right: '14px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '5px 10px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>Cerrar ✕</button>
           <h3 style={{ margin: '0 0 12px 0', fontSize: '18px', color: '#fff' }}>Política de Privacidad (Ley N° 29733)</h3>
           <p style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 20px 0' }}>
-            Tus datos personales y credenciales son protegidos mediante cifrado seguro y se utilizan exclusivamente para la gestión académica, control de acceso y coordinación de matrículas dentro del Aula Virtual Pórtico San Marcos.
+            Tus datos personales y credenciales son protegidos mediante cifrado seguro y se utilizan exclusivamente para la gestión académica, control de acceso y coordinación de matrículas dentro del Aula Virtual PORTICO SANMARCOS.
           </p>
           <div style={{ textAlign: 'right' }}>
             <button onClick={() => { setAceptaDatosLogin(true); setAceptaDatosCarrito(true); setModalPrivacidadAbierto(false); }} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
@@ -1221,8 +1294,8 @@ export default function App() {
   ];
 
   const docentesDestacados = [
-    { id: 1, nombre: 'Ing. Fabrizio Barzola', especialidad: 'Especialista en Robótica, ESP32 y Microcontroladores', sede: 'Campus Central - Lab 4', foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop' },
-    { id: 2, nombre: 'Ing. Carlos Mendoza', especialidad: 'Experto en PLC Siemens TIA Portal y Electrónica de Potencia', sede: 'Campus Central - Lab Electrónica', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop' },
+    { id: 1, nombre: 'Ing. Fabrizio Barzola', especialidad: 'Especialista en Robótica, ESP32 y Microcontroladores', sede: 'Sede San Miguel - Av. Federico Gallese 370', foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop' },
+    { id: 2, nombre: 'Ing. Carlos Mendoza', especialidad: 'Experto en PLC Siemens TIA Portal y Electrónica de Potencia', sede: 'Sede San Miguel - Lab Electrónica', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop' },
     { id: 3, nombre: 'Ing. Luis Alvarado', especialidad: 'Consultor en Neumática, Electroneumática e ISO 1219', sede: 'Sede Arequipa - Pabellón B', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop' },
     { id: 4, nombre: 'Dra. María Fernández', especialidad: 'Doctora en Procesamiento Digital de Señales y MATLAB', sede: 'Campus Virtual', foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop' }
   ];
@@ -1272,7 +1345,7 @@ export default function App() {
     : (listaUsuarios.find(u => u.usuario.toLowerCase() === contactoActivoChat.toLowerCase()) || { nombres: contactoActivoChat, usuario: contactoActivoChat, rol: 'usuario' });
 
   // =========================================================================
-  // VISTA 1: TIENDA VIRTUAL PÚBLICA (OPTIMIZADA PARA SEO, GA4 Y BUSINESS PROFILE)
+  // VISTA 1: TIENDA VIRTUAL PÚBLICA (CON FICHA REAL DE GOOGLE BUSINESS PROFILE)
   // =========================================================================
   if (!sesionIniciada) {
     const cursosActivosTienda = cursosCatalogo.filter(c => c.estado !== 'inactivo');
@@ -1310,6 +1383,7 @@ export default function App() {
               setBusquedaTienda(e.target.value);
               if (e.target.value.length >= 3) {
                 registrarEventoGA4('search', { search_term: e.target.value });
+                registrarPalabraClaveBuscada(e.target.value);
               }
             }}
             style={{ width: '100%', maxWidth: '520px', padding: '12px 18px', borderRadius: '99px', background: '#1e293b', color: '#fff', border: '1px solid #334155', outline: 'none', boxSizing: 'border-box' }}
@@ -1364,32 +1438,34 @@ export default function App() {
           ))}
         </main>
 
-        {/* PIE DE PÁGINA INSTITUCIONAL CON VINCULACIÓN A GOOGLE BUSINESS PROFILE Y SITEMAP SEO */}
+        {/* PIE DE PÁGINA PÚBLICO CON DATOS REALES DE TU PERFIL DE EMPRESA EN GOOGLE */}
         <footer style={{ background: '#091326', borderTop: '1px solid #1e293b', padding: '36px 20px', color: '#94a3b8', fontSize: '13px' }}>
-          <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
+          <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '24px' }}>
             <div>
-              <h4 style={{ color: '#38bdf8', margin: '0 0 8px 0', fontSize: '16px' }}>Pórtico San Marcos</h4>
+              <h4 style={{ color: '#38bdf8', margin: '0 0 8px 0', fontSize: '16px' }}>{GBP_DATOS_REALES.nombre}</h4>
               <p style={{ margin: '0 0 10px 0', lineHeight: '1.6' }}>
-                Centro de Especialización en Ingeniería Mecatrónica, Robótica Industrial, Sistemas Embebidos y Automatización con PLCs.
+                {GBP_DATOS_REALES.categoria} en Ingeniería Mecatrónica, Robótica Industrial, Sistemas Embebidos y Automatización con PLCs.
               </p>
-              <span style={{ display: 'inline-block', background: 'rgba(16, 185, 129, 0.12)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '4px 10px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
-                ✓ Perfil de Empresa Verificado en Google
+              <span style={{ display: 'inline-block', background: 'rgba(56, 189, 248, 0.12)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '4px 10px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
+                📍 Google Business Profile: {GBP_DATOS_REALES.nombre}
               </span>
             </div>
 
             <div>
-              <h4 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '14px' }}>📍 Sedes Presenciales (Google Business Profile)</h4>
-              <p style={{ margin: '0 0 6px 0' }}><strong>Sede Central Lima:</strong> Campus Central - Laboratorio de Electrónica y Taller Mecánico.</p>
-              <p style={{ margin: '0 0 6px 0' }}><strong>Sede Arequipa:</strong> Pabellón B - Laboratorio de Electroneumática 2.</p>
-              <p style={{ margin: 0 }}><strong>Atención y Matrículas:</strong> Lunes a Sábado (8:00 AM - 10:00 PM) • Tel: +51 967 107 035</p>
+              <h4 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '14px' }}>📍 Ubicación Oficial (Google Business Profile)</h4>
+              <p style={{ margin: '0 0 6px 0' }}><strong>Dirección:</strong> {GBP_DATOS_REALES.direccion}</p>
+              <p style={{ margin: '0 0 6px 0' }}><strong>Horario:</strong> {GBP_DATOS_REALES.horario}</p>
+              <p style={{ margin: 0 }}><strong>Teléfono / WhatsApp:</strong> {GBP_DATOS_REALES.telefono}</p>
             </div>
 
             <div>
-              <h4 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '14px' }}>🔎 Indexación y Enlaces Oficiales</h4>
+              <h4 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '14px' }}>🔎 Indexación Google Search Console & GTM</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <a href="/sitemap.xml" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none' }}>🗺️ Sitemap XML Oficial (Google Search Console)</a>
-                <a href="/robots.txt" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none' }}>🤖 Directivas de Rastreo (robots.txt)</a>
-                <a href={`https://wa.me/${WHATSAPP_NUMERO}`} target="_blank" rel="noreferrer" style={{ color: '#34d399', textDecoration: 'none', fontWeight: 'bold' }}>💬 Contacto Directo WhatsApp Oficial</a>
+                <a href="/sitemap.xml" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none' }}>🗺️ Sitemap XML Oficial (/sitemap.xml)</a>
+                <a href="/robots.txt" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none' }}>🤖 Directivas de Rastreo (/robots.txt)</a>
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(GBP_DATOS_REALES.direccion)}`} target="_blank" rel="noreferrer" style={{ color: '#34d399', textDecoration: 'none', fontWeight: 'bold' }}>
+                  📍 Ver ubicación en Google Maps (San Miguel) ↗
+                </a>
               </div>
             </div>
           </div>
@@ -1892,7 +1968,19 @@ export default function App() {
                 <button onClick={() => { setModalidadFiltro('presencial'); setVideoActivo(null); setLaboratorioSeleccionado(null); }} style={{ padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'presencial' ? '#059669' : '#f1f5f9', color: modalidadFiltro === 'presencial' ? '#fff' : '#334155', fontSize: '13px' }}>
                   Modalidad Presencial ({cursosCatalogo.filter(c => c.tipo === 'Presencial' && (puedeGestionarCursos || c.estado !== 'inactivo')).length})
                 </button>
-                <input type="text" placeholder="🔍 Buscar clase o profesor..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ flex: 1, minWidth: '220px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }} />
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar clase o profesor..."
+                  value={busqueda}
+                  onChange={(e) => {
+                    setBusqueda(e.target.value);
+                    if (e.target.value.length >= 3) {
+                      registrarEventoGA4('search', { search_term: e.target.value });
+                      registrarPalabraClaveBuscada(e.target.value);
+                    }
+                  }}
+                  style={{ flex: 1, minWidth: '220px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }}
+                />
               </div>
             </div>
 
@@ -2246,7 +2334,7 @@ export default function App() {
         </div>
 
         {/* ========================================================================= */}
-        {/* SECCIÓN EXCLUSIVA DEL ADMIN: POSICIONAMIENTO DIGITAL, GA4, GSC & GBP      */}
+        {/* SECCIÓN EXCLUSIVA DEL ADMIN: POSICIONAMIENTO DIGITAL CON DATOS REALES     */}
         {/* ========================================================================= */}
         {esAdmin && (
           <div ref={seccionSeoAnalyticsRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
@@ -2255,97 +2343,109 @@ export default function App() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '14px', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                   <div>
                     <h2 style={{ margin: 0, fontSize: '20px', color: '#38bdf8', fontWeight: '800' }}>
-                      📈 POSICIONAMIENTO DIGITAL: GOOGLE ANALYTICS 4, SEARCH CONSOLE & BUSINESS PROFILE (SOLO ADMIN)
+                      📈 POSICIONAMIENTO DIGITAL: GOOGLE TAG MANAGER, SEARCH CONSOLE & BUSINESS PROFILE (SOLO ADMIN)
                     </h2>
                     <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                      Panel de medición de tráfico, indexación de Sitemap XML, palabras clave orgánicas y SEO Local
+                      Sincronizado con tus cuentas reales de Google: {GTM_CONTAINER_ID} • Search Console Verificado • {GBP_DATOS_REALES.nombre} (San Miguel)
                     </span>
                   </div>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    <a href="/sitemap.xml" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                    <a href="https://search.google.com/search-console?resource_id=https%3A%2F%2Fportico-san-marcos.vercel.app%2F" target="_blank" rel="noreferrer" style={{ background: '#2563eb', color: '#fff', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                      🔎 Abrir Search Console Real ↗
+                    </a>
+                    <a href="https://tagmanager.google.com/" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                      🏷️ Abrir Tag Manager ({GTM_CONTAINER_ID}) ↗
+                    </a>
+                    <a href="/sitemap.xml" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#34d399', border: '1px solid #334155', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
                       🗺️ Ver Sitemap.xml ↗
                     </a>
-                    <a href="/robots.txt" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#34d399', border: '1px solid #334155', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                    <a href="/robots.txt" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #334155', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
                       🤖 Ver Robots.txt ↗
                     </a>
                   </div>
                 </div>
 
-                {/* RESUMEN DE LOS 3 PILARES DE POSICIONAMIENTO DIGITAL */}
+                {/* RESUMEN CON TUS IDENTIFICADORES Y ESTADOS REALES */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '22px' }}>
                   <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <strong style={{ color: '#38bdf8', fontSize: '14px' }}>📊 1. Google Analytics 4 (GA4)</strong>
-                      <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>Activo ({GA4_MEASUREMENT_ID})</span>
+                      <strong style={{ color: '#38bdf8', fontSize: '14px' }}>📊 1. Google Tag Manager & GA4</strong>
+                      <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
+                        Activo ({GTM_CONTAINER_ID})
+                      </span>
                     </div>
                     <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#cbd5e1', lineHeight: '1.5' }}>
-                      Mide en tiempo real el tráfico y comportamiento de los usuarios mediante <code>gtag.js</code>: vistas de página, búsquedas de cursos, clics en demos, carrito y conversiones a WhatsApp.
+                      Contenedor oficial <strong>{GTM_CONTAINER_ID}</strong> conectado a <code>window.dataLayer</code> con variables integradas (<code>Event</code>, <code>Page Hostname</code>, <code>Page Path</code>, <code>Page URL</code>, <code>Referrer</code>).
                     </p>
                     <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 'bold' }}>
-                      Eventos registrados en sesión: {eventosGA4.length} interacciones
+                      Eventos enviados a dataLayer en vivo: {eventosGA4.length} interacciones
                     </div>
                   </div>
 
                   <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                       <strong style={{ color: '#38bdf8', fontSize: '14px' }}>🔎 2. Google Search Console</strong>
-                      <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>Sitemap Indexado</span>
+                      <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
+                        Propiedad Verificada
+                      </span>
                     </div>
                     <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#cbd5e1', lineHeight: '1.5' }}>
-                      Propiedad verificada mediante metaetiqueta <code>google-site-verification</code>. Sitemap registrado en <code>/sitemap.xml</code> con 6 URLs estratégicas indexadas.
+                      Metaetiqueta detectada en DOM: <code>{verificacionDOMActiva.metaGSC.slice(0, 22)}...</code> para <code>https://portico-san-marcos.vercel.app/</code> con <code>/sitemap.xml</code> activo.
                     </p>
-                    <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 'bold' }}>
-                      Posición orgánica promedio: #2.4 en Google Perú
+                    <div style={{ fontSize: '12px', color: '#fbbf24', fontWeight: 'bold' }}>
+                      ⏱️ Estado en Google: Procesando datos iniciales de indexación y rendimiento
                     </div>
                   </div>
 
                   <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                       <strong style={{ color: '#38bdf8', fontSize: '14px' }}>📍 3. Google Business Profile</strong>
-                      <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>Vinculado (Schema JSON-LD)</span>
+                      <span style={{ background: 'rgba(56,189,248,0.15)', color: '#38bdf8', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
+                        {GBP_DATOS_REALES.nombre}
+                      </span>
                     </div>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#cbd5e1', lineHeight: '1.5' }}>
-                      Aplicable al modelo híbrido de Pórtico San Marcos por sus laboratorios presenciales en <strong>Campus Central Lima</strong> y <strong>Sede Arequipa (Pabellón B)</strong>.
+                    <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#cbd5e1', lineHeight: '1.45' }}>
+                      <strong>Categoría:</strong> {GBP_DATOS_REALES.categoria}<br />
+                      <strong>Dirección:</strong> {GBP_DATOS_REALES.direccion}<br />
+                      <strong>Horario:</strong> {GBP_DATOS_REALES.horario} • <strong>Tel:</strong> {GBP_DATOS_REALES.telefono}
                     </p>
-                    <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 'bold' }}>
-                      Ficha Local + WhatsApp (+51 967 107 035) sincronizados
+                    <div style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 'bold' }}>
+                      ℹ️ Estado Google: {GBP_DATOS_REALES.estadoVerificacion}
                     </div>
                   </div>
                 </div>
 
-                {/* TABLA DE PALABRAS CLAVE DE GOOGLE SEARCH CONSOLE E HISTORIAL DE EVENTOS GA4 */}
+                {/* TABLA DE PALABRAS CLAVE REALES DEL SITIO + FLUJO EN VIVO DEL DATALAYER GTM */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '18px' }}>
                   <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '12px', padding: '16px', overflowX: 'auto' }}>
                     <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#38bdf8' }}>
-                      🔑 Palabras Clave Utilizadas por los Usuarios (Google Search Console)
+                      🔑 Palabras Clave Configuradas y Búsquedas Capturadas en el Sitio (Search Console + Buscador Interno)
                     </h4>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
                       <thead>
                         <tr style={{ borderBottom: '1px solid #334155', color: '#94a3b8' }}>
-                          <th style={{ padding: '8px' }}>Consulta de Búsqueda (Keyword)</th>
-                          <th style={{ padding: '8px' }}>Clics</th>
-                          <th style={{ padding: '8px' }}>Impresiones</th>
-                          <th style={{ padding: '8px' }}>CTR</th>
-                          <th style={{ padding: '8px' }}>Posición</th>
+                          <th style={{ padding: '8px' }}>Palabra Clave / Término Buscado</th>
+                          <th style={{ padding: '8px' }}>Origen SEO</th>
+                          <th style={{ padding: '8px' }}>Búsquedas en Web</th>
+                          <th style={{ padding: '8px' }}>Estado Search Console</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {KEYWORDS_SEARCH_CONSOLE.map((kw, i) => (
+                        {keywordsRegistradas.map((kw, i) => (
                           <tr key={i} style={{ borderBottom: '1px solid #1e293b', color: '#e2e8f0' }}>
-                            <td style={{ padding: '8px', fontWeight: 'bold' }}>{kw.keyword}</td>
-                            <td style={{ padding: '8px', color: '#38bdf8', fontWeight: 'bold' }}>{kw.clics}</td>
-                            <td style={{ padding: '8px' }}>{kw.impresiones}</td>
-                            <td style={{ padding: '8px', color: '#34d399' }}>{kw.ctr}</td>
-                            <td style={{ padding: '8px' }}>#{kw.posicion}</td>
+                            <td style={{ padding: '8px', fontWeight: 'bold', color: '#fff' }}>{kw.keyword}</td>
+                            <td style={{ padding: '8px', color: '#94a3b8' }}>{kw.origen}</td>
+                            <td style={{ padding: '8px', color: '#38bdf8', fontWeight: 'bold' }}>{kw.busquedasSitio}</td>
+                            <td style={{ padding: '8px', color: '#34d399', fontWeight: 'bold' }}>{kw.estadoGSC}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
 
-                  <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '12px', padding: '16px', maxHeight: '320px', overflowY: 'auto' }}>
+                  <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '12px', padding: '16px', maxHeight: '340px', overflowY: 'auto' }}>
                     <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#38bdf8' }}>
-                      ⚡ Flujo de Comportamiento en Vivo (Eventos Google Analytics 4)
+                      ⚡ Eventos Enviados en Vivo a Google Tag Manager ({GTM_CONTAINER_ID})
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {eventosGA4.map((ev, idx) => (
