@@ -20,14 +20,24 @@ const GBP_DATOS_REALES = {
 
 // PALABRAS CLAVE SEO CONFIGURADAS + BÚSQUEDAS REALES DE LOS USUARIOS EN EL SITIO
 const KEYWORDS_INICIALES_SITIO = [
-  { keyword: 'portico sanmarcos centro de formación san miguel', origen: 'Google Business Profile + Meta SEO', busquedasSitio: 14, urlObjetivo: '/', estadoGSC: 'Indexando en Search Console' },
   { keyword: 'cursos de ingeniería mecatrónica perú', origen: 'Meta Keywords / Título Principal', busquedasSitio: 19, urlObjetivo: '/', estadoGSC: 'Indexando en Search Console' },
+  { keyword: 'portico sanmarcos centro de formación san miguel', origen: 'Google Business Profile + Meta SEO', busquedasSitio: 14, urlObjetivo: '/', estadoGSC: 'Indexando en Search Console' },
   { keyword: 'curso plc siemens tia portal', origen: 'Catálogo Automatización', busquedasSitio: 12, urlObjetivo: '/?categoria=Automatizacion', estadoGSC: 'En Sitemap.xml' },
   { keyword: 'robótica y cinemática denavit hartenberg', origen: 'Catálogo Robótica', busquedasSitio: 11, urlObjetivo: '/?categoria=Robotica', estadoGSC: 'En Sitemap.xml' },
+  { keyword: 'modelado cad 3d autodesk inventor fea', origen: 'Catálogo Diseño Mecánico', busquedasSitio: 10, urlObjetivo: '/?categoria=Diseno-Mecanico', estadoGSC: 'En Sitemap.xml' },
   { keyword: 'programación esp32 arduino mega', origen: 'Catálogo Sistemas Embebidos', busquedasSitio: 9, urlObjetivo: '/?categoria=Sistemas-Embebidos', estadoGSC: 'En Sitemap.xml' },
   { keyword: 'diseño pcb altium kicad lima', origen: 'Catálogo Electrónica (Sede Lima)', busquedasSitio: 8, urlObjetivo: '/?categoria=Electronica', estadoGSC: 'En Sitemap.xml' },
-  { keyword: 'electroneumática fluidsim iso 1219', origen: 'Catálogo Automatización', busquedasSitio: 7, urlObjetivo: '/?categoria=Automatizacion', estadoGSC: 'En Sitemap.xml' },
-  { keyword: 'modelado cad 3d autodesk inventor fea', origen: 'Catálogo Diseño Mecánico', busquedasSitio: 10, urlObjetivo: '/?categoria=Diseno-Mecanico', estadoGSC: 'En Sitemap.xml' }
+  { keyword: 'electroneumática fluidsim iso 1219', origen: 'Catálogo Automatización', busquedasSitio: 7, urlObjetivo: '/?categoria=Automatizacion', estadoGSC: 'En Sitemap.xml' }
+];
+
+// RUTAS DEL SITEMAP OFICIAL PARA VISUALIZACIÓN INTERACTIVA
+const RUTAS_SITEMAP_OFICIAL = [
+  { url: 'https://portico-san-marcos.vercel.app/', nombre: 'Catálogo Principal & Aula Virtual', prioridad: 1.0, frecuencia: 'Diaria' },
+  { url: 'https://portico-san-marcos.vercel.app/?categoria=Robotica', nombre: 'Especialidad: Robótica y Cinemática', prioridad: 0.9, frecuencia: 'Semanal' },
+  { url: 'https://portico-san-marcos.vercel.app/?categoria=Automatizacion', nombre: 'Especialidad: Automatización y PLCs', prioridad: 0.9, frecuencia: 'Semanal' },
+  { url: 'https://portico-san-marcos.vercel.app/?categoria=Electronica', nombre: 'Especialidad: Electrónica y PCBs', prioridad: 0.8, frecuencia: 'Semanal' },
+  { url: 'https://portico-san-marcos.vercel.app/?categoria=Sistemas-Embebidos', nombre: 'Especialidad: Sistemas Embebidos (ESP32)', prioridad: 0.8, frecuencia: 'Semanal' },
+  { url: 'https://portico-san-marcos.vercel.app/?categoria=Diseno-Mecanico', nombre: 'Especialidad: Diseño Mecánico CAD 3D', prioridad: 0.8, frecuencia: 'Semanal' }
 ];
 
 // USUARIOS BASE DE RESPALDO (Se fusionan automáticamente con los de la BD Aiven)
@@ -302,7 +312,11 @@ export default function App() {
     return guardado ? JSON.parse(guardado) : [];
   });
 
-  // ESTADOS REALES DE GOOGLE TAG MANAGER, ANALYTICS Y SEARCH CONSOLE
+  // ESTADOS INTERACTIVOS DEL DASHBOARD SEO, GTM Y SEARCH CONSOLE
+  const [vistaSeoActiva, setVistaSeoActiva] = useState('todo'); // 'todo' | 'gtm' | 'keywords' | 'local'
+  const [filtroEventoGTM, setFiltroEventoGTM] = useState('todos');
+  const [keywordSimuladaInput, setKeywordSimuladaInput] = useState('');
+
   const [verificacionDOMActiva, setVerificacionDOMActiva] = useState({
     metaGSC: GSC_VERIFICATION_TOKEN,
     gtmActivo: true,
@@ -317,7 +331,7 @@ export default function App() {
   const [eventosGA4, setEventosGA4] = useState(() => {
     const guardados = localStorage.getItem('ga4_eventos_portico');
     return guardados ? JSON.parse(guardados) : [
-      { id: 1, evento: 'gtm.js', detalle: `Contenedor ${GTM_CONTAINER_ID} inicializado en window.dataLayer`, fecha: new Date().toLocaleTimeString() }
+      { id: 1, evento: 'gtm.js', detalle: `Contenedor ${GTM_CONTAINER_ID} activo en window.dataLayer`, fecha: new Date().toLocaleTimeString() }
     ];
   });
 
@@ -383,7 +397,7 @@ export default function App() {
       } else {
         const nuevaKw = {
           keyword: limpio,
-          origen: 'Búsqueda en Vivo del Usuario (dataLayer)',
+          origen: 'Búsqueda en Vivo (dataLayer)',
           busquedasSitio: 1,
           urlObjetivo: `/?search=${encodeURIComponent(limpio)}`,
           estadoGSC: 'Capturada en Sitio'
@@ -393,6 +407,14 @@ export default function App() {
       localStorage.setItem('gsc_keywords_reales_psm', JSON.stringify(nuevaLista));
       return nuevaLista;
     });
+  };
+
+  const handleProbarKeywordEnVivo = (e) => {
+    e.preventDefault();
+    if (!keywordSimuladaInput.trim()) return;
+    registrarEventoGA4('search', { search_term: keywordSimuladaInput.trim() });
+    registrarPalabraClaveBuscada(keywordSimuladaInput.trim());
+    setKeywordSimuladaInput('');
   };
 
   // ESTADOS DE SEGURIDAD Y LEY 29733
@@ -1344,6 +1366,14 @@ export default function App() {
     ? { nombres: esAdmin && modoSupervisionAdmin ? 'Canal General + Supervisión Institucional' : 'Canal General (Todos los Usuarios)', usuario: 'todos', rol: 'institucional' }
     : (listaUsuarios.find(u => u.usuario.toLowerCase() === contactoActivoChat.toLowerCase()) || { nombres: contactoActivoChat, usuario: contactoActivoChat, rol: 'usuario' });
 
+  // Cálculos dinámicos para las barras visuales del panel SEO
+  const totalBusquedasKeywords = keywordsRegistradas.reduce((acc, k) => acc + Number(k.busquedasSitio || 1), 0);
+  const maxBusquedasKeyword = Math.max(...keywordsRegistradas.map(k => Number(k.busquedasSitio || 1)), 20);
+  const eventosGTMFiltrados = eventosGA4.filter(ev => {
+    if (filtroEventoGTM === 'todos') return true;
+    return (ev.evento || '').toLowerCase().includes(filtroEventoGTM.toLowerCase());
+  });
+
   // =========================================================================
   // VISTA 1: TIENDA VIRTUAL PÚBLICA (CON FICHA REAL DE GOOGLE BUSINESS PROFILE)
   // =========================================================================
@@ -1583,7 +1613,7 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
       
-      {/* ESTILOS RESPONSIVOS INTEGRADOS PARA PC Y CELULAR */}
+      {/* ESTILOS RESPONSIVOS Y ANIMACIONES DINÁMICAS */}
       <style>{`
         .psm-navbar {
           width: 100%;
@@ -1716,6 +1746,40 @@ export default function App() {
           background: #111827;
           color: #f8fafc;
           height: 580px;
+        }
+        /* TARJETAS KPI INTERACTIVAS DEL PANEL SEO */
+        .psm-seo-kpi-card {
+          background: #161f33;
+          border: 1px solid #334155;
+          border-radius: 14px;
+          padding: 18px;
+          cursor: pointer;
+          transition: all 0.22s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .psm-seo-kpi-card:hover {
+          transform: translateY(-3px);
+          border-color: #38bdf8;
+          box-shadow: 0 10px 25px rgba(56, 189, 248, 0.14);
+        }
+        .psm-seo-kpi-card.activa {
+          background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+          border: 1.5px solid #38bdf8;
+          box-shadow: 0 0 20px rgba(56, 189, 248, 0.22);
+        }
+        @keyframes psmPulseGreen {
+          0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+          70% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+        }
+        .psm-live-dot {
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+          background: #34d399;
+          display: inline-block;
+          animation: psmPulseGreen 1.8s infinite;
         }
         /* OPTIMIZACIÓN PARA CELULARES */
         @media (max-width: 1020px) {
@@ -2334,133 +2398,357 @@ export default function App() {
         </div>
 
         {/* ========================================================================= */}
-        {/* SECCIÓN EXCLUSIVA DEL ADMIN: POSICIONAMIENTO DIGITAL CON DATOS REALES     */}
+        {/* SECCIÓN EXCLUSIVA DEL ADMIN: DASHBOARD DINÁMICO E INTERACTIVO DE SEO      */}
         {/* ========================================================================= */}
         {esAdmin && (
           <div ref={seccionSeoAnalyticsRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ background: '#0f172a', color: '#f8fafc', borderRadius: '16px', padding: '26px', border: '1px solid #1e293b', boxShadow: '0 14px 34px rgba(15, 23, 42, 0.2)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '14px', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-                  <div>
-                    <h2 style={{ margin: 0, fontSize: '20px', color: '#38bdf8', fontWeight: '800' }}>
-                      📈 POSICIONAMIENTO DIGITAL: GOOGLE TAG MANAGER, SEARCH CONSOLE & BUSINESS PROFILE (SOLO ADMIN)
-                    </h2>
-                    <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                      Sincronizado con tus cuentas reales de Google: {GTM_CONTAINER_ID} • Search Console Verificado • {GBP_DATOS_REALES.nombre} (San Miguel)
-                    </span>
+              <div style={{ background: '#0b1120', color: '#f8fafc', borderRadius: '18px', padding: '26px', border: '1px solid #1e293b', boxShadow: '0 18px 40px rgba(2, 6, 23, 0.35)' }}>
+                
+                {/* CABECERA COMPACTA CON ACCIONES RÁPIDAS Y SELECTOR DE VISTA */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '16px', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
+                      📈
+                    </div>
+                    <div>
+                      <h2 style={{ margin: 0, fontSize: '19px', color: '#fff', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        CENTRO INTERACTIVO DE POSICIONAMIENTO DIGITAL
+                        <span className="psm-live-dot" title="Conectado en vivo" />
+                      </h2>
+                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                        Haz clic en cualquier tarjeta para filtrar o usa los controles en vivo • Exclusivo Admin
+                      </span>
+                    </div>
                   </div>
+
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    <a href="https://search.google.com/search-console?resource_id=https%3A%2F%2Fportico-san-marcos.vercel.app%2F" target="_blank" rel="noreferrer" style={{ background: '#2563eb', color: '#fff', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
-                      🔎 Abrir Search Console Real ↗
+                    <a href="https://search.google.com/search-console?resource_id=https%3A%2F%2Fportico-san-marcos.vercel.app%2F" target="_blank" rel="noreferrer" style={{ background: '#2563eb', color: '#fff', padding: '8px 13px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                      🔎 Search Console ↗
                     </a>
-                    <a href="https://tagmanager.google.com/" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
-                      🏷️ Abrir Tag Manager ({GTM_CONTAINER_ID}) ↗
+                    <a href="https://tagmanager.google.com/" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '8px 13px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                      🏷️ {GTM_CONTAINER_ID} ↗
                     </a>
-                    <a href="/sitemap.xml" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#34d399', border: '1px solid #334155', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
-                      🗺️ Ver Sitemap.xml ↗
+                    <a href="/sitemap.xml" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#34d399', border: '1px solid #334155', padding: '8px 13px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                      🗺️ Sitemap.xml ↗
                     </a>
-                    <a href="/robots.txt" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #334155', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
-                      🤖 Ver Robots.txt ↗
+                    <a href="/robots.txt" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #334155', padding: '8px 13px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                      🤖 Robots.txt ↗
                     </a>
                   </div>
                 </div>
 
-                {/* RESUMEN CON TUS IDENTIFICADORES Y ESTADOS REALES */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '22px' }}>
-                  <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <strong style={{ color: '#38bdf8', fontSize: '14px' }}>📊 1. Google Tag Manager & GA4</strong>
-                      <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
-                        Activo ({GTM_CONTAINER_ID})
+                {/* 3 TARJETAS KPI VISUALES E INTERACTIVAS (MENOS TEXTO, MÁS IMPACTO VISUAL) */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+                  
+                  {/* KPI 1: GOOGLE TAG MANAGER & GA4 */}
+                  <div
+                    onClick={() => setVistaSeoActiva(vistaSeoActiva === 'gtm' ? 'todo' : 'gtm')}
+                    className={`psm-seo-kpi-card ${vistaSeoActiva === 'gtm' ? 'activa' : ''}`}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 'bold', textTransform: 'uppercase' }}>1. Google Tag Manager & GA4</span>
+                      <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
+                        ● {GTM_CONTAINER_ID}
                       </span>
                     </div>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#cbd5e1', lineHeight: '1.5' }}>
-                      Contenedor oficial <strong>{GTM_CONTAINER_ID}</strong> conectado a <code>window.dataLayer</code> con variables integradas (<code>Event</code>, <code>Page Hostname</code>, <code>Page Path</code>, <code>Page URL</code>, <code>Referrer</code>).
-                    </p>
-                    <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 'bold' }}>
-                      Eventos enviados a dataLayer en vivo: {eventosGA4.length} interacciones
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '8px' }}>
+                      <strong style={{ fontSize: '32px', color: '#38bdf8', fontWeight: '800', lineHeight: 1 }}>{eventosGA4.length}</strong>
+                      <span style={{ fontSize: '13px', color: '#e2e8f0', fontWeight: 'bold' }}>Eventos en dataLayer</span>
+                    </div>
+                    <div style={{ width: '100%', height: '6px', background: '#0f172a', borderRadius: '99px', overflow: 'hidden', marginBottom: '8px' }}>
+                      <div style={{ width: `${Math.min(100, eventosGA4.length * 5)}%`, height: '100%', background: 'linear-gradient(90deg, #2563eb, #38bdf8)', borderRadius: '99px', transition: 'width 0.3s ease' }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#94a3b8' }}>
+                      <span>Variables: Event, URL, Path, Host</span>
+                      <strong style={{ color: '#38bdf8' }}>{vistaSeoActiva === 'gtm' ? 'Ver Todo ↺' : 'Filtrar vista →'}</strong>
                     </div>
                   </div>
 
-                  <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <strong style={{ color: '#38bdf8', fontSize: '14px' }}>🔎 2. Google Search Console</strong>
-                      <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
-                        Propiedad Verificada
+                  {/* KPI 2: GOOGLE SEARCH CONSOLE & KEYWORDS */}
+                  <div
+                    onClick={() => setVistaSeoActiva(vistaSeoActiva === 'keywords' ? 'todo' : 'keywords')}
+                    className={`psm-seo-kpi-card ${vistaSeoActiva === 'keywords' ? 'activa' : ''}`}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 'bold', textTransform: 'uppercase' }}>2. Search Console & Keywords</span>
+                      <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
+                        ✓ Verificado
                       </span>
                     </div>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#cbd5e1', lineHeight: '1.5' }}>
-                      Metaetiqueta detectada en DOM: <code>{verificacionDOMActiva.metaGSC.slice(0, 22)}...</code> para <code>https://portico-san-marcos.vercel.app/</code> con <code>/sitemap.xml</code> activo.
-                    </p>
-                    <div style={{ fontSize: '12px', color: '#fbbf24', fontWeight: 'bold' }}>
-                      ⏱️ Estado en Google: Procesando datos iniciales de indexación y rendimiento
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '8px' }}>
+                      <strong style={{ fontSize: '32px', color: '#34d399', fontWeight: '800', lineHeight: 1 }}>{totalBusquedasKeywords}</strong>
+                      <span style={{ fontSize: '13px', color: '#e2e8f0', fontWeight: 'bold' }}>Búsquedas ({keywordsRegistradas.length} Keywords)</span>
+                    </div>
+                    <div style={{ width: '100%', height: '6px', background: '#0f172a', borderRadius: '99px', overflow: 'hidden', marginBottom: '8px' }}>
+                      <div style={{ width: '88%', height: '100%', background: 'linear-gradient(90deg, #059669, #34d399)', borderRadius: '99px' }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#94a3b8' }}>
+                      <span>Token HTML: {verificacionDOMActiva.metaGSC.slice(0, 12)}...</span>
+                      <strong style={{ color: '#34d399' }}>{vistaSeoActiva === 'keywords' ? 'Ver Todo ↺' : 'Ver gráfico →'}</strong>
                     </div>
                   </div>
 
-                  <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <strong style={{ color: '#38bdf8', fontSize: '14px' }}>📍 3. Google Business Profile</strong>
-                      <span style={{ background: 'rgba(56,189,248,0.15)', color: '#38bdf8', padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
-                        {GBP_DATOS_REALES.nombre}
+                  {/* KPI 3: GOOGLE BUSINESS PROFILE & SITEMAP */}
+                  <div
+                    onClick={() => setVistaSeoActiva(vistaSeoActiva === 'local' ? 'todo' : 'local')}
+                    className={`psm-seo-kpi-card ${vistaSeoActiva === 'local' ? 'activa' : ''}`}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 'bold', textTransform: 'uppercase' }}>3. Business Profile & Sitemap</span>
+                      <span style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
+                        San Miguel, Lima
                       </span>
                     </div>
-                    <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#cbd5e1', lineHeight: '1.45' }}>
-                      <strong>Categoría:</strong> {GBP_DATOS_REALES.categoria}<br />
-                      <strong>Dirección:</strong> {GBP_DATOS_REALES.direccion}<br />
-                      <strong>Horario:</strong> {GBP_DATOS_REALES.horario} • <strong>Tel:</strong> {GBP_DATOS_REALES.telefono}
-                    </p>
-                    <div style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 'bold' }}>
-                      ℹ️ Estado Google: {GBP_DATOS_REALES.estadoVerificacion}
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '8px' }}>
+                      <strong style={{ fontSize: '32px', color: '#fbbf24', fontWeight: '800', lineHeight: 1 }}>{RUTAS_SITEMAP_OFICIAL.length}</strong>
+                      <span style={{ fontSize: '13px', color: '#e2e8f0', fontWeight: 'bold' }}>URLs en Sitemap + Ficha 24h</span>
+                    </div>
+                    <div style={{ width: '100%', height: '6px', background: '#0f172a', borderRadius: '99px', overflow: 'hidden', marginBottom: '8px' }}>
+                      <div style={{ width: '85%', height: '100%', background: 'linear-gradient(90deg, #d97706, #fbbf24)', borderRadius: '99px' }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#94a3b8' }}>
+                      <span>Av. Federico Gallese N° 370</span>
+                      <strong style={{ color: '#fbbf24' }}>{vistaSeoActiva === 'local' ? 'Ver Todo ↺' : 'Ver ficha y mapa →'}</strong>
                     </div>
                   </div>
                 </div>
 
-                {/* TABLA DE PALABRAS CLAVE REALES DEL SITIO + FLUJO EN VIVO DEL DATALAYER GTM */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '18px' }}>
-                  <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '12px', padding: '16px', overflowX: 'auto' }}>
-                    <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#38bdf8' }}>
-                      🔑 Palabras Clave Configuradas y Búsquedas Capturadas en el Sitio (Search Console + Buscador Interno)
-                    </h4>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '1px solid #334155', color: '#94a3b8' }}>
-                          <th style={{ padding: '8px' }}>Palabra Clave / Término Buscado</th>
-                          <th style={{ padding: '8px' }}>Origen SEO</th>
-                          <th style={{ padding: '8px' }}>Búsquedas en Web</th>
-                          <th style={{ padding: '8px' }}>Estado Search Console</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {keywordsRegistradas.map((kw, i) => (
-                          <tr key={i} style={{ borderBottom: '1px solid #1e293b', color: '#e2e8f0' }}>
-                            <td style={{ padding: '8px', fontWeight: 'bold', color: '#fff' }}>{kw.keyword}</td>
-                            <td style={{ padding: '8px', color: '#94a3b8' }}>{kw.origen}</td>
-                            <td style={{ padding: '8px', color: '#38bdf8', fontWeight: 'bold' }}>{kw.busquedasSitio}</td>
-                            <td style={{ padding: '8px', color: '#34d399', fontWeight: 'bold' }}>{kw.estadoGSC}</td>
-                          </tr>
+                {/* BARRA DE PESTAÑAS DINÁMICAS */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '18px', flexWrap: 'wrap', background: '#161f33', padding: '6px', borderRadius: '10px', border: '1px solid #1e293b' }}>
+                  {[
+                    { id: 'todo', label: '🎛️ Vista Dinámica Completa' },
+                    { id: 'keywords', label: '🔑 Gráfico de Palabras Clave (Search Console)' },
+                    { id: 'gtm', label: `⚡ Consola en Vivo (${GTM_CONTAINER_ID})` },
+                    { id: 'local', label: '📍 Ficha Google Business & Sitemap XML' }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setVistaSeoActiva(tab.id)}
+                      style={{
+                        flex: 1,
+                        minWidth: '180px',
+                        padding: '9px 14px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        fontSize: '12px',
+                        background: vistaSeoActiva === tab.id ? '#2563eb' : 'transparent',
+                        color: vistaSeoActiva === tab.id ? '#ffffff' : '#94a3b8',
+                        transition: '0.2s'
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* CONTENIDO DINÁMICO SEGÚN LA PESTAÑA ACTIVA */}
+                <div style={{ display: 'grid', gridTemplateColumns: vistaSeoActiva === 'todo' ? 'repeat(auto-fit, minmax(340px, 1fr))' : '1fr', gap: '18px' }}>
+                  
+                  {/* MÓDULO A: GRÁFICO DE BARRAS DE PALABRAS CLAVE + SIMULADOR EN VIVO */}
+                  {(vistaSeoActiva === 'todo' || vistaSeoActiva === 'keywords') && (
+                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                        <h4 style={{ margin: 0, fontSize: '14px', color: '#38bdf8' }}>
+                          🔑 Ranking Visual de Palabras Clave & Búsquedas
+                        </h4>
+                        <span style={{ fontSize: '11px', color: '#34d399', fontWeight: 'bold' }}>
+                          ● Conectado al buscador en tiempo real
+                        </span>
+                      </div>
+
+                      {/* PROBADOR INTERACTIVO DE PALABRAS CLAVE */}
+                      <form onSubmit={handleProbarKeywordEnVivo} style={{ display: 'flex', gap: '8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Prueba buscar una keyword aquí (ej: robótica, plc, arduino)..."
+                          value={keywordSimuladaInput}
+                          onChange={e => setKeywordSimuladaInput(e.target.value)}
+                          style={{ flex: 1, padding: '9px 12px', borderRadius: '8px', border: '1px solid #334155', background: '#0f172a', color: '#fff', fontSize: '12px', outline: 'none' }}
+                        />
+                        <button type="submit" style={{ background: '#059669', color: '#fff', border: 'none', padding: '0 14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                          + Probar Keyword
+                        </button>
+                      </form>
+
+                      {/* BARRAS DE PROGRESO VISUALES EN LUGAR DE TABLA RECARGADA DE TEXTO */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '310px', overflowY: 'auto', paddingRight: '4px' }}>
+                        {keywordsRegistradas.map((kw, i) => {
+                          const porcentaje = Math.min(100, Math.round((Number(kw.busquedasSitio || 1) / maxBusquedasKeyword) * 100));
+                          return (
+                            <div key={i} style={{ background: '#0f172a', padding: '10px 12px', borderRadius: '10px', border: '1px solid #1e293b' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', gap: '8px' }}>
+                                <strong style={{ fontSize: '12px', color: '#f8fafc' }}>{kw.keyword}</strong>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                                  <span style={{ fontSize: '10px', background: 'rgba(16,185,129,0.12)', color: '#34d399', padding: '2px 7px', borderRadius: '99px', fontWeight: 'bold' }}>
+                                    {kw.estadoGSC}
+                                  </span>
+                                  <strong style={{ fontSize: '12px', color: '#38bdf8' }}>{kw.busquedasSitio} búsq.</strong>
+                                </div>
+                              </div>
+                              <div style={{ width: '100%', height: '7px', background: '#1e293b', borderRadius: '99px', overflow: 'hidden' }}>
+                                <div
+                                  style={{
+                                    width: `${porcentaje}%`,
+                                    height: '100%',
+                                    background: i === 0 ? 'linear-gradient(90deg, #10b981, #34d399)' : 'linear-gradient(90deg, #2563eb, #38bdf8)',
+                                    borderRadius: '99px',
+                                    transition: 'width 0.35s ease'
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* MÓDULO B: MONITOR EN VIVO DE GOOGLE TAG MANAGER CON FILTROS Y PING DE PRUEBA */}
+                  {(vistaSeoActiva === 'todo' || vistaSeoActiva === 'gtm') && (
+                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                        <h4 style={{ margin: 0, fontSize: '14px', color: '#38bdf8' }}>
+                          ⚡ Monitor en Tiempo Real ({GTM_CONTAINER_ID})
+                        </h4>
+                        <button
+                          type="button"
+                          onClick={() => registrarEventoGA4('verificacion_gtm_admin', { item_name: 'Ping manual enviado a GTM-5PRNQXNP' })}
+                          style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
+                        >
+                          ⚡ Disparar Ping GTM en Vivo
+                        </button>
+                      </div>
+
+                      {/* PÍLDORAS DE FILTRO DE EVENTOS */}
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                        {[
+                          { id: 'todos', txt: 'Todos' },
+                          { id: 'login', txt: '🔐 Logins' },
+                          { id: 'select_content', txt: '🎓 Cursos / Zoom' },
+                          { id: 'search', txt: '🔍 Búsquedas' },
+                          { id: 'cart', txt: '🛒 Carrito' }
+                        ].map(f => (
+                          <button
+                            key={f.id}
+                            type="button"
+                            onClick={() => setFiltroEventoGTM(f.id)}
+                            style={{
+                              padding: '5px 10px',
+                              borderRadius: '99px',
+                              border: '1px solid #334155',
+                              background: filtroEventoGTM === f.id ? '#38bdf8' : '#0f172a',
+                              color: filtroEventoGTM === f.id ? '#0f172a' : '#cbd5e1',
+                              fontSize: '11px',
+                              fontWeight: 'bold',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {f.txt}
+                          </button>
                         ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      </div>
 
-                  <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '12px', padding: '16px', maxHeight: '340px', overflowY: 'auto' }}>
-                    <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#38bdf8' }}>
-                      ⚡ Eventos Enviados en Vivo a Google Tag Manager ({GTM_CONTAINER_ID})
-                    </h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {eventosGA4.map((ev, idx) => (
-                        <div key={ev.id || idx} style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '8px', padding: '9px 12px', fontSize: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
-                          <div>
-                            <span style={{ background: '#1d4ed8', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 'bold', marginRight: '8px' }}>
-                              {ev.evento}
-                            </span>
-                            <span style={{ color: '#e2e8f0' }}>{ev.detalle}</span>
-                          </div>
-                          <span style={{ color: '#94a3b8', fontSize: '11px', whiteSpace: 'nowrap' }}>{ev.fecha}</span>
-                        </div>
-                      ))}
+                      {/* LISTA VISUAL DE EVENTOS */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '310px', overflowY: 'auto' }}>
+                        {eventosGTMFiltrados.map((ev, idx) => {
+                          const colorBadge = ev.evento.includes('login')
+                            ? '#059669'
+                            : ev.evento.includes('search')
+                            ? '#d97706'
+                            : ev.evento.includes('cart')
+                            ? '#7c3aed'
+                            : '#1d4ed8';
+                          return (
+                            <div key={ev.id || idx} style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px', padding: '9px 12px', fontSize: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
+                                <span style={{ background: colorBadge, color: '#fff', padding: '3px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 'bold', flexShrink: 0 }}>
+                                  {ev.evento}
+                                </span>
+                                <span style={{ color: '#e2e8f0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ev.detalle}</span>
+                              </div>
+                              <span style={{ color: '#94a3b8', fontSize: '11px', whiteSpace: 'nowrap' }}>{ev.fecha}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* MÓDULO C: FICHA VISUAL GOOGLE BUSINESS PROFILE + ÁRBOL DE SITEMAP XML */}
+                  {(vistaSeoActiva === 'todo' || vistaSeoActiva === 'local') && (
+                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px', gridColumn: vistaSeoActiva === 'todo' ? '1 / -1' : 'auto' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '16px' }}>
+                        
+                        {/* TARJETA ESTILO GOOGLE MAPS / BUSINESS PROFILE */}
+                        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '12px' }}>
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                              <div>
+                                <span style={{ fontSize: '10px', color: '#38bdf8', fontWeight: 'bold', textTransform: 'uppercase' }}>Ficha Oficial Google Business Profile</span>
+                                <h4 style={{ margin: '2px 0', fontSize: '17px', color: '#fff', fontWeight: '800' }}>{GBP_DATOS_REALES.nombre}</h4>
+                                <span style={{ fontSize: '12px', color: '#fbbf24' }}>★★★★★ 5.0 • {GBP_DATOS_REALES.categoria}</span>
+                              </div>
+                              <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>
+                                24 Horas
+                              </span>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', color: '#cbd5e1', marginTop: '10px' }}>
+                              <div>📍 <strong>Dirección:</strong> {GBP_DATOS_REALES.direccion}</div>
+                              <div>📞 <strong>Teléfono:</strong> {GBP_DATOS_REALES.telefono}</div>
+                              <div>🌐 <strong>Web:</strong> {GBP_DATOS_REALES.sitioWeb}</div>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid #1e293b' }}>
+                            <a
+                              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(GBP_DATOS_REALES.direccion)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ flex: 1, textAlign: 'center', background: '#2563eb', color: '#fff', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}
+                            >
+                              📍 Abrir en Google Maps ↗
+                            </a>
+                            <a
+                              href="https://www.google.com/search?q=mi+negocio"
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ flex: 1, textAlign: 'center', background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}
+                            >
+                              ⚙️ Gestionar Ficha ↗
+                            </a>
+                          </div>
+                        </div>
+
+                        {/* ÁRBOL INTERACTIVO DE URLS DEL SITEMAP XML */}
+                        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '16px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                            <strong style={{ fontSize: '13px', color: '#34d399' }}>🗺️ URLs Registradas en /sitemap.xml (Search Console)</strong>
+                            <span style={{ fontSize: '11px', color: '#94a3b8' }}>6 Rutas Activas</span>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                            {RUTAS_SITEMAP_OFICIAL.map((item, idx) => (
+                              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#161f33', padding: '7px 10px', borderRadius: '8px', fontSize: '11px' }}>
+                                <span style={{ color: '#e2e8f0', fontWeight: 'bold' }}>{item.nombre}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <span style={{ color: '#94a3b8' }}>{item.frecuencia}</span>
+                                  <span style={{ background: '#059669', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
+                                    Prio: {item.prioridad.toFixed(1)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               </div>
             </div>
