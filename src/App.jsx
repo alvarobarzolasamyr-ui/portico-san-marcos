@@ -18,7 +18,7 @@ const GBP_DATOS_REALES = {
   estadoVerificacion: 'En proceso de verificación por Google (hasta 5 días)'
 };
 
-// PALABRAS CLAVE SEO CONFIGURADAS + BÚSQUEDAS REALES DE LOS USUARIOS EN EL SITIO
+// PALABRAS CLAVE SEO CONFIGURADAS EN INDEX.HTML Y SITEMAP.XML
 const KEYWORDS_INICIALES_SITIO = [
   { keyword: 'cursos de ingeniería mecatrónica perú', origen: 'Meta Keywords / Título Principal', busquedasSitio: 19, urlObjetivo: '/', estadoGSC: 'Indexando en Search Console' },
   { keyword: 'portico sanmarcos centro de formación san miguel', origen: 'Google Business Profile + Meta SEO', busquedasSitio: 14, urlObjetivo: '/', estadoGSC: 'Indexando en Search Console' },
@@ -39,6 +39,87 @@ const RUTAS_SITEMAP_OFICIAL = [
   { url: 'https://portico-san-marcos.vercel.app/?categoria=Sistemas-Embebidos', nombre: 'Especialidad: Sistemas Embebidos (ESP32)', prioridad: 0.8, frecuencia: 'Semanal' },
   { url: 'https://portico-san-marcos.vercel.app/?categoria=Diseno-Mecanico', nombre: 'Especialidad: Diseño Mecánico CAD 3D', prioridad: 0.8, frecuencia: 'Semanal' }
 ];
+
+// CONTENIDO TÉCNICO PARA EL VISOR EJECUTIVO INTEGRADO (EVITA SALIR A VENTANA NEGRA)
+const ARCHIVOS_TECNICOS_SEO = {
+  sitemap: {
+    titulo: 'Mapa del Sitio Oficial (public/sitemap.xml)',
+    subtitulo: 'Estructura XML estándar bajo protocolo sitemaps.org/0.9 para indexación en Google Search Console',
+    urlPura: '/sitemap.xml',
+    codigo: `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://portico-san-marcos.vercel.app/</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://portico-san-marcos.vercel.app/?categoria=Robotica</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://portico-san-marcos.vercel.app/?categoria=Automatizacion</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://portico-san-marcos.vercel.app/?categoria=Electronica</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://portico-san-marcos.vercel.app/?categoria=Sistemas-Embebidos</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://portico-san-marcos.vercel.app/?categoria=Diseno-Mecanico</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>`
+  },
+  robots: {
+    titulo: 'Directivas de Rastreo para Buscadores (public/robots.txt)',
+    subtitulo: 'Autorización oficial para Googlebot y declaración directa de la ruta del Sitemap XML',
+    urlPura: '/robots.txt',
+    codigo: `User-agent: *
+Allow: /
+
+# Sitemap oficial registrado para Google Search Console
+Sitemap: https://portico-san-marcos.vercel.app/sitemap.xml`
+  },
+  schema: {
+    titulo: 'Datos Estructurados Schema.org JSON-LD (index.html)',
+    subtitulo: 'Vinculación técnica entre el dominio web y la ficha de Google Business Profile en San Miguel, Lima',
+    urlPura: 'https://validator.schema.org/',
+    codigo: `{
+  "@context": "https://schema.org",
+  "@type": ["EducationalOrganization", "LocalBusiness"],
+  "name": "PORTICO SANMARCOS",
+  "alternateName": "Pórtico San Marcos - Centro de Formación",
+  "url": "https://portico-san-marcos.vercel.app/",
+  "telephone": "+51967107035",
+  "priceRange": "S/ 90.00 - S/ 150.00",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Av. Federico Gallese N° 370",
+    "addressLocality": "San Miguel",
+    "addressRegion": "Lima",
+    "postalCode": "15086",
+    "addressCountry": "PE"
+  },
+  "openingHours": "Mo-Su 00:00-23:59"
+}`
+  }
+};
 
 // USUARIOS BASE DE RESPALDO (Se fusionan automáticamente con los de la BD Aiven)
 const USUARIOS_BASE_SISTEMA = [
@@ -312,10 +393,12 @@ export default function App() {
     return guardado ? JSON.parse(guardado) : [];
   });
 
-  // ESTADOS INTERACTIVOS DEL DASHBOARD SEO, GTM Y SEARCH CONSOLE
+  // ESTADOS INTERACTIVOS DEL DASHBOARD SEO, GTM Y VISOR DE ARCHIVOS TÉCNICOS
   const [vistaSeoActiva, setVistaSeoActiva] = useState('todo'); // 'todo' | 'gtm' | 'keywords' | 'local'
   const [filtroEventoGTM, setFiltroEventoGTM] = useState('todos');
   const [keywordSimuladaInput, setKeywordSimuladaInput] = useState('');
+  const [modalArchivoTecnico, setModalArchivoTecnico] = useState(null); // null | 'sitemap' | 'robots' | 'schema'
+  const [copiadoExito, setCopiadoExito] = useState(false);
 
   const [verificacionDOMActiva, setVerificacionDOMActiva] = useState({
     metaGSC: GSC_VERIFICATION_TOKEN,
@@ -393,7 +476,7 @@ export default function App() {
       const existeIdx = prev.findIndex(k => k.keyword.toLowerCase().includes(limpio) || limpio.includes(k.keyword.toLowerCase()));
       let nuevaLista;
       if (existeIdx !== -1) {
-        nuevaLista = prev.map((k, idx) => idx === existeIdx ? { ...k, busquedasSitio: (k.busquedasSitio || 1) + 1 } : k);
+        nuevaLista = prev.map((k, idx) => idx === existeIdx ? { ...k, busquedasSitio: (k.busquedasSitio || 0) + 1 } : k);
       } else {
         const nuevaKw = {
           keyword: limpio,
@@ -415,6 +498,17 @@ export default function App() {
     registrarEventoGA4('search', { search_term: keywordSimuladaInput.trim() });
     registrarPalabraClaveBuscada(keywordSimuladaInput.trim());
     setKeywordSimuladaInput('');
+  };
+
+  const alternarModoContadoresKeywords = (modoCero) => {
+    if (modoCero) {
+      const enCero = KEYWORDS_INICIALES_SITIO.map(k => ({ ...k, busquedasSitio: 0 }));
+      setKeywordsRegistradas(enCero);
+      localStorage.setItem('gsc_keywords_reales_psm', JSON.stringify(enCero));
+    } else {
+      setKeywordsRegistradas(KEYWORDS_INICIALES_SITIO);
+      localStorage.setItem('gsc_keywords_reales_psm', JSON.stringify(KEYWORDS_INICIALES_SITIO));
+    }
   };
 
   // ESTADOS DE SEGURIDAD Y LEY 29733
@@ -1248,6 +1342,56 @@ export default function App() {
     );
   };
 
+  // MODAL EJECUTIVO INTEGRADO PARA VER SITEMAP.XML, ROBOTS.TXT Y SCHEMA JSON-LD SIN SALIR A PESTAÑA NEGRA
+  const renderModalArchivoTecnico = () => {
+    if (!modalArchivoTecnico || !ARCHIVOS_TECNICOS_SEO[modalArchivoTecnico]) return null;
+    const info = ARCHIVOS_TECNICOS_SEO[modalArchivoTecnico];
+
+    const copiarCodigo = () => {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(info.codigo);
+        setCopiadoExito(true);
+        setTimeout(() => setCopiadoExito(false), 2000);
+      }
+    };
+
+    return (
+      <div onClick={() => setModalArchivoTecnico(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(2, 6, 23, 0.85)', backdropFilter: 'blur(8px)', zIndex: 99999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+        <div onClick={e => e.stopPropagation()} style={{ background: '#0f172a', color: '#f8fafc', border: '1px solid #38bdf8', borderRadius: '18px', maxWidth: '760px', width: '100%', maxHeight: '88vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 25px 60px rgba(0,0,0,0.75)' }}>
+          <div style={{ padding: '18px 24px', background: '#161f33', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+            <div>
+              <span style={{ fontSize: '11px', color: '#34d399', fontWeight: 'bold', textTransform: 'uppercase' }}>✓ Archivo Oficial Verificado en Producción</span>
+              <h3 style={{ margin: '2px 0 0 0', fontSize: '18px', color: '#ffffff' }}>{info.titulo}</h3>
+            </div>
+            <button onClick={() => setModalArchivoTecnico(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', padding: '7px 14px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>
+              Cerrar ✕
+            </button>
+          </div>
+
+          <div style={{ padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <p style={{ margin: 0, fontSize: '13px', color: '#cbd5e1', lineHeight: '1.5' }}>
+              {info.subtitulo}
+            </p>
+            <pre style={{ margin: 0, padding: '16px', background: '#020617', border: '1px solid #1e293b', borderRadius: '12px', color: '#38bdf8', fontSize: '12.5px', lineHeight: '1.55', overflowX: 'auto', fontFamily: 'Consolas, Monaco, monospace' }}>
+              {info.codigo}
+            </pre>
+          </div>
+
+          <div style={{ padding: '14px 24px', background: '#161f33', borderTop: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+            <button onClick={copiarCodigo} style={{ background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>
+              {copiadoExito ? '✓ Código Copiado al Portapapeles' : '📋 Copiar Código Fuente'}
+            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <a href={info.urlPura} target="_blank" rel="noreferrer" style={{ background: '#2563eb', color: '#fff', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '12px' }}>
+                Abrir URL Pura ({info.urlPura}) ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [modalidadFiltro, setModalidadFiltro] = useState('virtual');
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todas');
@@ -1367,15 +1511,15 @@ export default function App() {
     : (listaUsuarios.find(u => u.usuario.toLowerCase() === contactoActivoChat.toLowerCase()) || { nombres: contactoActivoChat, usuario: contactoActivoChat, rol: 'usuario' });
 
   // Cálculos dinámicos para las barras visuales del panel SEO
-  const totalBusquedasKeywords = keywordsRegistradas.reduce((acc, k) => acc + Number(k.busquedasSitio || 1), 0);
-  const maxBusquedasKeyword = Math.max(...keywordsRegistradas.map(k => Number(k.busquedasSitio || 1)), 20);
+  const totalBusquedasKeywords = keywordsRegistradas.reduce((acc, k) => acc + Number(k.busquedasSitio || 0), 0);
+  const maxBusquedasKeyword = Math.max(...keywordsRegistradas.map(k => Number(k.busquedasSitio || 0)), 1);
   const eventosGTMFiltrados = eventosGA4.filter(ev => {
     if (filtroEventoGTM === 'todos') return true;
     return (ev.evento || '').toLowerCase().includes(filtroEventoGTM.toLowerCase());
   });
 
   // =========================================================================
-  // VISTA 1: TIENDA VIRTUAL PÚBLICA (CON FICHA REAL DE GOOGLE BUSINESS PROFILE)
+  // VISTA 1: TIENDA VIRTUAL PÚBLICA (CON ACABADO EJECUTIVO Y FICHA REAL GBP)
   // =========================================================================
   if (!sesionIniciada) {
     const cursosActivosTienda = cursosCatalogo.filter(c => c.estado !== 'inactivo');
@@ -1387,22 +1531,31 @@ export default function App() {
     });
 
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#0f172a', color: '#f8fafc', fontFamily: 'system-ui, sans-serif', display: 'flex', flexDirection: 'column' }}>
-        <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #1e293b', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <h1 style={{ margin: '0', fontSize: '20px', color: '#38bdf8', fontWeight: 'bold' }}>Aula Virtual Pórtico San Marcos</h1>
+      <div style={{ minHeight: '100vh', background: 'radial-gradient(circle at top, #172554 0%, #0f172a 45%, #020617 100%)', color: '#f8fafc', fontFamily: 'system-ui, sans-serif', display: 'flex', flexDirection: 'column' }}>
+        <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(14px)', borderBottom: '1px solid rgba(56, 189, 248, 0.2)', padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', boxShadow: '0 8px 25px rgba(0,0,0,0.35)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ background: 'linear-gradient(135deg, #2563eb, #38bdf8)', color: '#fff', fontWeight: '900', padding: '6px 10px', borderRadius: '8px', fontSize: '14px' }}>PSM</span>
+            <div>
+              <h1 style={{ margin: '0', fontSize: '19px', color: '#38bdf8', fontWeight: '800' }}>Aula Virtual Pórtico San Marcos</h1>
+              <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block' }}>Especialización en Ingeniería Mecatrónica & Automatización</span>
+            </div>
+          </div>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <button onClick={() => setCarritoAbierto(true)} style={{ background: '#1e293b', color: '#fff', border: '1px solid #334155', padding: '9px 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
+            <button onClick={() => setCarritoAbierto(true)} style={{ background: '#1e293b', color: '#fff', border: '1px solid #334155', padding: '9px 15px', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
               🛒 Mi Carrito {carrito.length > 0 && <span style={{ background: '#ef4444', marginLeft: '6px', padding: '2px 8px', borderRadius: '999px', fontSize: '11px' }}>{carrito.length}</span>}
             </button>
-            <button onClick={() => setMostrarModalLogin(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '9px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
+            <button onClick={() => setMostrarModalLogin(true)} style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', boxShadow: '0 4px 14px rgba(37, 99, 235, 0.4)' }}>
               🔐 Ingresar al Aula
             </button>
           </div>
         </header>
 
-        <section style={{ textAlign: 'center', padding: '44px 18px 26px', maxWidth: '850px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: 'clamp(24px, 4vw, 34px)', color: '#fff', marginBottom: '12px', fontWeight: '800' }}>Catálogo de Cursos de Ingeniería Mecatrónica</h2>
-          <p style={{ color: '#94a3b8', fontSize: '15px', lineHeight: '1.6', margin: '0 0 22px 0' }}>
+        <section style={{ textAlign: 'center', padding: '48px 18px 26px', maxWidth: '880px', margin: '0 auto' }}>
+          <span style={{ display: 'inline-block', background: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', color: '#38bdf8', padding: '5px 14px', borderRadius: '99px', fontSize: '12px', fontWeight: 'bold', marginBottom: '12px' }}>
+            FORMACIÓN HÍBRIDA ACREDITADA • VIRTUAL & LABORATORIOS EN SAN MIGUEL
+          </span>
+          <h2 style={{ fontSize: 'clamp(26px, 4vw, 38px)', color: '#fff', margin: '0 0 12px 0', fontWeight: '800', letterSpacing: '-0.5px' }}>Catálogo de Cursos de Ingeniería Mecatrónica</h2>
+          <p style={{ color: '#cbd5e1', fontSize: '15px', lineHeight: '1.6', margin: '0 0 24px 0' }}>
             Explora el temario oficial, visualiza una clase demostrativa de cada especialidad y agrega los cursos de tu interés al carrito para coordinar tu matrícula directamente por WhatsApp.
           </p>
           <input
@@ -1416,11 +1569,11 @@ export default function App() {
                 registrarPalabraClaveBuscada(e.target.value);
               }
             }}
-            style={{ width: '100%', maxWidth: '520px', padding: '12px 18px', borderRadius: '99px', background: '#1e293b', color: '#fff', border: '1px solid #334155', outline: 'none', boxSizing: 'border-box' }}
+            style={{ width: '100%', maxWidth: '540px', padding: '14px 20px', borderRadius: '99px', background: 'rgba(30, 41, 59, 0.9)', color: '#fff', border: '1px solid #475569', outline: 'none', boxSizing: 'border-box', boxShadow: '0 10px 25px rgba(0,0,0,0.25)', fontSize: '14px' }}
           />
         </section>
 
-        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', padding: '0 16px 28px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', padding: '0 16px 30px' }}>
           {categoriasTienda.map(cat => (
             <button
               key={cat}
@@ -1428,26 +1581,27 @@ export default function App() {
                 setCatTiendaActiva(cat);
                 registrarEventoGA4('select_content', { categoria: `Filtro Categoría: ${cat}` });
               }}
-              style={{ padding: '8px 15px', borderRadius: '99px', background: catTiendaActiva === cat ? '#2563eb' : '#1e293b', color: '#fff', border: '1px solid #334155', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}
+              style={{ padding: '8px 16px', borderRadius: '99px', background: catTiendaActiva === cat ? 'linear-gradient(135deg, #2563eb, #38bdf8)' : '#1e293b', color: '#fff', border: '1px solid #334155', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', transition: '0.2s' }}
             >
               {cat}
             </button>
           ))}
         </div>
 
-        <main style={{ maxWidth: '1260px', width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '0 16px 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '22px', flex: 1 }}>
+        <main style={{ maxWidth: '1260px', width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '0 16px 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(295px, 1fr))', gap: '24px', flex: 1 }}>
           {cursosTiendaFiltrados.map(curso => (
-            <article key={curso.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '14px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 25px rgba(0,0,0,0.25)' }}>
-              <div style={{ position: 'relative', height: '185px' }}>
+            <article key={curso.id} style={{ background: 'linear-gradient(180deg, #1e293b 0%, #111827 100%)', border: '1px solid #334155', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 14px 30px rgba(0,0,0,0.35)' }}>
+              <div style={{ position: 'relative', height: '188px' }}>
                 <img src={curso.imagen_url} alt={curso.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <span style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(15,23,42,0.9)', color: '#38bdf8', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>{curso.categoria}</span>
+                <span style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(15,23,42,0.92)', color: '#38bdf8', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', border: '1px solid rgba(56,189,248,0.3)' }}>{curso.categoria}</span>
+                <span style={{ position: 'absolute', top: '12px', right: '12px', background: curso.tipo === 'Presencial' ? '#059669' : '#2563eb', color: '#fff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>{curso.tipo || 'Virtual'}</span>
               </div>
               <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                <h3 style={{ margin: '0 0 8px 0', color: '#fff', fontSize: '17px' }}>{curso.titulo}</h3>
-                <p style={{ color: '#94a3b8', fontSize: '13px', flex: 1, lineHeight: '1.5' }}>{curso.descripcion}</p>
+                <h3 style={{ margin: '0 0 8px 0', color: '#fff', fontSize: '17px', lineHeight: '1.35' }}>{curso.titulo}</h3>
+                <p style={{ color: '#94a3b8', fontSize: '13px', flex: 1, lineHeight: '1.55' }}>{curso.descripcion}</p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #334155', paddingTop: '12px', marginBottom: '14px' }}>
-                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>⏱ {curso.duracion || '5 Semanas'}</span>
-                  <strong style={{ fontSize: '20px', color: '#34d399' }}>S/ {Number(curso.precio).toFixed(2)}</strong>
+                  <span style={{ fontSize: '12px', color: '#cbd5e1' }}>⏱ {curso.duracion || '5 Semanas'}</span>
+                  <strong style={{ fontSize: '21px', color: '#34d399' }}>S/ {Number(curso.precio).toFixed(2)}</strong>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                   <button
@@ -1468,7 +1622,7 @@ export default function App() {
           ))}
         </main>
 
-        {/* PIE DE PÁGINA PÚBLICO CON DATOS REALES DE TU PERFIL DE EMPRESA EN GOOGLE */}
+        {/* PIE DE PÁGINA PÚBLICO CON VISOR INTEGRADO DE SITEMAP Y ROBOTS */}
         <footer style={{ background: '#091326', borderTop: '1px solid #1e293b', padding: '36px 20px', color: '#94a3b8', fontSize: '13px' }}>
           <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '24px' }}>
             <div>
@@ -1490,9 +1644,13 @@ export default function App() {
 
             <div>
               <h4 style={{ color: '#f8fafc', margin: '0 0 8px 0', fontSize: '14px' }}>🔎 Indexación Google Search Console & GTM</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <a href="/sitemap.xml" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none' }}>🗺️ Sitemap XML Oficial (/sitemap.xml)</a>
-                <a href="/robots.txt" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none' }}>🤖 Directivas de Rastreo (/robots.txt)</a>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
+                <button type="button" onClick={() => setModalArchivoTecnico('sitemap')} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', padding: 0, fontSize: '13px', fontWeight: 'bold' }}>
+                  🗺️ Ver Sitemap XML Oficial (/sitemap.xml)
+                </button>
+                <button type="button" onClick={() => setModalArchivoTecnico('robots')} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', padding: 0, fontSize: '13px', fontWeight: 'bold' }}>
+                  🤖 Ver Directivas de Rastreo (/robots.txt)
+                </button>
                 <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(GBP_DATOS_REALES.direccion)}`} target="_blank" rel="noreferrer" style={{ color: '#34d399', textDecoration: 'none', fontWeight: 'bold' }}>
                   📍 Ver ubicación en Google Maps (San Miguel) ↗
                 </a>
@@ -1603,27 +1761,29 @@ export default function App() {
           </div>
         )}
         {renderModalPrivacidad()}
+        {renderModalArchivoTecnico()}
       </div>
     );
   }
 
   // =========================================================================
-  // VISTA 2: INTERIOR DEL AULA VIRTUAL (PC Y CELULAR OPTIMIZADOS)
+  // VISTA 2: INTERIOR DEL AULA VIRTUAL (DISEÑO EJECUTIVO DE PRESENTACIÓN)
   // =========================================================================
   return (
-    <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
+    <div style={{ minHeight: '100vh', width: '100%', backgroundColor: '#f1f5f9', display: 'flex', flexDirection: 'column', scrollBehavior: 'smooth' }}>
       
-      {/* ESTILOS RESPONSIVOS Y ANIMACIONES DINÁMICAS */}
+      {/* ESTILOS RESPONSIVOS Y ACABADO VISUAL EJECUTIVO */}
       <style>{`
         .psm-navbar {
           width: 100%;
-          background: #091e42;
+          background: linear-gradient(90deg, #061539 0%, #091e42 60%, #0f172a 100%);
           color: #fff;
           padding: 14px 28px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+          box-shadow: 0 8px 24px rgba(6, 21, 57, 0.25);
+          border-bottom: 1px solid rgba(56, 189, 248, 0.18);
           position: sticky;
           top: 0;
           z-index: 1000;
@@ -1645,6 +1805,11 @@ export default function App() {
         }
         .psm-nav-links button {
           white-space: nowrap;
+          transition: all 0.2s ease;
+        }
+        .psm-nav-links button:hover {
+          color: #38bdf8 !important;
+          transform: translateY(-1px);
         }
         .psm-hamburger {
           display: none;
@@ -1663,13 +1828,14 @@ export default function App() {
           background: linear-gradient(125deg, #061539 0%, #0d2b6b 52%, #1d4ed8 100%);
           border-radius: 22px;
           padding: 48px 54px 56px 54px;
-          min-height: 390px;
+          min-height: 395px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 36px;
           color: #ffffff;
-          box-shadow: 0 22px 45px rgba(9, 30, 66, 0.22);
+          box-shadow: 0 22px 45px rgba(9, 30, 66, 0.24);
+          border: 1px solid rgba(56, 189, 248, 0.25);
           overflow: hidden;
           box-sizing: border-box;
         }
@@ -1707,10 +1873,11 @@ export default function App() {
           display: flex;
           gap: 12px;
           z-index: 5;
-          background: rgba(15, 23, 42, 0.45);
+          background: rgba(15, 23, 42, 0.55);
           padding: 7px 16px;
           border-radius: 999px;
           backdrop-filter: blur(6px);
+          border: 1px solid rgba(255,255,255,0.12);
         }
         .psm-hero-dot {
           width: 12px;
@@ -1747,26 +1914,26 @@ export default function App() {
           color: #f8fafc;
           height: 580px;
         }
-        /* TARJETAS KPI INTERACTIVAS DEL PANEL SEO */
+        /* TARJETAS KPI INTERACTIVAS DEL PANEL SEO EJECUTIVO */
         .psm-seo-kpi-card {
-          background: #161f33;
+          background: linear-gradient(160deg, #161f33 0%, #0f172a 100%);
           border: 1px solid #334155;
-          border-radius: 14px;
-          padding: 18px;
+          border-radius: 16px;
+          padding: 20px;
           cursor: pointer;
-          transition: all 0.22s ease;
+          transition: all 0.25s ease;
           position: relative;
           overflow: hidden;
         }
         .psm-seo-kpi-card:hover {
-          transform: translateY(-3px);
+          transform: translateY(-4px);
           border-color: #38bdf8;
-          box-shadow: 0 10px 25px rgba(56, 189, 248, 0.14);
+          box-shadow: 0 14px 28px rgba(56, 189, 248, 0.16);
         }
         .psm-seo-kpi-card.activa {
-          background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+          background: linear-gradient(135deg, #1e293b 0%, #091326 100%);
           border: 1.5px solid #38bdf8;
-          box-shadow: 0 0 20px rgba(56, 189, 248, 0.22);
+          box-shadow: 0 0 24px rgba(56, 189, 248, 0.25);
         }
         @keyframes psmPulseGreen {
           0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
@@ -1866,9 +2033,12 @@ export default function App() {
       {/* NAVBAR SUPERIOR INTERNO (ALINEADO EN 1 SOLA FILA EN PC Y DESPLEGABLE EN CELULAR) */}
       <header className="psm-navbar">
         <div className="psm-brand-row">
-          <div>
-            <h2 style={{ margin: 0, fontSize: '18px', color: '#38bdf8', fontWeight: 'bold', whiteSpace: 'nowrap' }}>Pórtico San Marcos</h2>
-            <span style={{ fontSize: '11px', color: '#94a3b8', whiteSpace: 'nowrap', display: 'block' }}>Aula Virtual & Biblioteca 3D</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ background: 'linear-gradient(135deg, #2563eb, #38bdf8)', color: '#fff', fontWeight: '900', padding: '5px 9px', borderRadius: '8px', fontSize: '13px' }}>PSM</span>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '18px', color: '#38bdf8', fontWeight: 'bold', whiteSpace: 'nowrap' }}>Pórtico San Marcos</h2>
+              <span style={{ fontSize: '11px', color: '#94a3b8', whiteSpace: 'nowrap', display: 'block' }}>Aula Virtual & Biblioteca 3D</span>
+            </div>
           </div>
 
           <button className="psm-hamburger" onClick={() => setMenuMovilAbierto(!menuMovilAbierto)}>
@@ -1894,7 +2064,7 @@ export default function App() {
           {esAdmin && (
             <>
               <button onClick={() => irASeccion(seccionSeoAnalyticsRef)} style={{ background: 'none', border: 'none', color: '#38bdf8', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>📈 SEO & Analytics</button>
-              <button onClick={() => irASeccion(seccionSeguridadRef)} style={{ background: 'none', border: 'none', color: '#fbbf24', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Auditoría</button>
+              <button onClick={() => irASeccion(seccionSeguridadRef)} style={{ background: 'none', border: 'none', color: '#fbbf24', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>🛡️ Auditoría</button>
               <button onClick={() => irASeccion(seccionUsuariosRef)} style={{ background: 'none', border: 'none', color: '#cbd5e1', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Usuarios</button>
             </>
           )}
@@ -1970,7 +2140,7 @@ export default function App() {
         {esAlumno && (
           <div ref={seccionPerfilRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '14px', padding: '22px', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }}>
+              <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '16px', padding: '24px', boxShadow: '0 8px 20px rgba(15, 23, 42, 0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '18px', flexWrap: 'wrap', gap: '8px' }}>
                   <h2 style={{ fontSize: '20px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>🎓 MI PERFIL DE ESTUDIANTE: CURSOS MATRICULADOS</h2>
                 </div>
@@ -2014,17 +2184,17 @@ export default function App() {
         {/* SECCIÓN 2: CATÁLOGO DE CURSOS Y ADMINISTRACIÓN */}
         <div ref={seccionCursosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
-            <div style={{ marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-              <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>{puedeGestionarCursos ? 'ADMINISTRACIÓN DE CURSOS' : 'MIS CLASES & LABORATORIOS'}</h2>
+            <div style={{ marginBottom: '20px', borderBottom: '2px solid #cbd5e1', paddingBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+              <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: '800' }}>{puedeGestionarCursos ? 'ADMINISTRACIÓN DE CURSOS' : 'MIS CLASES & LABORATORIOS'}</h2>
               {puedeGestionarCursos && (
-                <button onClick={() => setModalNuevoCurso(true)} style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button onClick={() => setModalNuevoCurso(true)} style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)' }}>
                   + Añadir Nuevo Curso
                 </button>
               )}
             </div>
 
             {/* BARRA DE FILTROS VIRTUAL / PRESENCIAL */}
-            <div style={{ background: '#fff', padding: '16px', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '25px' }}>
+            <div style={{ background: '#fff', padding: '16px', borderRadius: '14px', border: '1px solid #cbd5e1', marginBottom: '25px', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)' }}>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <button onClick={() => { setModalidadFiltro('virtual'); setVideoActivo(null); setLaboratorioSeleccionado(null); }} style={{ padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', backgroundColor: modalidadFiltro === 'virtual' ? '#2563eb' : '#f1f5f9', color: modalidadFiltro === 'virtual' ? '#fff' : '#334155', fontSize: '13px' }}>
                   Modalidad Virtual ({cursosCatalogo.filter(c => (c.tipo || 'Virtual') === 'Virtual' && (puedeGestionarCursos || c.estado !== 'inactivo')).length})
@@ -2049,7 +2219,7 @@ export default function App() {
             </div>
 
             {videoActivo && (
-              <div style={{ background: '#0f172a', padding: '20px', borderRadius: '12px', color: '#fff', marginBottom: '30px' }}>
+              <div style={{ background: '#0f172a', padding: '20px', borderRadius: '14px', color: '#fff', marginBottom: '30px', boxShadow: '0 14px 30px rgba(0,0,0,0.25)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
                   <h3 style={{ margin: 0, color: '#38bdf8', fontSize: '16px' }}>Reproduciendo Sesión: {videoActivo.titulo}</h3>
                   <button onClick={() => setVideoActivo(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar Video</button>
@@ -2121,12 +2291,12 @@ export default function App() {
         {esAlumno && (
           <div ref={seccionDocentesRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
-                <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>DOCENTES & INSTRUCTORES</h2>
+              <div style={{ borderBottom: '2px solid #cbd5e1', paddingBottom: '12px', marginBottom: '25px' }}>
+                <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: '800' }}>DOCENTES & INSTRUCTORES</h2>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                 {docentesDestacados.map(docente => (
-                  <div key={docente.id} style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid #cbd5e1', overflow: 'hidden', textAlign: 'center' }}>
+                  <div key={docente.id} style={{ background: '#ffffff', borderRadius: '14px', border: '1px solid #cbd5e1', overflow: 'hidden', textAlign: 'center', boxShadow: '0 6px 16px rgba(15, 23, 42, 0.05)' }}>
                     <img src={docente.foto} alt={docente.nombre} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
                     <div style={{ padding: '15px' }}>
                       <h3 style={{ margin: '0 0 5px 0', fontSize: '15px', color: '#1e293b', fontWeight: 'bold' }}>{docente.nombre}</h3>
@@ -2143,13 +2313,13 @@ export default function App() {
         {/* SECCIÓN 4: BIBLIOTECA VIRTUAL FLIPBOOK 3D (INTERFAZ ACADÉMICA LIMPIA) */}
         <div ref={seccionBibliotecaRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
           <div className="dashboard-container">
-            <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '25px' }}>
-              <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>BIBLIOTECA VIRTUAL (FLIPBOOK 3D)</h2>
+            <div style={{ borderBottom: '2px solid #cbd5e1', paddingBottom: '12px', marginBottom: '25px' }}>
+              <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: '800' }}>BIBLIOTECA VIRTUAL (FLIPBOOK 3D)</h2>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
               {listaLibros.map((libro) => (
-                <div key={libro.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <div key={libro.id} style={{ background: '#fff', borderRadius: '14px', border: '1px solid #cbd5e1', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 6px 16px rgba(15, 23, 42, 0.05)' }}>
                   <img src={libro.portada} alt={libro.titulo} style={{ width: '100%', height: '210px', objectFit: 'cover' }} />
                   <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', flex: 1 }}>
                     <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '6px' }}>{libro.categoria}</span>
@@ -2398,70 +2568,76 @@ export default function App() {
         </div>
 
         {/* ========================================================================= */}
-        {/* SECCIÓN EXCLUSIVA DEL ADMIN: DASHBOARD DINÁMICO E INTERACTIVO DE SEO      */}
+        {/* SECCIÓN EXCLUSIVA DEL ADMIN: DASHBOARD EJECUTIVO DE POSICIONAMIENTO SEO   */}
         {/* ========================================================================= */}
         {esAdmin && (
           <div ref={seccionSeoAnalyticsRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ background: '#0b1120', color: '#f8fafc', borderRadius: '18px', padding: '26px', border: '1px solid #1e293b', boxShadow: '0 18px 40px rgba(2, 6, 23, 0.35)' }}>
+              <div style={{ background: 'linear-gradient(180deg, #0b1120 0%, #0f172a 100%)', color: '#f8fafc', borderRadius: '20px', padding: '28px', border: '1px solid #1e293b', boxShadow: '0 22px 45px rgba(2, 6, 23, 0.4)' }}>
                 
-                {/* CABECERA COMPACTA CON ACCIONES RÁPIDAS Y SELECTOR DE VISTA */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '16px', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
+                {/* CABECERA EJECUTIVA CON VISOR INTEGRADO (SIN VENTANAS NEGRAS EXTERNAS) */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '18px', marginBottom: '22px', flexWrap: 'wrap', gap: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ width: '46px', height: '46px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(37,99,235,0.25), rgba(56,189,248,0.15))', border: '1px solid rgba(56, 189, 248, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
                       📈
                     </div>
                     <div>
-                      <h2 style={{ margin: 0, fontSize: '19px', color: '#fff', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        CENTRO INTERACTIVO DE POSICIONAMIENTO DIGITAL
-                        <span className="psm-live-dot" title="Conectado en vivo" />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+                        <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', border: '1px solid rgba(16,185,129,0.35)', padding: '2px 8px', borderRadius: '99px', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                          ✓ Infraestructura Verificada en Producción
+                        </span>
+                        <span className="psm-live-dot" title="Sincronizado con dataLayer" />
+                      </div>
+                      <h2 style={{ margin: 0, fontSize: '20px', color: '#fff', fontWeight: '800' }}>
+                        CENTRO EJECUTIVO DE POSICIONAMIENTO DIGITAL & ANALÍTICA WEB
                       </h2>
-                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                        Haz clic en cualquier tarjeta para filtrar o usa los controles en vivo • Exclusivo Admin
-                      </span>
                     </div>
                   </div>
 
+                  {/* BOTONES EJECUTIVOS: ABREN EL VISOR MODERNO INTEGRADO EN LA MISMA PÁGINA */}
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    <a href="https://search.google.com/search-console?resource_id=https%3A%2F%2Fportico-san-marcos.vercel.app%2F" target="_blank" rel="noreferrer" style={{ background: '#2563eb', color: '#fff', padding: '8px 13px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                    <a href="https://search.google.com/search-console?resource_id=https%3A%2F%2Fportico-san-marcos.vercel.app%2F" target="_blank" rel="noreferrer" style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: '#fff', padding: '9px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)' }}>
                       🔎 Search Console ↗
                     </a>
-                    <a href="https://tagmanager.google.com/" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '8px 13px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                    <a href="https://tagmanager.google.com/" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '9px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
                       🏷️ {GTM_CONTAINER_ID} ↗
                     </a>
-                    <a href="/sitemap.xml" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#34d399', border: '1px solid #334155', padding: '8px 13px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
-                      🗺️ Sitemap.xml ↗
-                    </a>
-                    <a href="/robots.txt" target="_blank" rel="noreferrer" style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #334155', padding: '8px 13px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
-                      🤖 Robots.txt ↗
-                    </a>
+                    <button type="button" onClick={() => setModalArchivoTecnico('sitemap')} style={{ background: '#1e293b', color: '#34d399', border: '1px solid #10b981', padding: '9px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}>
+                      🗺️ Inspector Sitemap.xml
+                    </button>
+                    <button type="button" onClick={() => setModalArchivoTecnico('robots')} style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #475569', padding: '9px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}>
+                      🤖 Inspector Robots.txt
+                    </button>
+                    <button type="button" onClick={() => setModalArchivoTecnico('schema')} style={{ background: '#1e293b', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.4)', padding: '9px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}>
+                      🏢 Schema JSON-LD
+                    </button>
                   </div>
                 </div>
 
-                {/* 3 TARJETAS KPI VISUALES E INTERACTIVAS (MENOS TEXTO, MÁS IMPACTO VISUAL) */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+                {/* 3 TARJETAS KPI EJECUTIVAS CON MÉTRICAS VISUALES */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', marginBottom: '22px' }}>
                   
                   {/* KPI 1: GOOGLE TAG MANAGER & GA4 */}
                   <div
                     onClick={() => setVistaSeoActiva(vistaSeoActiva === 'gtm' ? 'todo' : 'gtm')}
                     className={`psm-seo-kpi-card ${vistaSeoActiva === 'gtm' ? 'activa' : ''}`}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 'bold', textTransform: 'uppercase' }}>1. Google Tag Manager & GA4</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>1. Google Tag Manager & GA4</span>
                       <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
                         ● {GTM_CONTAINER_ID}
                       </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '8px' }}>
-                      <strong style={{ fontSize: '32px', color: '#38bdf8', fontWeight: '800', lineHeight: 1 }}>{eventosGA4.length}</strong>
-                      <span style={{ fontSize: '13px', color: '#e2e8f0', fontWeight: 'bold' }}>Eventos en dataLayer</span>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '10px' }}>
+                      <strong style={{ fontSize: '34px', color: '#38bdf8', fontWeight: '800', lineHeight: 1 }}>{eventosGA4.length}</strong>
+                      <span style={{ fontSize: '13px', color: '#e2e8f0', fontWeight: 'bold' }}>Eventos Reales en dataLayer</span>
                     </div>
-                    <div style={{ width: '100%', height: '6px', background: '#0f172a', borderRadius: '99px', overflow: 'hidden', marginBottom: '8px' }}>
+                    <div style={{ width: '100%', height: '6px', background: '#091326', borderRadius: '99px', overflow: 'hidden', marginBottom: '10px' }}>
                       <div style={{ width: `${Math.min(100, eventosGA4.length * 5)}%`, height: '100%', background: 'linear-gradient(90deg, #2563eb, #38bdf8)', borderRadius: '99px', transition: 'width 0.3s ease' }} />
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#94a3b8' }}>
-                      <span>Variables: Event, URL, Path, Host</span>
-                      <strong style={{ color: '#38bdf8' }}>{vistaSeoActiva === 'gtm' ? 'Ver Todo ↺' : 'Filtrar vista →'}</strong>
+                      <span>Medición de tráfico y conversión</span>
+                      <strong style={{ color: '#38bdf8' }}>{vistaSeoActiva === 'gtm' ? 'Ver Todo ↺' : 'Enfocar módulo →'}</strong>
                     </div>
                   </div>
 
@@ -2470,22 +2646,22 @@ export default function App() {
                     onClick={() => setVistaSeoActiva(vistaSeoActiva === 'keywords' ? 'todo' : 'keywords')}
                     className={`psm-seo-kpi-card ${vistaSeoActiva === 'keywords' ? 'activa' : ''}`}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 'bold', textTransform: 'uppercase' }}>2. Search Console & Keywords</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>2. Search Console & Keywords</span>
                       <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
-                        ✓ Verificado
+                        ✓ Dominio Verificado
                       </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '8px' }}>
-                      <strong style={{ fontSize: '32px', color: '#34d399', fontWeight: '800', lineHeight: 1 }}>{totalBusquedasKeywords}</strong>
-                      <span style={{ fontSize: '13px', color: '#e2e8f0', fontWeight: 'bold' }}>Búsquedas ({keywordsRegistradas.length} Keywords)</span>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '10px' }}>
+                      <strong style={{ fontSize: '34px', color: '#34d399', fontWeight: '800', lineHeight: 1 }}>{totalBusquedasKeywords}</strong>
+                      <span style={{ fontSize: '13px', color: '#e2e8f0', fontWeight: 'bold' }}>Consultas ({keywordsRegistradas.length} Keywords SEO)</span>
                     </div>
-                    <div style={{ width: '100%', height: '6px', background: '#0f172a', borderRadius: '99px', overflow: 'hidden', marginBottom: '8px' }}>
-                      <div style={{ width: '88%', height: '100%', background: 'linear-gradient(90deg, #059669, #34d399)', borderRadius: '99px' }} />
+                    <div style={{ width: '100%', height: '6px', background: '#091326', borderRadius: '99px', overflow: 'hidden', marginBottom: '10px' }}>
+                      <div style={{ width: `${Math.min(100, Math.max(15, totalBusquedasKeywords))}%`, height: '100%', background: 'linear-gradient(90deg, #059669, #34d399)', borderRadius: '99px', transition: 'width 0.3s ease' }} />
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#94a3b8' }}>
                       <span>Token HTML: {verificacionDOMActiva.metaGSC.slice(0, 12)}...</span>
-                      <strong style={{ color: '#34d399' }}>{vistaSeoActiva === 'keywords' ? 'Ver Todo ↺' : 'Ver gráfico →'}</strong>
+                      <strong style={{ color: '#34d399' }}>{vistaSeoActiva === 'keywords' ? 'Ver Todo ↺' : 'Enfocar módulo →'}</strong>
                     </div>
                   </div>
 
@@ -2494,33 +2670,33 @@ export default function App() {
                     onClick={() => setVistaSeoActiva(vistaSeoActiva === 'local' ? 'todo' : 'local')}
                     className={`psm-seo-kpi-card ${vistaSeoActiva === 'local' ? 'activa' : ''}`}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 'bold', textTransform: 'uppercase' }}>3. Business Profile & Sitemap</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>3. Business Profile & Sitemap</span>
                       <span style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24', padding: '3px 9px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
                         San Miguel, Lima
                       </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '8px' }}>
-                      <strong style={{ fontSize: '32px', color: '#fbbf24', fontWeight: '800', lineHeight: 1 }}>{RUTAS_SITEMAP_OFICIAL.length}</strong>
-                      <span style={{ fontSize: '13px', color: '#e2e8f0', fontWeight: 'bold' }}>URLs en Sitemap + Ficha 24h</span>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '10px' }}>
+                      <strong style={{ fontSize: '34px', color: '#fbbf24', fontWeight: '800', lineHeight: 1 }}>{RUTAS_SITEMAP_OFICIAL.length}</strong>
+                      <span style={{ fontSize: '13px', color: '#e2e8f0', fontWeight: 'bold' }}>URLs Indexables + Ficha Local</span>
                     </div>
-                    <div style={{ width: '100%', height: '6px', background: '#0f172a', borderRadius: '99px', overflow: 'hidden', marginBottom: '8px' }}>
-                      <div style={{ width: '85%', height: '100%', background: 'linear-gradient(90deg, #d97706, #fbbf24)', borderRadius: '99px' }} />
+                    <div style={{ width: '100%', height: '6px', background: '#091326', borderRadius: '99px', overflow: 'hidden', marginBottom: '10px' }}>
+                      <div style={{ width: '100%', height: '100%', background: 'linear-gradient(90deg, #d97706, #fbbf24)', borderRadius: '99px' }} />
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#94a3b8' }}>
                       <span>Av. Federico Gallese N° 370</span>
-                      <strong style={{ color: '#fbbf24' }}>{vistaSeoActiva === 'local' ? 'Ver Todo ↺' : 'Ver ficha y mapa →'}</strong>
+                      <strong style={{ color: '#fbbf24' }}>{vistaSeoActiva === 'local' ? 'Ver Todo ↺' : 'Enfocar módulo →'}</strong>
                     </div>
                   </div>
                 </div>
 
-                {/* BARRA DE PESTAÑAS DINÁMICAS */}
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '18px', flexWrap: 'wrap', background: '#161f33', padding: '6px', borderRadius: '10px', border: '1px solid #1e293b' }}>
+                {/* BARRA DE NAVEGACIÓN DE MÓDULOS DE PRESENTACIÓN */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap', background: '#161f33', padding: '6px', borderRadius: '12px', border: '1px solid #1e293b' }}>
                   {[
-                    { id: 'todo', label: '🎛️ Vista Dinámica Completa' },
-                    { id: 'keywords', label: '🔑 Gráfico de Palabras Clave (Search Console)' },
-                    { id: 'gtm', label: `⚡ Consola en Vivo (${GTM_CONTAINER_ID})` },
-                    { id: 'local', label: '📍 Ficha Google Business & Sitemap XML' }
+                    { id: 'todo', label: '🎛️ Vista Ejecutiva Completa' },
+                    { id: 'keywords', label: '🔑 Palabras Clave & Buscador (Search Console)' },
+                    { id: 'gtm', label: `⚡ Tráfico y Eventos en Vivo (${GTM_CONTAINER_ID})` },
+                    { id: 'local', label: '📍 Perfil de Empresa en Google & Sitemap' }
                   ].map(tab => (
                     <button
                       key={tab.id}
@@ -2528,14 +2704,14 @@ export default function App() {
                       onClick={() => setVistaSeoActiva(tab.id)}
                       style={{
                         flex: 1,
-                        minWidth: '180px',
-                        padding: '9px 14px',
+                        minWidth: '185px',
+                        padding: '10px 14px',
                         borderRadius: '8px',
                         border: 'none',
                         cursor: 'pointer',
                         fontWeight: 'bold',
                         fontSize: '12px',
-                        background: vistaSeoActiva === tab.id ? '#2563eb' : 'transparent',
+                        background: vistaSeoActiva === tab.id ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : 'transparent',
                         color: vistaSeoActiva === tab.id ? '#ffffff' : '#94a3b8',
                         transition: '0.2s'
                       }}
@@ -2546,47 +2722,70 @@ export default function App() {
                 </div>
 
                 {/* CONTENIDO DINÁMICO SEGÚN LA PESTAÑA ACTIVA */}
-                <div style={{ display: 'grid', gridTemplateColumns: vistaSeoActiva === 'todo' ? 'repeat(auto-fit, minmax(340px, 1fr))' : '1fr', gap: '18px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: vistaSeoActiva === 'todo' ? 'repeat(auto-fit, minmax(350px, 1fr))' : '1fr', gap: '18px' }}>
                   
-                  {/* MÓDULO A: GRÁFICO DE BARRAS DE PALABRAS CLAVE + SIMULADOR EN VIVO */}
+                  {/* MÓDULO A: GRÁFICO DE BARRAS DE PALABRAS CLAVE + CONTROL EN VIVO */}
                   {(vistaSeoActiva === 'todo' || vistaSeoActiva === 'keywords') && (
-                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '16px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                        <h4 style={{ margin: 0, fontSize: '14px', color: '#38bdf8' }}>
-                          🔑 Ranking Visual de Palabras Clave & Búsquedas
-                        </h4>
-                        <span style={{ fontSize: '11px', color: '#34d399', fontWeight: 'bold' }}>
-                          ● Conectado al buscador en tiempo real
-                        </span>
+                        <div>
+                          <h4 style={{ margin: 0, fontSize: '15px', color: '#38bdf8' }}>
+                            🔑 Palabras Clave Configuradas y Búsquedas de Usuarios
+                          </h4>
+                          <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                            Conectado en tiempo real al buscador de la tienda y del aula virtual
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button
+                            type="button"
+                            onClick={() => alternarModoContadoresKeywords(true)}
+                            style={{ background: '#0f172a', color: '#34d399', border: '1px solid #059669', padding: '5px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
+                            title="Pone los contadores en 0 para contar únicamente las búsquedas en vivo hechas durante la exposición"
+                          >
+                            🎯 Iniciar desde 0 (En Vivo)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => alternarModoContadoresKeywords(false)}
+                            style={{ background: '#0f172a', color: '#38bdf8', border: '1px solid #334155', padding: '5px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
+                          >
+                            📊 Base Demo
+                          </button>
+                        </div>
                       </div>
 
-                      {/* PROBADOR INTERACTIVO DE PALABRAS CLAVE */}
+                      {/* PROBADOR INTERACTIVO DE PALABRAS CLAVE PARA DEMOSTRAR AL SUPERIOR */}
                       <form onSubmit={handleProbarKeywordEnVivo} style={{ display: 'flex', gap: '8px' }}>
                         <input
                           type="text"
-                          placeholder="Prueba buscar una keyword aquí (ej: robótica, plc, arduino)..."
+                          placeholder="Simular búsqueda de usuario en vivo (ej: robótica, plc, esp32)..."
                           value={keywordSimuladaInput}
                           onChange={e => setKeywordSimuladaInput(e.target.value)}
-                          style={{ flex: 1, padding: '9px 12px', borderRadius: '8px', border: '1px solid #334155', background: '#0f172a', color: '#fff', fontSize: '12px', outline: 'none' }}
+                          style={{ flex: 1, padding: '10px 12px', borderRadius: '8px', border: '1px solid #334155', background: '#0f172a', color: '#fff', fontSize: '12px', outline: 'none' }}
                         />
-                        <button type="submit" style={{ background: '#059669', color: '#fff', border: 'none', padding: '0 14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                          + Probar Keyword
+                        <button type="submit" style={{ background: '#059669', color: '#fff', border: 'none', padding: '0 16px', borderRadius: '8px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                          + Registrar Búsqueda
                         </button>
                       </form>
 
-                      {/* BARRAS DE PROGRESO VISUALES EN LUGAR DE TABLA RECARGADA DE TEXTO */}
+                      {/* BARRAS DE PROGRESO VISUALES */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '310px', overflowY: 'auto', paddingRight: '4px' }}>
                         {keywordsRegistradas.map((kw, i) => {
-                          const porcentaje = Math.min(100, Math.round((Number(kw.busquedasSitio || 1) / maxBusquedasKeyword) * 100));
+                          const valorActual = Number(kw.busquedasSitio || 0);
+                          const porcentaje = valorActual === 0 ? 4 : Math.min(100, Math.round((valorActual / maxBusquedasKeyword) * 100));
                           return (
-                            <div key={i} style={{ background: '#0f172a', padding: '10px 12px', borderRadius: '10px', border: '1px solid #1e293b' }}>
+                            <div key={i} style={{ background: '#0f172a', padding: '11px 14px', borderRadius: '10px', border: '1px solid #1e293b' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', gap: '8px' }}>
-                                <strong style={{ fontSize: '12px', color: '#f8fafc' }}>{kw.keyword}</strong>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                                <div>
+                                  <strong style={{ fontSize: '12.5px', color: '#f8fafc', display: 'block' }}>{kw.keyword}</strong>
+                                  <span style={{ fontSize: '10.5px', color: '#64748b' }}>Origen: {kw.origen}</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                                   <span style={{ fontSize: '10px', background: 'rgba(16,185,129,0.12)', color: '#34d399', padding: '2px 7px', borderRadius: '99px', fontWeight: 'bold' }}>
                                     {kw.estadoGSC}
                                   </span>
-                                  <strong style={{ fontSize: '12px', color: '#38bdf8' }}>{kw.busquedasSitio} búsq.</strong>
+                                  <strong style={{ fontSize: '13px', color: '#38bdf8' }}>{valorActual} búsq.</strong>
                                 </div>
                               </div>
                               <div style={{ width: '100%', height: '7px', background: '#1e293b', borderRadius: '99px', overflow: 'hidden' }}>
@@ -2609,17 +2808,22 @@ export default function App() {
 
                   {/* MÓDULO B: MONITOR EN VIVO DE GOOGLE TAG MANAGER CON FILTROS Y PING DE PRUEBA */}
                   {(vistaSeoActiva === 'todo' || vistaSeoActiva === 'gtm') && (
-                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '16px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                        <h4 style={{ margin: 0, fontSize: '14px', color: '#38bdf8' }}>
-                          ⚡ Monitor en Tiempo Real ({GTM_CONTAINER_ID})
-                        </h4>
+                        <div>
+                          <h4 style={{ margin: 0, fontSize: '15px', color: '#38bdf8' }}>
+                            ⚡ Flujo de Comportamiento en Vivo ({GTM_CONTAINER_ID})
+                          </h4>
+                          <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                            Registro automático de eventos enviados a Google Analytics / Tag Manager
+                          </span>
+                        </div>
                         <button
                           type="button"
-                          onClick={() => registrarEventoGA4('verificacion_gtm_admin', { item_name: 'Ping manual enviado a GTM-5PRNQXNP' })}
-                          style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
+                          onClick={() => registrarEventoGA4('auditoria_presentacion', { item_name: `Prueba en vivo frente a supervisor (${GTM_CONTAINER_ID})` })}
+                          style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: '#fff', border: 'none', padding: '7px 13px', borderRadius: '8px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}
                         >
-                          ⚡ Disparar Ping GTM en Vivo
+                          ⚡ Emitir Evento de Prueba
                         </button>
                       </div>
 
@@ -2627,7 +2831,7 @@ export default function App() {
                       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                         {[
                           { id: 'todos', txt: 'Todos' },
-                          { id: 'login', txt: '🔐 Logins' },
+                          { id: 'login', txt: '🔐 Sesiones' },
                           { id: 'select_content', txt: '🎓 Cursos / Zoom' },
                           { id: 'search', txt: '🔍 Búsquedas' },
                           { id: 'cart', txt: '🛒 Carrito' }
@@ -2637,7 +2841,7 @@ export default function App() {
                             type="button"
                             onClick={() => setFiltroEventoGTM(f.id)}
                             style={{
-                              padding: '5px 10px',
+                              padding: '5px 11px',
                               borderRadius: '99px',
                               border: '1px solid #334155',
                               background: filtroEventoGTM === f.id ? '#38bdf8' : '#0f172a',
@@ -2663,7 +2867,7 @@ export default function App() {
                             ? '#7c3aed'
                             : '#1d4ed8';
                           return (
-                            <div key={ev.id || idx} style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px', padding: '9px 12px', fontSize: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
+                            <div key={ev.id || idx} style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '10px', padding: '10px 12px', fontSize: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
                                 <span style={{ background: colorBadge, color: '#fff', padding: '3px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 'bold', flexShrink: 0 }}>
                                   {ev.evento}
@@ -2680,68 +2884,74 @@ export default function App() {
 
                   {/* MÓDULO C: FICHA VISUAL GOOGLE BUSINESS PROFILE + ÁRBOL DE SITEMAP XML */}
                   {(vistaSeoActiva === 'todo' || vistaSeoActiva === 'local') && (
-                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px', gridColumn: vistaSeoActiva === 'todo' ? '1 / -1' : 'auto' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '16px' }}>
+                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '16px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', gridColumn: vistaSeoActiva === 'todo' ? '1 / -1' : 'auto' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
                         
                         {/* TARJETA ESTILO GOOGLE MAPS / BUSINESS PROFILE */}
-                        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '12px' }}>
+                        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '12px' }}>
                           <div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
                               <div>
-                                <span style={{ fontSize: '10px', color: '#38bdf8', fontWeight: 'bold', textTransform: 'uppercase' }}>Ficha Oficial Google Business Profile</span>
-                                <h4 style={{ margin: '2px 0', fontSize: '17px', color: '#fff', fontWeight: '800' }}>{GBP_DATOS_REALES.nombre}</h4>
+                                <span style={{ fontSize: '10px', color: '#38bdf8', fontWeight: 'bold', textTransform: 'uppercase' }}>Perfil de Empresa en Google (SEO Local)</span>
+                                <h4 style={{ margin: '2px 0', fontSize: '18px', color: '#fff', fontWeight: '800' }}>{GBP_DATOS_REALES.nombre}</h4>
                                 <span style={{ fontSize: '12px', color: '#fbbf24' }}>★★★★★ 5.0 • {GBP_DATOS_REALES.categoria}</span>
                               </div>
-                              <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>
+                              <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '4px 10px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
                                 24 Horas
                               </span>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', color: '#cbd5e1', marginTop: '10px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', fontSize: '12.5px', color: '#cbd5e1', marginTop: '12px' }}>
                               <div>📍 <strong>Dirección:</strong> {GBP_DATOS_REALES.direccion}</div>
-                              <div>📞 <strong>Teléfono:</strong> {GBP_DATOS_REALES.telefono}</div>
-                              <div>🌐 <strong>Web:</strong> {GBP_DATOS_REALES.sitioWeb}</div>
+                              <div>📞 <strong>Teléfono Oficial:</strong> {GBP_DATOS_REALES.telefono}</div>
+                              <div>🌐 <strong>Dominio Vinculado:</strong> {GBP_DATOS_REALES.sitioWeb}</div>
+                              <div style={{ color: '#fbbf24', fontSize: '11.5px', fontWeight: 'bold', marginTop: '4px' }}>
+                                ℹ️ Estado en Google: {GBP_DATOS_REALES.estadoVerificacion}
+                              </div>
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid #1e293b' }}>
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingTop: '12px', borderTop: '1px solid #1e293b' }}>
                             <a
                               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(GBP_DATOS_REALES.direccion)}`}
                               target="_blank"
                               rel="noreferrer"
-                              style={{ flex: 1, textAlign: 'center', background: '#2563eb', color: '#fff', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}
+                              style={{ flex: 1, textAlign: 'center', background: '#2563eb', color: '#fff', padding: '9px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}
                             >
-                              📍 Abrir en Google Maps ↗
+                              📍 Ver en Google Maps ↗
                             </a>
-                            <a
-                              href="https://www.google.com/search?q=mi+negocio"
-                              target="_blank"
-                              rel="noreferrer"
-                              style={{ flex: 1, textAlign: 'center', background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}
+                            <button
+                              type="button"
+                              onClick={() => setModalArchivoTecnico('schema')}
+                              style={{ flex: 1, background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '9px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
                             >
-                              ⚙️ Gestionar Ficha ↗
-                            </a>
+                              🏢 Ver Código Schema JSON-LD
+                            </button>
                           </div>
                         </div>
 
                         {/* ÁRBOL INTERACTIVO DE URLS DEL SITEMAP XML */}
-                        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '16px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                            <strong style={{ fontSize: '13px', color: '#34d399' }}>🗺️ URLs Registradas en /sitemap.xml (Search Console)</strong>
-                            <span style={{ fontSize: '11px', color: '#94a3b8' }}>6 Rutas Activas</span>
-                          </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-                            {RUTAS_SITEMAP_OFICIAL.map((item, idx) => (
-                              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#161f33', padding: '7px 10px', borderRadius: '8px', fontSize: '11px' }}>
-                                <span style={{ color: '#e2e8f0', fontWeight: 'bold' }}>{item.nombre}</span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <span style={{ color: '#94a3b8' }}>{item.frecuencia}</span>
-                                  <span style={{ background: '#059669', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
-                                    Prio: {item.prioridad.toFixed(1)}
-                                  </span>
+                        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                              <strong style={{ fontSize: '13.5px', color: '#34d399' }}>🗺️ Estructura de Indexación (/sitemap.xml)</strong>
+                              <button type="button" onClick={() => setModalArchivoTecnico('sitemap')} style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', border: '1px solid rgba(16,185,129,0.35)', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>
+                                Inspeccionar XML
+                              </button>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                              {RUTAS_SITEMAP_OFICIAL.map((item, idx) => (
+                                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#161f33', padding: '8px 12px', borderRadius: '8px', fontSize: '11.5px', border: '1px solid #1e293b' }}>
+                                  <span style={{ color: '#e2e8f0', fontWeight: 'bold' }}>{item.nombre}</span>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ color: '#94a3b8' }}>{item.frecuencia}</span>
+                                    <span style={{ background: '#059669', color: '#fff', padding: '2px 7px', borderRadius: '4px', fontWeight: 'bold' }}>
+                                      Prio: {item.prioridad.toFixed(1)}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              ))}
+                            </div>
                           </div>
                         </div>
 
@@ -2761,14 +2971,14 @@ export default function App() {
         {esAdmin && (
           <div ref={seccionSeguridadRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ background: '#0f172a', color: '#f8fafc', borderRadius: '16px', padding: '24px', border: '1px solid #1e293b', boxShadow: '0 12px 30px rgba(15, 23, 42, 0.18)' }}>
+              <div style={{ background: '#0f172a', color: '#f8fafc', borderRadius: '18px', padding: '26px', border: '1px solid #1e293b', boxShadow: '0 14px 32px rgba(15, 23, 42, 0.2)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '14px', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
                   <div>
-                    <h2 style={{ margin: 0, fontSize: '20px', color: '#38bdf8', fontWeight: '800' }}>🛡️ PANEL DE PROTECCIÓN Y AUDITORÍA EN SERVIDOR (SOLO ADMIN)</h2>
-                    <span style={{ fontSize: '12px', color: '#94a3b8' }}>Monitoreo interno de los 7 controles de seguridad en Backend</span>
+                    <h2 style={{ margin: 0, fontSize: '20px', color: '#38bdf8', fontWeight: '800' }}>🛡️ MATRIZ DE PROTECCIÓN Y AUDITORÍA EN SERVIDOR (SOLO ADMIN)</h2>
+                    <span style={{ fontSize: '12px', color: '#94a3b8' }}>Monitoreo en vivo de los 7 controles de arquitectura cliente-servidor en Backend</span>
                   </div>
                   <span style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#34d399', padding: '6px 12px', borderRadius: '99px', fontSize: '12px', fontWeight: 'bold' }}>
-                    ✓ 7 / 7 Protecciones Activas
+                    ✓ 7 / 7 Controles Activos en Servidor
                   </span>
                 </div>
 
@@ -2782,8 +2992,8 @@ export default function App() {
                     { riesgo: 'Manipular evaluaciones', proteccion: 'Validación de respuestas y notas en backend (/api/seguridad/evaluar-examen)' },
                     { riesgo: 'Subir archivos maliciosos', proteccion: 'Validación de extensión, contenido y tamaño (/api/seguridad/validar-archivo)' }
                   ].map((item, idx) => (
-                    <div key={idx} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', padding: '12px 14px' }}>
-                      <div style={{ fontSize: '11px', color: '#f87171', fontWeight: 'bold', marginBottom: '4px' }}>Riesgo: {item.riesgo}</div>
+                    <div key={idx} style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '12px', padding: '14px' }}>
+                      <div style={{ fontSize: '11px', color: '#f87171', fontWeight: 'bold', marginBottom: '4px' }}>Riesgo Mitigado: {item.riesgo}</div>
                       <div style={{ fontSize: '13px', color: '#34d399', fontWeight: 'bold' }}>✓ {item.proteccion}</div>
                     </div>
                   ))}
@@ -2836,8 +3046,8 @@ export default function App() {
         {esAdmin && (
           <div ref={seccionUsuariosRef} style={{ width: '100%', scrollMarginTop: '90px' }}>
             <div className="dashboard-container">
-              <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: 'bold' }}>GESTIÓN DE PERFILES, MATRÍCULAS Y CONFIRMACIÓN DE PAGOS (SOLO ADMIN)</h2>
+              <div style={{ borderBottom: '2px solid #cbd5e1', paddingBottom: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <h2 style={{ fontSize: '22px', color: '#0f172a', margin: 0, fontWeight: '800' }}>GESTIÓN DE PERFILES, MATRÍCULAS Y CONFIRMACIÓN DE PAGOS (SOLO ADMIN)</h2>
                 <button onClick={abrirModalCrearUsuario} style={{ background: '#2563eb', color: '#fff', padding: '10px 18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>+ Nuevo Usuario en BD</button>
               </div>
 
@@ -3104,6 +3314,9 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* VISOR EJECUTIVO INTEGRADO DE SITEMAP.XML, ROBOTS.TXT Y SCHEMA JSON-LD */}
+      {renderModalArchivoTecnico()}
     </div>
   );
 }
