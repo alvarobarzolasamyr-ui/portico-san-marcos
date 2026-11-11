@@ -136,23 +136,25 @@ const USUARIOS_BASE_SISTEMA = [
   { id: 11, usuario: 'dflores', nombres: 'Diego Flores', rol: 'alumno', estado: 'activo' }
 ];
 
-// CATÁLOGO MAESTRO UNIFICADO (10 CURSOS COMPLETOS CON SUS 5 MÓDULOS DE TEMARIO)
+// =========================================================================
+// CATÁLOGO MAESTRO UNIFICADO (CONTENIDO ACADÉMICO DE ALTO NIVEL)
+// =========================================================================
 const CATALOGO_INICIAL = [
   {
     id: 1,
-    titulo: 'Fundamentos de Robótica y Cinemática',
+    titulo: 'Robótica Industrial y Cinemática Aplicada',
     categoria: 'Robótica',
-    descripcion: 'Domina el modelado espacial, matrices de transformación y parámetros Denavit-Hartenberg para brazos robóticos.',
+    descripcion: 'Especialización intensiva en modelado espacial, matrices de transformación homogénea y cinemática diferencial para el diseño y control de manipuladores robóticos industriales.',
     precio: 120.00,
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/fc_cA62Z1kQ',
     temario: [
-      'Módulo 1: Morfología del robot (grados de libertad, articulaciones y actuadores)',
-      'Módulo 2: Álgebra matricial y transformaciones espaciales 3D',
-      'Módulo 3: Cinemática Directa y parámetros Denavit-Hartenberg (D-H)',
-      'Módulo 4: Cinemática Inversa algebraica y geométrica',
-      'Módulo 5: Planificación de trayectorias articulares y cartesianas'
+      'Módulo 1: Morfología robótica, grados de libertad (DOF) y selección de actuadores.',
+      'Módulo 2: Álgebra matricial y transformaciones espaciales 3D (Traslación y Rotación).',
+      'Módulo 3: Cinemática Directa aplicando algoritmos y parámetros Denavit-Hartenberg (D-H).',
+      'Módulo 4: Cinemática Inversa (métodos algebraicos/geométricos) y cálculo del Jacobiano.',
+      'Módulo 5: Planificación de trayectorias articulares y cartesianas e introducción a ROS.'
     ],
     tipo: 'Virtual',
     horario: 'Martes y Jueves - 7:00 PM',
@@ -163,19 +165,19 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 2,
-    titulo: 'Electrónica Aplicada a la Ingeniería',
+    titulo: 'Diseño Electrónico Avanzado e Instrumentación',
     categoria: 'Electrónica',
-    descripcion: 'Análisis de circuitos DC/AC, semiconductores, amplificadores operacionales y etapas de potencia para motores.',
+    descripcion: 'Análisis de estado sólido y diseño integral de circuitos analógicos y digitales, abarcando desde la instrumentación de sensores hasta la electrónica de potencia para motores.',
     precio: 95.00,
     duracion: '4 Semanas (16 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/r9GC50r2Ge8',
     temario: [
-      'Módulo 1: Leyes de Ohm, Kirchhoff y análisis de mallas/nodos DC',
-      'Módulo 2: Componentes pasivos e impedancia en corriente alterna',
-      'Módulo 3: Diodos, transistores BJT y MOSFET en conmutación',
-      'Módulo 4: Amplificadores Operacionales (Op-Amps) y filtrado de sensores',
-      'Módulo 5: Electrónica de potencia, reguladores y drivers Puente H'
+      'Módulo 1: Teoremas de redes (Thevenin/Norton) y análisis transitorio en corriente alterna.',
+      'Módulo 2: Semiconductores: Diodos de propósito específico, BJT y MOSFET en conmutación.',
+      'Módulo 3: Amplificadores Operacionales, instrumentación de precisión y filtros activos.',
+      'Módulo 4: Electrónica de potencia: Tiristores, Triacs, Optoaisladores y drivers Puente H.',
+      'Módulo 5: Diseño y dimensionamiento de fuentes conmutadas (SMPS) y reguladores lineales.'
     ],
     tipo: 'Presencial',
     horario: 'Viernes - 7:00 PM',
@@ -186,19 +188,19 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 3,
-    titulo: 'Arquitectura y Programación de Microcontroladores',
+    titulo: 'Arquitectura de Sistemas Embebidos y RTOS',
     categoria: 'Sistemas Embebidos',
-    descripcion: 'Programación de registros, conversores ADC, señales PWM y protocolos industriales con Arduino Mega y ESP32.',
+    descripcion: 'Desarrollo y programación de firmware de alto rendimiento sobre plataformas microcontroladas (ARM y Tensilica), dominando protocolos de red, conversores e interrupciones.',
     precio: 110.00,
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1553406830-ef2513450d76?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/fJWR7dBuc18',
     temario: [
-      'Módulo 1: Arquitectura interna (CPU, memoria Flash/RAM y registros)',
-      'Módulo 2: Entradas y salidas digitales (GPIO) y control de actuadores',
-      'Módulo 3: Conversión Analógica-Digital (ADC) y control de velocidad PWM',
-      'Módulo 4: Interrupciones externas y Timers por hardware en tiempo real',
-      'Módulo 5: Protocolos de comunicación UART, I2C y SPI'
+      'Módulo 1: Arquitectura interna de MCU, jerarquía de memoria (Flash/RAM) y mapas de registros.',
+      'Módulo 2: Manejo de Entradas/Salidas (GPIO), rebotes por hardware/software y Pull-Up/Down.',
+      'Módulo 3: Interrupciones externas (ISR), Timers de precisión, PWM y conversores ADC/DAC.',
+      'Módulo 4: Implementación de protocolos seriales síncronos y asíncronos (UART, I2C, SPI).',
+      'Módulo 5: Introducción a Sistemas Operativos en Tiempo Real (FreeRTOS) y conectividad IoT.'
     ],
     tipo: 'Virtual',
     horario: 'Sábados - 3:00 PM',
@@ -209,19 +211,19 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 4,
-    titulo: 'Lógica de Programación para Mecatrónica (C++ y Python)',
+    titulo: 'Ingeniería de Software para Mecatrónica (C++ y Python)',
     categoria: 'Programación',
-    descripcion: 'Desarrollo de algoritmos de control de hardware en C++ orientado a objetos y procesamiento matemático en Python.',
+    descripcion: 'Estructuración de algoritmos de control de hardware en C++ orientado a objetos y procesamiento matemático avanzado de señales mediante librerías científicas en Python.',
     precio: 100.00,
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/ZzaPdXTrSb8',
     temario: [
-      'Módulo 1: Algoritmos, diagramas de flujo y estructuras de control',
-      'Módulo 2: C++ Parte 1: Tipos de datos, funciones y manejo de punteros',
-      'Módulo 3: C++ Parte 2: Programación Orientada a Objetos para librerías de sensores',
-      'Módulo 4: Python Parte 1: Sintaxis, colecciones y automatización de scripts',
-      'Módulo 5: Python Parte 2: Matrices con NumPy y cálculo de trayectorias'
+      'Módulo 1: Lógica computacional, diagramas de flujo y eficiencia de algoritmos (Big O).',
+      'Módulo 2: Fundamentos de C++: Manejo dinámico de memoria, punteros y estructuras de datos.',
+      'Módulo 3: Programación Orientada a Objetos (POO) en C++ para creación de librerías de sensores.',
+      'Módulo 4: Python Scripting: Sintaxis automatizada, control de hilos e interfaces gráficas (GUI).',
+      'Módulo 5: Computación científica en Python: Manejo tensorial con NumPy y gráficas con Matplotlib.'
     ],
     tipo: 'Virtual',
     horario: 'Lunes y Miércoles - 8:00 PM',
@@ -232,19 +234,19 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 5,
-    titulo: 'Automatización Industrial y PLCs Multimarca',
+    titulo: 'Controladores Lógicos Programables (PLC) y SCADA',
     categoria: 'Automatización',
-    descripcion: 'Programación industrial en entornos Siemens TIA Portal, Allen-Bradley y Delta bajo la norma IEC 61131-3.',
+    descripcion: 'Programación avanzada de autómatas industriales bajo el estándar internacional IEC 61131-3, integrando plataformas Siemens TIA Portal, Allen-Bradley y redes HMI/SCADA.',
     precio: 150.00,
     duracion: '6 Semanas (24 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/PbAGl_mv5XI',
     temario: [
-      'Módulo 1: Hardware de PLCs: Siemens (S7-1200/1500), Allen-Bradley y Delta',
-      'Módulo 2: Lenguaje Ladder (KOP), temporizadores y contadores en TIA Portal y Studio 5000',
-      'Módulo 3: Diagrama de Bloques de Funciones (FBD) y escalamiento analógico',
-      'Módulo 4: Texto Estructurado (ST/SCL) para algoritmos matemáticos',
-      'Módulo 5: Secuencias industriales paso a paso con Grafcet (SFC)'
+      'Módulo 1: Arquitectura de hardware industrial PLC (Módulos I/O, fuentes y CPUs Siemens S7).',
+      'Módulo 2: Lógica de contactos (Ladder/KOP), enclavamientos, temporizadores y contadores.',
+      'Módulo 3: Procesamiento analógico (FBD), escalamiento de sensores y control PID industrial.',
+      'Módulo 4: Programación en Texto Estructurado (ST/SCL) para algoritmos matemáticos complejos.',
+      'Módulo 5: Sistemas SCADA, diseño de interfaces HMI y comunicación por PROFINET / Modbus TCP.'
     ],
     tipo: 'Virtual',
     horario: 'Martes y Jueves - 8:00 PM',
@@ -255,19 +257,19 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 6,
-    titulo: 'Visión Artificial y Procesamiento de Imágenes',
+    titulo: 'Machine Learning y Visión Artificial Industrial',
     categoria: 'Inteligencia Artificial',
-    descripcion: 'Clasificación de piezas industriales, detección de bordes y seguimiento de objetos en tiempo real con Python y OpenCV.',
+    descripcion: 'Implementación de redes neuronales y procesamiento digital de imágenes aplicados al control de calidad automatizado y al guiado de robots utilizando Python y OpenCV.',
     precio: 140.00,
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/oXlwWbU8l2o',
     temario: [
-      'Módulo 1: Espacios de color (RGB, HSV) y matrices de píxeles',
-      'Módulo 2: Filtrado de ruido y detección de bordes Canny con OpenCV',
-      'Módulo 3: Segmentación y reconocimiento de geometrías en fajas transportadoras',
-      'Módulo 4: Object Tracking y extracción de coordenadas para robots',
-      'Módulo 5: Redes neuronales básicas para control de calidad visual'
+      'Módulo 1: Fundamentos de Visión Computacional, operaciones morfológicas y espacios de color.',
+      'Módulo 2: Filtros de convolución, umbralización adaptativa y detección de bordes (Canny).',
+      'Módulo 3: Segmentación geométrica y extracción de contornos para clasificación de piezas.',
+      'Módulo 4: Seguimiento de objetos en tiempo real (Object Tracking) y calibración de cámaras.',
+      'Módulo 5: Introducción al Deep Learning (CNNs) para inspección de defectos industriales.'
     ],
     tipo: 'Virtual',
     horario: 'Viernes - 6:00 PM',
@@ -278,19 +280,19 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 7,
-    titulo: 'Diseño y Ruteo de Placas Electrónicas (PCBs)',
+    titulo: 'Ingeniería de Hardware y Manufactura PCB',
     categoria: 'Electrónica',
-    descripcion: 'Creación de esquemáticos profesionales, ruteo multicapa, aislamiento óptico y archivos Gerber listos para manufactura.',
+    descripcion: 'Diseño integral de Printed Circuit Boards (PCBs): desde la captura esquemática profesional hasta el ruteo multicapa, gestión de integridad de señal y generación DFM.',
     precio: 115.00,
     duracion: '4 Semanas (16 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/35YuILUlfGs',
     temario: [
-      'Módulo 1: Simbología esquemática y encapsulados SMD vs THT',
-      'Módulo 2: Captura de esquemáticos electrónicos en software EDA (KiCad/Altium)',
-      'Módulo 3: Reglas de ruteo PCB, cálculo de ancho de pistas y planos GND',
-      'Módulo 4: Diseño de etapas de potencia y aislamiento con optoacopladores',
-      'Módulo 5: Exportación de archivos Gerber, BOM y preparación DFM'
+      'Módulo 1: Diseño jerárquico de esquemáticos, gestión de librerías y selección de footprints.',
+      'Módulo 2: Reglas de Diseño (DRC): Cálculo de ancho de pistas, vías y gestión térmica.',
+      'Módulo 3: Ruteo avanzado multicapa, planos de tierra (GND/VCC) y técnicas de ruteo diferencial.',
+      'Módulo 4: Compatibilidad Electromagnética (EMC), shielding y aislamiento galvánico de potencia.',
+      'Módulo 5: Design For Manufacturing (DFM): Exportación de archivos Gerber, NC Drill y BOM.'
     ],
     tipo: 'Presencial',
     horario: 'Miércoles - 4:00 PM',
@@ -301,19 +303,19 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 8,
-    titulo: 'Simulación de Sistemas Neumáticos y Electroneumáticos',
+    titulo: 'Control de Potencia Fluida: Neumática e Hidráulica',
     categoria: 'Automatización',
-    descripcion: 'Diseño de circuitos secuenciales por método cascada, válvulas direccionales y control por relés en FluidSIM.',
+    descripcion: 'Dimensionamiento y diseño de automatismos electroneumáticos y circuitos de fluidos de potencia para aplicaciones industriales, rigurosamente bajo normativas ISO 1219.',
     precio: 105.00,
     duracion: '4 Semanas (16 Horas)',
-    imagen_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80',
+    imagen_url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/2f_ca121kFQ',
     temario: [
-      'Módulo 1: Tratamiento del aire comprimido y unidad de mantenimiento FRL',
-      'Módulo 2: Válvulas distribuidoras (3/2, 5/2, 5/3) y cilindros neumáticos (ISO 1219)',
-      'Módulo 3: Diseño de mandos secuenciales por método Cascada y Paso a Paso',
-      'Módulo 4: Electroneumática con relés, sensores magnéticos y electroválvulas',
-      'Módulo 5: Sistemas de vacío, ventosas y actuadores de giro'
+      'Módulo 1: Dinámica de fluidos, compresión, secado y unidades de mantenimiento (FRL).',
+      'Módulo 2: Simbología normalizada (ISO 1219), válvulas direccionales y actuadores lineales/rotativos.',
+      'Módulo 3: Diseño lógico de circuitos secuenciales (Método de Cascada y Paso a Paso).',
+      'Módulo 4: Integración Electroneumática: Relés, solenoides, sensores magnéticos y presostatos.',
+      'Módulo 5: Dimensionamiento de electrobombas, válvulas proporcionales y tecnología de vacío.'
     ],
     tipo: 'Presencial',
     horario: 'Martes - 4:00 PM',
@@ -324,19 +326,19 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 9,
-    titulo: 'Manufactura Aditiva e Impresión 3D',
+    titulo: 'Manufactura Aditiva y Polímeros de Ingeniería',
     categoria: 'Manufactura',
-    descripcion: 'Configuración avanzada de laminadores, selección de polímeros técnicos (PLA, PETG, ABS, TPU) y diseño de tolerancias.',
+    descripcion: 'Optimización topológica y parametrización avanzada de polímeros de grado técnico para la creación de prototipos mecánicos funcionales, ensamblajes de precisión y herramentales.',
     precio: 90.00,
     duracion: '4 Semanas (16 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/Vx0Z6LplaMU',
     temario: [
-      'Módulo 1: Tecnologías FDM, SLA y cinemática de impresoras 3D',
-      'Módulo 2: Propiedades mecánicas y térmicas de filamentos (PLA, ABS, PETG, TPU)',
-      'Módulo 3: Parámetros de laminado en Cura/PrusaSlicer (Infill, perímetros y soportes)',
-      'Módulo 4: Diseño paramétrico de tolerancias y ajustes para piezas móviles',
-      'Módulo 5: Diagnóstico de fallas (Warping, Stringing) y calibración mecánica'
+      'Módulo 1: Cinemática de impresión FDM/SLA y componentes de extrusión (Hotend, extrusores).',
+      'Módulo 2: Propiedades termomecánicas de filamentos técnicos (PETG, ABS, ASA, TPU, Fibra de Carbono).',
+      'Módulo 3: Técnicas avanzadas de Slicing (Perímetros, infill adaptativo y soportes hidrosolubles).',
+      'Módulo 4: Diseño enfocado a la manufactura aditiva (DfAM): Voladizos, puentes y tolerancias de ensamble.',
+      'Módulo 5: Diagnóstico y resolución de defectos mecánicos (Warping, Ghosting, Extrusión inconsistente).'
     ],
     tipo: 'Presencial',
     horario: 'Jueves - 5:00 PM',
@@ -347,19 +349,19 @@ const CATALOGO_INICIAL = [
   },
   {
     id: 10,
-    titulo: 'Diseño Mecánico y Modelado CAD 3D',
+    titulo: 'Diseño Mecánico Computacional y Análisis FEA',
     categoria: 'Diseño Mecánico',
-    descripcion: 'Modelado paramétrico en Autodesk Inventor, cajas reductoras de engranajes, cálculo AGMA y análisis de esfuerzos FEA.',
+    descripcion: 'Ingeniería de diseño asistido por computadora (CAD 3D), modelado paramétrico complejo y validación de resistencia mecánica de materiales mediante Análisis de Elementos Finitos.',
     precio: 135.00,
     duracion: '5 Semanas (20 Horas)',
     imagen_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80',
     video_demo_url: 'https://www.youtube.com/embed/ddU98eb21wY',
     temario: [
-      'Módulo 1: Lectura de planos industriales, cortes y tolerancias geométricas (GD&T)',
-      'Módulo 2: Modelado paramétrico 3D (extrusión, revolución, barrido y nervios)',
-      'Módulo 3: Ensamblaje de caja reductora de engranajes rectos de 3 ejes',
-      'Módulo 4: Simulación de esfuerzos (FEA) y validación de engranajes bajo norma AGMA',
-      'Módulo 5: Planos de fabricación detallados, lista de materiales (BOM) y exportación STEP'
+      'Módulo 1: Metrología y estándares de dibujo industrial (Tolerancias Geométricas GD&T).',
+      'Módulo 2: Modelado paramétrico avanzado: Operaciones booleanas, superficies y chapa metálica.',
+      'Módulo 3: Diseño y simulación cinemática de mecanismos y transmisiones de potencia (Engranajes).',
+      'Módulo 4: Análisis de Elementos Finitos (FEA): Esfuerzo de Von Mises, fatiga y factor de seguridad.',
+      'Módulo 5: Generación de planimetría automatizada, listas de materiales (BOM) y despieces renderizados.'
     ],
     tipo: 'Virtual',
     horario: 'Lunes - 7:00 PM',
@@ -2769,7 +2771,7 @@ export default function App() {
                         </button>
                       </form>
 
-                      {/* BARRAS DE PROGRESO VISUALES */}
+                      {/* BARRAS DE PROGRESO VISUALES EN LUGAR DE TABLA RECARGADA DE TEXTO */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '310px', overflowY: 'auto', paddingRight: '4px' }}>
                         {keywordsRegistradas.map((kw, i) => {
                           const valorActual = Number(kw.busquedasSitio || 0);
@@ -2884,46 +2886,43 @@ export default function App() {
 
                   {/* MÓDULO C: FICHA VISUAL GOOGLE BUSINESS PROFILE + ÁRBOL DE SITEMAP XML */}
                   {(vistaSeoActiva === 'todo' || vistaSeoActiva === 'local') && (
-                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '16px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', gridColumn: vistaSeoActiva === 'todo' ? '1 / -1' : 'auto' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+                    <div style={{ background: '#161f33', border: '1px solid #334155', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px', gridColumn: vistaSeoActiva === 'todo' ? '1 / -1' : 'auto' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '16px' }}>
                         
                         {/* TARJETA ESTILO GOOGLE MAPS / BUSINESS PROFILE */}
-                        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '12px' }}>
+                        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '12px' }}>
                           <div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
                               <div>
-                                <span style={{ fontSize: '10px', color: '#38bdf8', fontWeight: 'bold', textTransform: 'uppercase' }}>Perfil de Empresa en Google (SEO Local)</span>
-                                <h4 style={{ margin: '2px 0', fontSize: '18px', color: '#fff', fontWeight: '800' }}>{GBP_DATOS_REALES.nombre}</h4>
+                                <span style={{ fontSize: '10px', color: '#38bdf8', fontWeight: 'bold', textTransform: 'uppercase' }}>Ficha Oficial Google Business Profile</span>
+                                <h4 style={{ margin: '2px 0', fontSize: '17px', color: '#fff', fontWeight: '800' }}>{GBP_DATOS_REALES.nombre}</h4>
                                 <span style={{ fontSize: '12px', color: '#fbbf24' }}>★★★★★ 5.0 • {GBP_DATOS_REALES.categoria}</span>
                               </div>
-                              <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '4px 10px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold' }}>
+                              <span style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>
                                 24 Horas
                               </span>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', fontSize: '12.5px', color: '#cbd5e1', marginTop: '12px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', color: '#cbd5e1', marginTop: '10px' }}>
                               <div>📍 <strong>Dirección:</strong> {GBP_DATOS_REALES.direccion}</div>
-                              <div>📞 <strong>Teléfono Oficial:</strong> {GBP_DATOS_REALES.telefono}</div>
-                              <div>🌐 <strong>Dominio Vinculado:</strong> {GBP_DATOS_REALES.sitioWeb}</div>
-                              <div style={{ color: '#fbbf24', fontSize: '11.5px', fontWeight: 'bold', marginTop: '4px' }}>
-                                ℹ️ Estado en Google: {GBP_DATOS_REALES.estadoVerificacion}
-                              </div>
+                              <div>📞 <strong>Teléfono:</strong> {GBP_DATOS_REALES.telefono}</div>
+                              <div>🌐 <strong>Web:</strong> {GBP_DATOS_REALES.sitioWeb}</div>
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingTop: '12px', borderTop: '1px solid #1e293b' }}>
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid #1e293b' }}>
                             <a
                               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(GBP_DATOS_REALES.direccion)}`}
                               target="_blank"
                               rel="noreferrer"
-                              style={{ flex: 1, textAlign: 'center', background: '#2563eb', color: '#fff', padding: '9px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}
+                              style={{ flex: 1, textAlign: 'center', background: '#2563eb', color: '#fff', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}
                             >
-                              📍 Ver en Google Maps ↗
+                              📍 Abrir en Google Maps ↗
                             </a>
                             <button
                               type="button"
                               onClick={() => setModalArchivoTecnico('schema')}
-                              style={{ flex: 1, background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '9px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
+                              style={{ flex: 1, background: '#1e293b', color: '#38bdf8', border: '1px solid #334155', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
                             >
                               🏢 Ver Código Schema JSON-LD
                             </button>
@@ -2931,27 +2930,23 @@ export default function App() {
                         </div>
 
                         {/* ÁRBOL INTERACTIVO DE URLS DEL SITEMAP XML */}
-                        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                          <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                              <strong style={{ fontSize: '13.5px', color: '#34d399' }}>🗺️ Estructura de Indexación (/sitemap.xml)</strong>
-                              <button type="button" onClick={() => setModalArchivoTecnico('sitemap')} style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', border: '1px solid rgba(16,185,129,0.35)', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>
-                                Inspeccionar XML
-                              </button>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-                              {RUTAS_SITEMAP_OFICIAL.map((item, idx) => (
-                                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#161f33', padding: '8px 12px', borderRadius: '8px', fontSize: '11.5px', border: '1px solid #1e293b' }}>
-                                  <span style={{ color: '#e2e8f0', fontWeight: 'bold' }}>{item.nombre}</span>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <span style={{ color: '#94a3b8' }}>{item.frecuencia}</span>
-                                    <span style={{ background: '#059669', color: '#fff', padding: '2px 7px', borderRadius: '4px', fontWeight: 'bold' }}>
-                                      Prio: {item.prioridad.toFixed(1)}
-                                    </span>
-                                  </div>
+                        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '16px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                            <strong style={{ fontSize: '13px', color: '#34d399' }}>🗺️ URLs Registradas en /sitemap.xml (Search Console)</strong>
+                            <span style={{ fontSize: '11px', color: '#94a3b8' }}>6 Rutas Activas</span>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                            {RUTAS_SITEMAP_OFICIAL.map((item, idx) => (
+                              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#161f33', padding: '7px 10px', borderRadius: '8px', fontSize: '11px' }}>
+                                <span style={{ color: '#e2e8f0', fontWeight: 'bold' }}>{item.nombre}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <span style={{ color: '#94a3b8' }}>{item.frecuencia}</span>
+                                  <span style={{ background: '#059669', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
+                                    Prio: {item.prioridad.toFixed(1)}
+                                  </span>
                                 </div>
-                              ))}
-                            </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
 
