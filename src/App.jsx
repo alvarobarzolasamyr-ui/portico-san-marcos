@@ -1454,11 +1454,49 @@ export default function App() {
   const [laboratorioSeleccionado, setLaboratorioSeleccionado] = useState(null);
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
 
+  // 3 EJEMPLOS DE LIBROS SEGÚN LOS SÍLABOS DEL ÁREA
+  const ejemplosLibrosSilabo = [
+    {
+      id: 5,
+      titulo: 'Fundamentos de Robótica y Automatización',
+      modulo: 'Sistemas de Control y PLC',
+      autor: 'Ing. Fabrizio Barzola',
+      categoria: 'mecatronica',
+      descripcion: 'Libro base del sílabo para el modelado cinemático Denavit-Hartenberg, diseño de sistemas neumáticos, control de actuadores y programación lógica.',
+      portada: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop',
+      archivoPdf: '/guia_esp32.pdf',
+      pdfUrl: '/guia_esp32.pdf'
+    },
+    {
+      id: 6,
+      titulo: 'Diseño Mecatrónico en CAD y Análisis FEA',
+      modulo: 'Modelado 3D y Ensamblajes',
+      autor: 'Ing. Luis Alvarado',
+      categoria: 'ingenieria',
+      descripcion: 'Guía técnica alineada al sílabo de diseño de transmisiones, cajas reductoras, tolerancias geométricas (GD&T) y cálculo de esfuerzos de Von Mises.',
+      portada: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=600&auto=format&fit=crop',
+      archivoPdf: '/neumatica_iso1219.pdf',
+      pdfUrl: '/neumatica_iso1219.pdf'
+    },
+    {
+      id: 7,
+      titulo: 'Programación Aplicada a la Ingeniería',
+      modulo: 'Python y C++ Orientado a Objetos',
+      autor: 'Dra. María Fernández',
+      categoria: 'programacion',
+      descripcion: 'Texto del sílabo para procesamiento de señales, vectorización de datos con NumPy y algoritmos de control en C++ para microcontroladores.',
+      portada: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop',
+      archivoPdf: '/manual_plc.pdf',
+      pdfUrl: '/manual_plc.pdf'
+    }
+  ];
+
   const listaLibros = [
     { id: 1, titulo: 'Manual de Automatización e Industria 4.0 con TIA Portal', autor: 'Ing. Carlos Mendoza', categoria: 'ingenieria', portada: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600&auto=format&fit=crop', pdfUrl: '/manual_plc.pdf' },
     { id: 2, titulo: 'Arquitectura Limpia y Microservicios con Node.js', autor: 'Dr. Roberto Gómez', categoria: 'programacion', portada: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop', pdfUrl: '/node_microservicios.pdf' },
     { id: 3, titulo: 'Guía Práctica de Robótica e IoT con ESP32', autor: 'Ing. Fabrizio Barzola', categoria: 'mecatronica', portada: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=600&auto=format&fit=crop', pdfUrl: '/guia_esp32.pdf' },
-    { id: 4, titulo: 'Fundamentos de Neumática e Hidráulica ISO 1219', autor: 'Ing. Luis Alvarado', categoria: 'mecatronica', portada: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=600&auto=format&fit=crop', pdfUrl: '/neumatica_iso1219.pdf' }
+    { id: 4, titulo: 'Fundamentos de Neumática e Hidráulica ISO 1219', autor: 'Ing. Luis Alvarado', categoria: 'mecatronica', portada: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=600&auto=format&fit=crop', pdfUrl: '/neumatica_iso1219.pdf' },
+    ...ejemplosLibrosSilabo
   ];
 
   const docentesDestacados = [
@@ -1624,6 +1662,59 @@ export default function App() {
           ))}
         </main>
 
+        {/* --- INICIO SECCIÓN LIBROS DE EJEMPLO SEGÚN SÍLABO (AÑADIDO SIN BORRAR LO ANTERIOR) --- */}
+        <section style={{ maxWidth: '1260px', width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '32px 16px 60px', borderTop: '1px solid rgba(56, 189, 248, 0.2)' }}>
+          <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+            <span style={{ display: 'inline-block', background: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', color: '#38bdf8', padding: '4px 12px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px' }}>
+              BIBLIOTECA DIGITAL INTERACTIVA • VISOR FLIPBOOK 3D
+            </span>
+            <h2 style={{ fontSize: 'clamp(22px, 3vw, 30px)', color: '#fff', margin: '0 0 8px 0', fontWeight: '800' }}>
+              Recursos y Libros del Sílabo
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>
+              Material bibliográfico de consulta directa propuesto en los sílabos de nuestra área de Ingeniería Mecatrónica.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(295px, 1fr))', gap: '24px' }}>
+            {ejemplosLibrosSilabo.map((libro) => (
+              <div
+                key={libro.id}
+                style={{ background: 'linear-gradient(180deg, #1e293b 0%, #111827 100%)', border: '1px solid #334155', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 14px 30px rgba(0,0,0,0.35)' }}
+              >
+                <div style={{ position: 'relative', height: '215px', overflow: 'hidden', background: '#0f172a' }}>
+                  <img
+                    src={libro.portada}
+                    alt={`Portada de ${libro.titulo}`}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  <span style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(15,23,42,0.92)', color: '#38bdf8', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', border: '1px solid rgba(56,189,248,0.3)' }}>
+                    {libro.modulo}
+                  </span>
+                </div>
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                  <h3 style={{ margin: '0 0 6px 0', color: '#fff', fontSize: '17px', lineHeight: '1.35' }}>
+                    {libro.titulo}
+                  </h3>
+                  <span style={{ fontSize: '12px', color: '#38bdf8', fontWeight: 'bold', marginBottom: '10px' }}>
+                    Autor: {libro.autor}
+                  </span>
+                  <p style={{ color: '#94a3b8', fontSize: '13px', flex: 1, lineHeight: '1.55', margin: '0 0 16px 0' }}>
+                    {libro.descripcion}
+                  </p>
+                  <button
+                    onClick={() => abrirLibroConEnlaceTemporal(libro)}
+                    style={{ width: '100%', background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: '#fff', border: 'none', padding: '11px 16px', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)' }}
+                  >
+                    📖 Abrir Libro en Flipbook 3D
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+        {/* --- FIN SECCIÓN LIBROS DE EJEMPLO SEGÚN SÍLABO --- */}
+
         {/* PIE DE PÁGINA PÚBLICO CON VISOR INTEGRADO DE SITEMAP Y ROBOTS */}
         <footer style={{ background: '#091326', borderTop: '1px solid #1e293b', padding: '36px 20px', color: '#94a3b8', fontSize: '13px' }}>
           <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '24px' }}>
@@ -1762,6 +1853,7 @@ export default function App() {
             </div>
           </div>
         )}
+        {libroSeleccionado && <PdfFlipbook pdfUrl={libroSeleccionado} alCerrar={() => setLibroSeleccionado(null)} />}
         {renderModalPrivacidad()}
         {renderModalArchivoTecnico()}
       </div>
@@ -2324,7 +2416,7 @@ export default function App() {
                 <div key={libro.id} style={{ background: '#fff', borderRadius: '14px', border: '1px solid #cbd5e1', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 6px 16px rgba(15, 23, 42, 0.05)' }}>
                   <img src={libro.portada} alt={libro.titulo} style={{ width: '100%', height: '210px', objectFit: 'cover' }} />
                   <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '6px' }}>{libro.categoria}</span>
+                    <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '6px' }}>{libro.modulo || libro.categoria}</span>
                     <h3 style={{ fontSize: '15px', color: '#0f172a', margin: '0 0 8px 0', fontWeight: 'bold' }}>{libro.titulo}</h3>
                     <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 15px 0' }}>Autor: {libro.autor}</p>
                     <button onClick={() => abrirLibroConEnlaceTemporal(libro)} style={{ marginTop: 'auto', padding: '10px 16px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>
